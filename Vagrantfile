@@ -31,7 +31,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # master node
   config.vm.define "master" do |master|
     master.vm.box = BOX_IMAGE
-#   master.vm.box_version = BOX_VERSION
+    # master.vm.box_version = BOX_VERSION
     master.vm.network :private_network, ip:"192.168.100.100"
     master.vm.network :forwarded_port, guest: 22, host: 22100, id: 'ssh'
     master.vm.hostname = 'master.local'
@@ -43,7 +43,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # slave node
   config.vm.define "node01", autostart:false do |node|
     node.vm.box = BOX_IMAGE
-#   node.vm.box_version = BOX_VERSION
+    # node.vm.box_version = BOX_VERSION
     node.vm.network :private_network, ip:"192.168.100.101"
     node.vm.network :forwarded_port, guest: 22, host: 22101, id: 'ssh'
     node.vm.hostname = 'node01.local'
@@ -54,7 +54,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # slave node
   config.vm.define "node02", autostart:false do |node|
     node.vm.box = BOX_IMAGE
-#   node.vm.box_version = BOX_VERSION
+    # node.vm.box_version = BOX_VERSION
     node.vm.network :private_network, ip:"192.168.100.102"
     node.vm.network :forwarded_port, guest: 22, host: 22102, id: 'ssh'
     node.vm.hostname = 'node02.local'
