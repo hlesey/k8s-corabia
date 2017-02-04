@@ -36,6 +36,10 @@ cp /etc/kubernetes/admin.conf /src/output/kubeconfig.yaml
 echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /root/.bashrc
 echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /home/vagrant/.bashrc
 
+# Enabling shell autocompletion
+echo "source <(kubectl completion bash)" >> ~/.bashrc
+echo "source <(kubectl completion bash)" >> ~/home/vagrant/.bashrc
+
 # configure shortcuts
 echo "alias kns='/src/scripts/kns.sh'" >> /root/.bashrc
 echo "alias kns='/src/scripts/kns.sh'" >> /home/vagrant/.bashrc
