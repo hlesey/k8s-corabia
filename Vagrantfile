@@ -15,7 +15,7 @@ end
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provider :virtualbox do |vb|
-    vb.customize ["modifyvm", :id, "--memory", "4096", "--cpus", "4", "--ioapic", "on"]
+    vb.customize ["modifyvm", :id, "--memory", "2048", "--cpus", "2", "--ioapic", "on"]
   end
 
   config.vm.synced_folder "../", "/repo", id: "repo",
@@ -38,6 +38,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     master.vm.provision "shell", path: "src/scripts/common.sh"
     master.vm.provision "shell", path: "src/scripts/nfs.sh"
     master.vm.provision "shell", path: "src/scripts/master.sh"
+    master.vm.provider "virtualbox" do |v|
+        v.memory = 3072
+        v.cpus = 4
+      end
   end
 
   # slave node
