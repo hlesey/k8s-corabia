@@ -12,3 +12,4 @@ move /Y %hostspath%.bk  %hostspath%
 
 SET NEWLINE=^& echo.
 echo %NEWLINE%^192.168.100.100 master.local phippy.local k8s.local myapp.local cluster.local nfsstorage.local >> %hostspath%
+echo %NEWLINE%^192.168.100.101 traefik.local >> %hostspath%
