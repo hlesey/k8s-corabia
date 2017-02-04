@@ -1,0 +1,9 @@
+.project
+*/.project
+/*.iml
+.idea/
+*.DS_Store
+.vagrant/*
+scripts/cluster_admin_token.txt
+scripts/.kubeadmin_init
+
