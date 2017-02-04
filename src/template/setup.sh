@@ -105,3 +105,7 @@ ip_vs_rr
 ip_vs
 nf_conntrack_ipv4
 EOF
+
+#################### KUBEADM PREREQUISITES ##########################
+
+kubeadm config images pull
