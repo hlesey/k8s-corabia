@@ -5,5 +5,6 @@
 *.DS_Store
 .vagrant/*
 scripts/cluster_admin_token.txt
+scripts/kubeconfig.yaml
 scripts/.kubeadmin_init
 
