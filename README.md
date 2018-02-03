@@ -14,6 +14,13 @@ vagrant up node02
 export KUBECONFIG=$(pwd)/src/output/kubeconfig.yaml
 kubectl cluster-info
 ```
+or login into the master node:
+```
+vagrant ssh master
+kubectl cluster-info
+kns <my-fancy-namespace> # change the default namespace in kubeconfig
+kubectl get <my-fancy-object>
+```
 
 ### Manage cluster with kube-dashboard
 ```
@@ -25,7 +32,7 @@ Use token generated in src/output/cluster_admin_token.txt
 
 If you want to run only the master node and be able to schedule Pods on it, remove the taint from the master:
 ```
- `kubectl taint nodes master node-role.kubernetes.io/master-`
+kubectl taint nodes master node-role.kubernetes.io/master-`
 ```
 
 
