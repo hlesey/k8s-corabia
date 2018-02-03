@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source ./src/scripts/vars
+source /src/scripts/vars
 
 # init the control plane components
 kubeadm init --apiserver-advertise-address=192.168.100.100 --pod-network-cidr=10.244.0.0/16 > /src/output/.kubeadmin_init
@@ -43,7 +43,7 @@ kubectl apply -f  /src/manifests/ingress/${INGRESS_CONTROLLER}
 kubectl apply -f /src/manifests/metrics-server/
 
 # deploy debug container
-kubectl apply -f /src/manifests/debug-container/deployment.yaml
+kubectl apply -f /src/manifests/debug-container/statefulset.yaml
 
 # fix coredns
 kubectl apply -f /src/manifests/coredns/coredns-cm.yaml

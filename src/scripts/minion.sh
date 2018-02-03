@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source ./src/scripts/vars
+source /src/scripts/vars
 cluster_join=""
 
 while [ "$cluster_join" == "" ] ; do
