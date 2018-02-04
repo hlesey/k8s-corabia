@@ -2,7 +2,7 @@
 
 ## Usage
 
-### Bring cluster up
+### Bring the cluster up
 ```
 vagrant up master
 vagrant up node01
@@ -20,5 +20,14 @@ kubectl cluster-info
 Browse to https://192.168.100.100:31001
 Use token generated in src/output/cluster_admin_token.txt
 ```
+
+### Running one node cluster
+
+If you want to run only the master node and be able to schedule Pods on it, remove the taint from the master:
+```
+ `kubectl taint nodes master node-role.kubernetes.io/master-`
+```
+
+
 
 Enjoi;
