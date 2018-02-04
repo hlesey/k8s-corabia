@@ -3,6 +3,7 @@
 
 VAGRANTFILE_API_VERSION = "2"
 BOX_IMAGE="ubuntu/bionic64"
+BOX_VERSION = "20190508.0.0"
 
 required_plugins = %w(vagrant-vbguest vagrant-share)
 
@@ -24,6 +25,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # template image
   config.vm.define "template" do |template|
     template.vm.box = BOX_IMAGE
+    config.vm.box_version = BOX_VERSION
     template.vm.network :private_network, ip:"192.168.100.201"
     template.vm.network :forwarded_port, guest: 22, host: 22201, id: 'ssh'
     template.vm.hostname = 'template.local'
