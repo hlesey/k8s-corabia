@@ -3,7 +3,7 @@
 source /src/scripts/vars
 
 # init the control plane components
-kubeadm init --apiserver-advertise-address=192.168.100.100 --pod-network-cidr=10.244.0.0/16 > /src/output/.kubeadmin_init
+kubeadm init --apiserver-advertise-address=$MASTER_IP --pod-network-cidr=10.244.0.0/16 > /src/output/.kubeadmin_init
 
 export KUBECONFIG=/etc/kubernetes/admin.conf
 

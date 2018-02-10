@@ -3,9 +3,9 @@
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
-BOX_IMAGE="qedzone/k8s-base"
-BOX_VERSION="1.14.1"
-
+BOX_IMAGE="hlesey/k8s-base"
+#BOX_VERSION="1.14.1"
+BOX_VERSION="0"
 required_plugins = %w(vagrant-vbguest vagrant-share)
 
 required_plugins.each do |plugin|
@@ -23,7 +23,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.define hostname do |cfg|
       cfg.vm.provider :virtualbox do |vb, override|
         config.vm.box = BOX_IMAGE
-        # config.vm.box_version = BOX_VERSION
+        config.vm.box_version = BOX_VERSION
         override.vm.network :private_network, ip: "#{info[:ip]}"
         override.vm.hostname = hostname + ".local"
 
