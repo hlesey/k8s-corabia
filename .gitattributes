@@ -1,0 +1,7 @@
+*           text=auto
+*.txt		text
+*.vcproj	text eol=crlf
+*.sh		text eol=lf
+*.yaml		text eol=lf
+*.json		text eol=lf
+*.jpg		-text
