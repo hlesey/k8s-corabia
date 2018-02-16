@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard-nodeport
+  namespace: kube-system
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 8443
+    targetPort: 8443
+    nodePort: 31001
+    protocol: TCP
+  selector:
+    k8s-app: kubernetes-dashboard
