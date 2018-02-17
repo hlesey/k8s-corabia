@@ -12,10 +12,10 @@ required_plugins.each do |plugin|
   system "vagrant plugin install #{plugin}" unless Vagrant.has_plugin? plugin
 end
 
-cluster = {
-  "master" => { :ip => "192.168.100.100", :cpus => 4, :mem => 2048 },
-  "node01" => { :ip => "192.168.100.101", :cpus => 2, :mem => 1280 },
-  "node02" => { :ip => "192.168.100.102", :cpus => 2, :mem => 1280 },
+cluster = {                                                  
+  "master" => { :ip => "192.168.100.100", :cpus => 4, :mem => 2560 },
+  "node01" => { :ip => "192.168.100.101", :cpus => 2, :mem => 1024 },
+  "node02" => { :ip => "192.168.100.102", :cpus => 2, :mem => 1024 },
 }
  
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -47,11 +47,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         mount_option: ["dmode=777,fmode=777"]
 
         vb.name = hostname
-        vb.customize ["modifyvm", :id, "--memory", info[:mem], 
-                      "--cpus", info[:cpus], "--hwvirtex", "on", 
-                      "--ioapic", "on", "--uartmode1", "disconnected"]
+        vb.customize [
+          "modifyvm", :id, 
+          "--memory", info[:mem], 
+          "--cpus", info[:cpus], 
+          "--hwvirtex", "on", 
+          "--uartmode1", "disconnected",
+          "--nested-hw-virt", "on",
+          "--ioapic", "on"
+        ]
       end # end provider
     end # end config
-
   end # end cluster
 end
