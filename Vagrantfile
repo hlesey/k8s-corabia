@@ -3,7 +3,7 @@
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
-BOX_IMAGE="adriananeci/centos7"
+BOX_IMAGE="centos/7"
 
 
 required_plugins = %w(vagrant-vbguest vagrant-share)
