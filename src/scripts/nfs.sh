@@ -8,6 +8,9 @@ for i in {0..10}; do
 done
 chmod 777 /nfs
 
+mkdir /nfs/pv-prom
+chmod 777 /nfs/pv-prom
+
 # (rw,sync,no_root_squash,subtree_check)
 cat <<EOF > /etc/exports
 /nfs *(rw,sync,no_root_squash,subtree_check)
