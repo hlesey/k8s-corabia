@@ -176,7 +176,7 @@ spec:
     metadata:
       annotations:
         prometheus.io/port: "9090"
-        prometheus.io/scrape: "true"
+        prometheus.io/scrape: "false"
         # This annotation plus the CriticalAddonsOnly toleration makes
         # cilium to be a critical pod in the cluster, which ensures cilium
         # gets priority scheduling.
