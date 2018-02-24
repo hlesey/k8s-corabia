@@ -30,7 +30,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     template.vm.network :forwarded_port, guest: 22, host: 22201, id: 'ssh'
     template.vm.hostname = 'template.local'
     template.vm.provision "shell", path: "setup.sh"
-    template.vm.provision "shell", path: "images.sh"
   end
 end
 
