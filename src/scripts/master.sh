@@ -27,6 +27,11 @@ else
     kubectl apply -f /src/manifests/network/${NETWORK_PLUGIN}
 fi
 
+# workaround for 140615704306112:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/root/.rnd
+touch /root/.rnd && chmod 600 /root/.rnd
+touch /home/vagrant/.rnd && chmod 600 /home/vagrant/.rnd
+
+
 # deploy dashboard
 mkdir /home/vagrant/certs
 openssl genrsa -out /home/vagrant/certs/dashboard.key 2048
@@ -43,10 +48,6 @@ kubectl apply -f /src/manifests/metrics-server/
 
 # scale coredns to 1 replica
 kubectl -n kube-system scale deployment coredns --replicas=1
-
-# workaround for 140615704306112:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/root/.rnd
-touch /root/.rnd
-touch /home/vagrant/.rnd
 
 # get admin token
 kubectl describe secret $(kubectl get secrets | grep cluster | cut -d ' ' -f1) | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /src/output/cluster_admin_token.txt
