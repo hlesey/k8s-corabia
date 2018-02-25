@@ -13,9 +13,9 @@ required_plugins.each do |plugin|
 end
 
 cluster = {                                                  
-  "master" => { :ip => "192.168.100.100", :cpus => 4, :mem => 3072 },
-  "node01" => { :ip => "192.168.100.101", :cpus => 2, :mem => 2048 },
-  "node02" => { :ip => "192.168.100.102", :cpus => 2, :mem => 2048 },
+  "master" => { :ip => "192.168.100.100", :cpus => 2, :mem => 2048 },
+  "node01" => { :ip => "192.168.100.101", :cpus => 2, :mem => 1280 },
+  "node02" => { :ip => "192.168.100.102", :cpus => 2, :mem => 1280 },
 }
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
