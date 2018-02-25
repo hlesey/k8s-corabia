@@ -29,7 +29,7 @@ fi
 
 # workaround for 140615704306112:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/root/.rnd
 touch /root/.rnd && chmod 600 /root/.rnd
-touch /home/vagrant/.rnd && chmod 600 /home/vagrant/.rnd
+touch /home/vagrant/.rnd && chmod 600 /home/vagrant/.rnd && chown vagrant:vagrant /home/vagrant/.rnd
 
 
 # deploy dashboard
