@@ -27,6 +27,7 @@ kubectl apply -f /scripts/metrics-server/
 
 # get admin token
 kubectl describe secret $(kubectl get secrets | grep cluster | cut -d ' ' -f1) | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /scripts/cluster_admin_token.txt
+cp /etc/kubernetes/admin.conf /scripts/kubeconfig.yaml
 
 # configure vagrant and root user with kubeconfig
 echo "export KUBECONFIG=/etc/kubernetes/admin.conf"  >> /root/.bashrc
