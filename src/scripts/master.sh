@@ -40,8 +40,8 @@ setfacl -m u:vagrant:rx /etc/kubernetes/admin.conf
 echo "export KUBECONFIG=/etc/kubernetes/admin.conf"  >> /home/vagrant/.bashrc
 
 # configure shortcuts
-echo "alias set_default_namespace='/src/scripts/set_default_namespace.sh'" >> /root/.bashrc
-echo "alias set_default_namespace='/src/scripts/set_default_namespace.sh'" >> /home/vagrant/.bashrc
+echo "alias kns='/src/scripts/kns.sh'" >> /root/.bashrc
+echo "alias kns='/src/scripts/kns.sh'" >> /home/vagrant/.bashrc
 
 ln -s /src/output/cluster_admin_token.txt /root/cluster_admin_token.txt
 echo "-------------------------------------------------------------"
