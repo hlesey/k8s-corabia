@@ -1,0 +1,34 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+BOX_IMAGE="centos/7"
+
+required_plugins = %w(vagrant-vbguest vagrant-share)
+
+required_plugins.each do |plugin|
+  system "vagrant plugin install #{plugin}" unless Vagrant.has_plugin? plugin
+end
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "4096", "--cpus", "4", "--ioapic", "on"]
+  end
+
+  config.vm.synced_folder "../", "/src", id: "src",
+    owner: "vagrant",
+    group: "vagrant",
+    mount_option: ["dmode=777,fmode=777"]
+
+  # template image
+  config.vm.define "template" do |template|
+    template.vm.box = BOX_IMAGE
+    template.vm.network :private_network, ip:"192.168.100.100"
+    template.vm.network :forwarded_port, guest: 22, host: 22100, id: 'ssh'
+    template.vm.hostname = 'master.local'
+    template.vm.provision "shell", path: "setup.sh"
+  end
+end
+

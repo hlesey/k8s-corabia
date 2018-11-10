@@ -5,8 +5,10 @@ cluster_join=""
 while [ "$cluster_join" == "" ] ; do
     echo "waiting for the master node";
     sleep 1;
-    cluster_join="$(cat /scripts/.kubeadmin_init  | grep 'kubeadm join')"
+    cluster_join="$(cat /src/output/.kubeadmin_init  | grep 'kubeadm join')"
 done
 
 export PATH=$PATH:/root/go/bin/
-$cluster_join --ignore-preflight-errors=cri
+$cluster_join 
+
+#--ignore-preflight-errors=cri

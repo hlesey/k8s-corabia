@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -12,4 +13,4 @@ spec:
     spec:
       containers:
       - name: debug-container
-        image: trainersontheweb/debug-container
+        image: qedzone/debug_container
