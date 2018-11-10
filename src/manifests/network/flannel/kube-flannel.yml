@@ -123,6 +123,8 @@ spec:
         args:
         - --ip-masq
         - --kube-subnet-mgr
+        # https://github.com/coreos/flannel/blob/master/Documentation/troubleshooting.md
+        - --iface=eth1
         resources:
           requests:
             cpu: "100m"
