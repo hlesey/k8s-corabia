@@ -4,7 +4,7 @@
 .idea/
 *.DS_Store
 .vagrant/*
-scripts/cluster_admin_token.txt
-scripts/kubeconfig.yaml
-scripts/.kubeadmin_init
+src/template/.vagrant/*
+src/template/output/*
+src/output/*
 
