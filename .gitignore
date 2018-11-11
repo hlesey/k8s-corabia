@@ -5,6 +5,8 @@
 *.DS_Store
 .vagrant/*
 src/template/.vagrant/*
-src/template/output/*
-src/output/*
+src/template/output/*.box
+src/output/.kubeadmin_init
+src/output/*.txt
+src/output/*.yaml
 
