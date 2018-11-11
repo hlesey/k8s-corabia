@@ -21,7 +21,6 @@ kubectl apply -f /src/manifests/dashboard/
 kubectl apply -f /src/manifests/rbac/rbac.yaml
 
 # deploy ingress controller
-kubectl apply -f /src/manifests/ingress/${INGRESS_CONTROLLER}/namespace.yaml
 kubectl apply -f  /src/manifests/ingress/${INGRESS_CONTROLLER}
 
 # deploy metrics-server
@@ -35,9 +34,8 @@ kubectl describe secret $(kubectl get secrets | grep cluster | cut -d ' ' -f1) |
 cp /etc/kubernetes/admin.conf /src/output/kubeconfig.yaml
 
 # configure vagrant and root user with kubeconfig
-echo "export KUBECONFIG=/etc/kubernetes/admin.conf"  >> /root/.bashrc
-setfacl -m u:vagrant:rx /etc/kubernetes/admin.conf
-echo "export KUBECONFIG=/etc/kubernetes/admin.conf"  >> /home/vagrant/.bashrc
+echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /root/.bashrc
+echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /home/vagrant/.bashrc
 
 # configure shortcuts
 echo "alias kns='/src/scripts/kns.sh'" >> /root/.bashrc
