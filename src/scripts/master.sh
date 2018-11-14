@@ -4,7 +4,6 @@ NETWORK_PLUGIN="flannel"
 INGRESS_CONTROLLER="nginx"
 export PATH=$PATH:/root/go/bin/
 
-kubeadm config images pull
 kubeadm init --apiserver-advertise-address=192.168.100.100 --pod-network-cidr=10.244.0.0/16 > /src/output/.kubeadmin_init
 
 export KUBECONFIG=/etc/kubernetes/admin.conf
