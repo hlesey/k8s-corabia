@@ -1,10 +1,14 @@
 ---
 apiVersion: apps/v1beta1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: debug-container
+  name: debug
   namespace: default
 spec:
+  selector:
+    matchLabels:
+      app: debug 
+  serviceName: "debug"
   replicas: 1
   template:
     metadata:
@@ -13,4 +17,4 @@ spec:
     spec:
       containers:
       - name: debug-container
-        image: qedzone/debug_container
+        image: qedzone/debug-container

@@ -3,6 +3,7 @@
 /*.iml
 .idea/
 *.DS_Store
+.vscode
 .vagrant/*
 src/template/.vagrant/*
 src/template/output/*.box
