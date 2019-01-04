@@ -12,58 +12,44 @@ required_plugins.each do |plugin|
   system "vagrant plugin install #{plugin}" unless Vagrant.has_plugin? plugin
 end
 
+cluster = {
+  "master" => { :ip => "192.168.100.100", :cpus => 4, :mem => 3072 },
+  "node01" => { :ip => "192.168.100.101", :cpus => 2, :mem => 1536 },
+  "node02" => { :ip => "192.168.100.102", :cpus => 2, :mem => 1536 },
+}
+ 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  cluster.each_with_index do |(hostname, info), index|
+    config.vm.define hostname do |cfg|
+      cfg.vm.provider :virtualbox do |vb, override|
+        config.vm.box = BOX_IMAGE
+         # config.vm.box_version = BOX_VERSION
+        override.vm.network :private_network, ip: "#{info[:ip]}"
+        override.vm.hostname = hostname + ".local"
 
-  config.vm.provider :virtualbox do |vb|
-    vb.customize ["modifyvm", :id, "--memory", "4096", "--cpus", "4", "--ioapic", "on"]
-  end
+        if hostname.include? "master" 
+          override.vm.provision "shell", path: "src/scripts/common.sh"
+          override.vm.provision "shell", path: "src/scripts/nfs.sh"
+          override.vm.provision "shell", path: "src/scripts/master.sh"
+        else
+          override.vm.provision "shell", path: "src/scripts/common.sh"
+          override.vm.provision "shell", path: "src/scripts/minion.sh"
+        end
+        
+        override.vm.synced_folder "../", "/repo", id: "repo",
+        owner: "vagrant",
+        group: "vagrant",
+        mount_option: ["dmode=777,fmode=777"]
+       
+        override.vm.synced_folder "src", "/src", id: "scripts",
+        owner: "vagrant",
+        group: "vagrant",
+        mount_option: ["dmode=777,fmode=777"]
 
-  config.vm.synced_folder "../", "/repo", id: "repo",
-    owner: "vagrant",
-    group: "vagrant",
-    mount_option: ["dmode=777,fmode=777"]
+        vb.name = hostname
+        vb.customize ["modifyvm", :id, "--memory", info[:mem], "--cpus", info[:cpus], "--hwvirtex", "on"]
+      end # end provider
+    end # end config
 
-  config.vm.synced_folder "src", "/src", id: "scripts",
-    owner: "vagrant",
-    group: "vagrant",
-    mount_option: ["dmode=777,fmode=777"]
-
-  # master node
-  config.vm.define "master" do |master|
-    master.vm.box = BOX_IMAGE
-    # master.vm.box_version = BOX_VERSION
-    master.vm.network :private_network, ip:"192.168.100.100"
-    master.vm.network :forwarded_port, guest: 22, host: 22100, id: 'ssh'
-    master.vm.hostname = 'master.local'
-    master.vm.provision "shell", path: "src/scripts/common.sh"
-    master.vm.provision "shell", path: "src/scripts/nfs.sh"
-    master.vm.provision "shell", path: "src/scripts/master.sh"
-    master.vm.provider "virtualbox" do |v|
-        v.memory = 3072
-        v.cpus = 4
-      end
-  end
-
-  # slave node
-  config.vm.define "node01", autostart:false do |node|
-    node.vm.box = BOX_IMAGE
-    # node.vm.box_version = BOX_VERSION
-    node.vm.network :private_network, ip:"192.168.100.101"
-    node.vm.network :forwarded_port, guest: 22, host: 22101, id: 'ssh'
-    node.vm.hostname = 'node01.local'
-    node.vm.provision "shell", path: "src/scripts/common.sh"
-    node.vm.provision "shell", path: "src/scripts/minion.sh"
-  end
-
-  # slave node
-  config.vm.define "node02", autostart:false do |node|
-    node.vm.box = BOX_IMAGE
-    # node.vm.box_version = BOX_VERSION
-    node.vm.network :private_network, ip:"192.168.100.102"
-    node.vm.network :forwarded_port, guest: 22, host: 22102, id: 'ssh'
-    node.vm.hostname = 'node02.local'
-    node.vm.provision "shell", path: "src/scripts/common.sh"
-    node.vm.provision "shell", path: "src/scripts/minion.sh"
-  end
+  end # end cluster
 end
-
