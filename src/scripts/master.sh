@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NETWORK_PLUGIN="flannel"
+NETWORK_PLUGIN="calico"
 INGRESS_CONTROLLER="nginx"
 export PATH=$PATH:/root/go/bin/
 
@@ -27,6 +27,9 @@ kubectl apply -f /src/manifests/metrics-server/
 
 # deploy debug container
 kubectl apply -f /src/manifests/debug-container/deployment.yaml
+
+# fix coredns
+kubectl apply -f /src/manifests/coredns/coredns-cm.yaml
 
 # get admin token
 kubectl describe secret $(kubectl get secrets | grep cluster | cut -d ' ' -f1) | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /src/output/cluster_admin_token.txt
