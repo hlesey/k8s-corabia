@@ -22,6 +22,6 @@ EOF
 exportfs -r
 
 
-for i in {0..4}; do
+for i in {0..10}; do
     mkdir /nfs/pv0$i
 done
