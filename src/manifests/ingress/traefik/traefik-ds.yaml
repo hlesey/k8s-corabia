@@ -45,10 +45,13 @@ metadata:
 spec:
   selector:
     k8s-app: traefik-ingress-lb
+  type: NodePort
   ports:
     - protocol: TCP
       port: 80
       name: web
+      nodePort: 31080
     - protocol: TCP
       port: 8080
       name: admin
+      nodePort: 31808
