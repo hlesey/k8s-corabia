@@ -8,7 +8,4 @@ while [ "$cluster_join" == "" ] ; do
     cluster_join="$(cat /src/output/.kubeadmin_init  | grep 'kubeadm join')"
 done
 
-export PATH=$PATH:/root/go/bin/
 $cluster_join 
-
-#--ignore-preflight-errors=cri
