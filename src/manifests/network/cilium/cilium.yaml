@@ -10,7 +10,7 @@ data:
   etcd-config: |-
     ---
     endpoints:
-      - https://{{MASTER_IP}}:2379
+      - https://[192.168.100.100]:2379
     #
     # In case you want to use TLS in etcd, uncomment the 'ca-file' line
     # and create a kubernetes secret by following the tutorial in
