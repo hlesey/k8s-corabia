@@ -29,8 +29,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
         if hostname.include? "master" 
           override.vm.provision "shell", path: "src/scripts/common.sh"
-          override.vm.provision "shell", path: "src/scripts/nfs.sh"
           override.vm.provision "shell", path: "src/scripts/master.sh"
+          override.vm.provision "shell", path: "src/scripts/nfs.sh"
         else
           override.vm.provision "shell", path: "src/scripts/common.sh"
           override.vm.provision "shell", path: "src/scripts/minion.sh"
