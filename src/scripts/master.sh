@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NETWORK_PLUGIN="calico"
+NETWORK_PLUGIN="cilium"
 INGRESS_CONTROLLER="nginx"
 export PATH=$PATH:/root/go/bin/
 
@@ -9,6 +9,27 @@ kubeadm init --apiserver-advertise-address=192.168.100.100 --pod-network-cidr=10
 export KUBECONFIG=/etc/kubernetes/admin.conf
 
 # deploy overlay network
+
+if [[ "$NETWORK_PLUGIN" == "cilium" ]]; then
+# setup etcd endpoint
+MASTER_IP=$(ip a | grep 192.168 | cut -d ' ' -f 6 | cut -d '/' -f1)
+sed -i'' -e "s'{{MASTER_IP}}'${MASTER_IP}'g" "/src/manifests/network/${NETWORK_PLUGIN}/cilium.yaml"
+# setup kubelet
+cat <<EOF >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+ExecStartPre=/bin/bash -c "if [[ $(/bin/mount | /bin/grep /sys/fs/bpf -c) -eq 0 ]]; then /bin/mount bpffs /sys/fs/bpf -t bpf; fi"
+EOF
+
+systemctl daemon-reload
+systemctl restart kubelet
+
+kubectl create secret generic -n kube-system cilium-etcd-secrets \
+    --from-file=etcd-ca=/etc/kubernetes/pki/etcd/ca.crt \
+    --from-file=etcd-client-key=/etc/kubernetes/pki/etcd/peer.key \
+    --from-file=etcd-client-crt=/etc/kubernetes/pki/etcd/peer.crt
+
+echo "NETWORK_PLUGIN=cilium" >> /src/output/.kubeadmin_init
+fi
+
 kubectl apply -f /src/manifests/network/${NETWORK_PLUGIN}
 
 # deploy dashboard
@@ -40,8 +61,12 @@ echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /root/.bashrc
 echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /home/vagrant/.bashrc
 
 # Enabling shell autocompletion
-echo "source <(kubectl completion bash)" >> ~/.bashrc
-echo "source <(kubectl completion bash)" >> ~/home/vagrant/.bashrc
+echo "source <(kubectl completion bash)" >> /root/.bashrc
+echo "source <(kubectl completion bash)" >> /home/vagrant/.bashrc
+echo '. /usr/share/bash-completion/bash_completion' >> /root/.bashrc
+echo '. /usr/share/bash-completion/bash_completion' >> /home/vagrant/.bashrc
+echo  'alias kns="kubectl config set-context $(kubectl config current-context) --namespace "' >>  /root/.bashrc
+echo  'alias kns="kubectl config set-context $(kubectl config current-context) --namespace "' >> /home/vagrant/.bashrc
 
 # configure shortcuts
 echo "alias kns='/src/scripts/kns.sh'" >> /root/.bashrc
