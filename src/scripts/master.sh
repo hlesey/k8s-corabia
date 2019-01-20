@@ -68,10 +68,7 @@ echo '. /usr/share/bash-completion/bash_completion' >> /home/vagrant/.bashrc
 echo  'alias kns="kubectl config set-context $(kubectl config current-context) --namespace "' >>  /root/.bashrc
 echo  'alias kns="kubectl config set-context $(kubectl config current-context) --namespace "' >> /home/vagrant/.bashrc
 
-# configure shortcuts
-echo "alias kns='/src/scripts/kns.sh'" >> /root/.bashrc
-echo "alias kns='/src/scripts/kns.sh'" >> /home/vagrant/.bashrc
-
+# finish
 ln -s /src/output/cluster_admin_token.txt /root/cluster_admin_token.txt
 echo "-------------------------------------------------------------"
 echo "Use this token to login to the kubernetes dashboard:"
