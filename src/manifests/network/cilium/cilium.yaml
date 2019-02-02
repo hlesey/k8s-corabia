@@ -17,7 +17,7 @@ data:
   etcd-config: |-
     ---
     endpoints:
-      - https://{{MASTER_IP}}:2379
+      - https://{{CONTROL_PLANE_IP}}:2379
     trusted-ca-file: '/var/lib/etcd-secrets/etcd-client-ca.crt'
     key-file: '/var/lib/etcd-secrets/etcd-client.key'
     cert-file: '/var/lib/etcd-secrets/etcd-client.crt'
