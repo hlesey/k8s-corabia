@@ -2,6 +2,7 @@ In order to build a new template you need a vagrant cloud token that can be aqui
 Make sure you have `packer` and `vagrant` installed (for macos `brew install packer vagrant`)
 
 To build and upload a new `hlesey/k8s-base` vagrant box run
+
 ```bash
 VAGRANT_CLOUD_TOKEN=<token> VERSION=<box_version> make box
 ```
