@@ -6,7 +6,7 @@ REM ============================================================================
 
 set vbox_manage="C:\Program Files\Oracle\VirtualBox\VBoxManage.exe"
 
-set vm_name="master"
+set vm_name="control-plane"
 echo "fixing DNS for %vm_name%..."
 %vbox_manage% controlvm %vm_name% setlinkstate1 off
 %vbox_manage% controlvm %vm_name% setlinkstate1 on
