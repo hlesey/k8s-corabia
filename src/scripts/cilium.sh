@@ -13,5 +13,5 @@ kubectl create secret generic -n kube-system cilium-etcd-secrets \
     --from-file=etcd-client.key=/etc/kubernetes/pki/etcd/peer.key \
     --from-file=etcd-client.crt=/etc/kubernetes/pki/etcd/peer.crt
 
-MASTER_IP=$(ip a | grep 192.168 | cut -d ' ' -f 6 | cut -d '/' -f1)
-cat "/src/manifests/network/${NETWORK_PLUGIN}/cilium.yaml" | sed -e "s'{{MASTER_IP}}'${MASTER_IP}'g" | kubectl apply -f -
+CONTROL_PLANE_IP=$(ip a | grep 192.168 | cut -d ' ' -f 6 | cut -d '/' -f1)
+cat "/src/manifests/network/${NETWORK_PLUGIN}/cilium.yaml" | sed -e "s'{{CONTROL_PLANE_IP}}'${CONTROL_PLANE_IP}'g" | kubectl apply -f -
