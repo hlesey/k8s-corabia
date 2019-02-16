@@ -10,6 +10,8 @@ cluster = {
   "control-plane" => { :ip => "192.168.234.100", :cpus => 2, :mem => 2048 },
   "node01" => { :ip => "192.168.234.101", :cpus => 2, :mem => 1280 },
   "node02" => { :ip => "192.168.234.102", :cpus => 2, :mem => 1280 },
+  # "node01" => { :ip => "192.168.234.101", :cpus => 2, :mem => 3072 },
+  # "node02" => { :ip => "192.168.234.102", :cpus => 2, :mem => 3072 },
 }
 
 required_plugins.each do |plugin|
