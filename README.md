@@ -4,13 +4,13 @@ This repository provides helps you to run a minimum best-practice Kubernetes Clu
 
 VirtualBox, Vagrant and Kubeadm are used for Virtualization, VMs deployment and K8s Cluster bootstrap:
 
-<img alt="Vagrant flow" src="./docs/images/vagrant_flow.png" width="800px" />
+<img alt="Vagrant flow" src="./docs/images/vagrant-flow.png" width="800px" />
 
 In order to run this cluster on your local machine, please go thought the following docs:
 
 - [prerequisites](./docs/prerequisites.md)
-- [cluster setup](./docs/cluster_setup.md)
+- [cluster setup](./docs/cluster-setup.md)
 
 The Kubernetes Cluster is described in this diagram:
 
-<img alt="Cluster diagram" src="./docs/images/cluster_diagram.png" width="800px" />
+<img alt="Cluster diagram" src="./docs/images/cluster-diagram.png" width="800px" />

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Setup data plane node
 
 source /src/scripts/vars.txt
 cluster_join=""

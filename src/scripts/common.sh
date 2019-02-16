@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Setup common configuration for control plane and data plane nodes
 
 source /src/scripts/vars.txt
 

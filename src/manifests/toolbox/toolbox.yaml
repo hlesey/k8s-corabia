@@ -17,4 +17,4 @@ spec:
     spec:
       containers:
       - name: toolbox
-        image: hlesey/toolbox:1.0
+        image: ghcr.io/hlesey/toolbox:1.0
