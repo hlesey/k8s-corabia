@@ -9,6 +9,13 @@ if [ "$DOCKER_PW" == "" ]; then
     read -p "Enter your dockerhub password:" DOCKER_PW
 fi 
 
+echo "$DOCKER_PW" | docker login -u "$DOCKER_USER" --password-stdin
+
+if [[ $? -ne 0 ]]; then
+   echo "Invalid docker crendetials. Please try again."
+   exit 1
+fi
+
 kubectl create secret docker-registry docker-registry-registrycreds \
   --namespace kube-system \
   --docker-username=$DOCKER_USER \
