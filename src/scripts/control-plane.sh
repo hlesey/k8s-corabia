@@ -35,7 +35,7 @@ kubectl apply -f /src/manifests/metrics-server/
 kubectl -n kube-system scale deployment coredns --replicas=1
 
 # get admin token
-kubectl describe secret $(kubectl get secrets | grep cluster | cut -d ' ' -f1) | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /src/output/cluster_admin_token.txt
+kubectl describe secret $(kubectl get secrets | grep cluster | cut -d ' ' -f1) | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /src/output/cluster-admin-token
 cp /etc/kubernetes/admin.conf /src/output/kubeconfig.yaml
 
 # configure vagrant and root user with kubeconfig
@@ -51,8 +51,8 @@ echo  "alias kns='kubectl config set-context \$(kubectl config current-context) 
 cat /root/.bashrc >> /home/vagrant/.bashrc
 
 # finish
-ln -s /src/output/cluster_admin_token.txt /root/cluster_admin_token.txt
+ln -s /src/output/cluster-admin-token /root/cluster-admin-token
 echo "-------------------------------------------------------------"
 echo "Use this token to login to the kubernetes dashboard:"
-cat /root/cluster_admin_token.txt
+cat /root/cluster-admin-token
 echo "Enjoy."
