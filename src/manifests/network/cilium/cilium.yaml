@@ -409,6 +409,11 @@ spec:
               name: cilium-config
               optional: true
         image: "ghcr.io/hlesey/cilium/cilium:v1.6.8"
+        resources:
+          limits:
+          requests:
+            cpu: 100m
+            memory: 100Mi
         imagePullPolicy: IfNotPresent
         lifecycle:
           postStart:
@@ -477,6 +482,12 @@ spec:
               name: cilium-config
               optional: true
         image: "ghcr.io/hlesey/cilium/cilium:v1.6.8"
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
         imagePullPolicy: IfNotPresent
         name: clean-cilium-state
         securityContext:
@@ -669,6 +680,12 @@ spec:
               name: cilium-config
               optional: true
         image: "ghcr.io/hlesey/cilium/operator:v1.6.8"
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
         imagePullPolicy: IfNotPresent
         name: cilium-operator
         livenessProbe:
