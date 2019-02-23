@@ -3,9 +3,14 @@
 set -xe
 
 source /src/scripts/vars.sh
+[[ -z $BOOTSTRAP_TOKEN ]] && BOOTSTRAP_TOKEN="$(openssl rand -hex 3).$(openssl rand -hex 8)"
 
 # bootstrap k8s control-plane components
-cat /src/manifests/kubeadm/control-plane.yaml | sed -e "s'{{CONTROL_PLANE_IP}}'${CONTROL_PLANE_IP}'g"  > /tmp/control-plane.yaml
+cat /src/manifests/kubeadm/control-plane.yaml \
+    | sed -e "s'{{CONTROL_PLANE_IP}}'${CONTROL_PLANE_IP}'g" \
+    | sed -e "s'{{BOOTSTRAP_TOKEN}}'${BOOTSTRAP_TOKEN}'g" \
+    > /tmp/control-plane.yaml
+
 kubeadm init --config /tmp/control-plane.yaml > /src/output/.kubeadmin_init
 
 export KUBECONFIG=/etc/kubernetes/admin.conf
@@ -21,10 +26,6 @@ EOF
 fi
 
 kubectl apply -f /src/manifests/network/${NETWORK_PLUGIN}
-
-# # workaround for 140615704306112:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/root/.rnd
-# touch /root/.rnd && chmod 600 /root/.rnd
-# touch /home/vagrant/.rnd && chmod 600 /home/vagrant/.rnd && chown vagrant:vagrant /home/vagrant/.rnd
 
 # deploy dashboard
 kubectl apply -f /src/manifests/dashboard/
@@ -47,10 +48,6 @@ cp /etc/kubernetes/admin.conf /src/output/kubeconfig.yaml
 
 # configure vagrant and root user with kubeconfig
 echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /root/.bashrc
-echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /home/vagrant/.bashrc
-
-# copy root user bash config to vagrant user
-cat /root/.bashrc >> /home/vagrant/.bashrc
 
 # finish
 ln -s /src/output/cluster-admin-token /root/cluster-admin-token

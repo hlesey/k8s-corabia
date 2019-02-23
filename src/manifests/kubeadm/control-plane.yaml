@@ -1,7 +1,11 @@
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: InitConfiguration
+bootstrapTokens:
+- token: {{BOOTSTRAP_TOKEN}}
+  description: "kubeadm bootstrap token"
+  ttl: "24h"
 localAPIEndpoint:
-  advertiseAddress:  {{CONTROL_PLANE_IP}}
+  advertiseAddress: {{CONTROL_PLANE_IP}}
   bindPort: 6443
 ---
 apiVersion: kubeadm.k8s.io/v1beta2

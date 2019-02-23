@@ -1,6 +1,4 @@
 provider "aws" {
-  access_key = var.access_key
-  secret_key = var.secret_key
   region     = var.region
 }
 
@@ -10,7 +8,7 @@ resource "aws_key_pair" "main" {
 }
 
 resource "aws_vpc" "main" {
-  cidr_block            = "192.168.0.0/16"
+  cidr_block            = var.vpc-cidr
   enable_dns_hostnames  = true
 }
 
@@ -42,7 +40,7 @@ resource "aws_subnet" "main" {
 
 resource "aws_security_group" "kubernetes" {
   name          = var.cluster-name
-  description   = "Allow inbound ssh traffic"
+  description   = "Allow inbound traffic"
   vpc_id        = aws_vpc.main.id
 }
 
@@ -102,7 +100,7 @@ resource "aws_security_group_rule" "allow_all_out" {
 
 resource "aws_spot_instance_request" "control-plane" {
     availability_zone           = "${var.region}${var.az}"
-    ami                         = "ami-0e1ce3e0deb8896d2"
+    ami                         = var.instance-ami
     instance_type               = var.control-plane-instance-type
     spot_price                  = var.control-plane-spot-price
     key_name                    = var.k8s-ssh-key-name
@@ -111,4 +109,133 @@ resource "aws_spot_instance_request" "control-plane" {
     associate_public_ip_address = true
     vpc_security_group_ids      = [aws_security_group.kubernetes.id]
     depends_on                  = [aws_internet_gateway.gw, aws_key_pair.main]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file(var.k8s-ssh-key-path)
+      host        = aws_spot_instance_request.control-plane.public_ip
+    }
+
+    provisioner "remote-exec" {
+      inline = [
+        "sudo mkdir -p /src/output /repo",
+        "sudo chown -R ubuntu /src /repo",
+      ]
+    }
+    
+    provisioner "file" {
+      source      = "../scripts"
+      destination = "/src/"
+    }
+
+    provisioner "file" {
+      source      = "../manifests"
+      destination = "/src/"
+    }
+
+    provisioner "remote-exec" {
+      inline = [
+        "sudo echo 'export CONTROL_PLANE_IP=${aws_spot_instance_request.control-plane.private_ip}' >> /src/scripts/vars.sh",
+        "sudo echo 'export BOOTSTRAP_TOKEN=${local.bootstraptoken}' >> /src/scripts/vars.sh",
+        "sudo /bin/bash /src/scripts/common.sh",
+        "sudo /bin/bash /src/scripts/nfs.sh",
+        "sudo /bin/bash /src/scripts/control-plane.sh",
+      ]
+    }
+
+    provisioner "file" {
+      source      = "../../../k8s-labs"
+      destination = "/repo/"
+    }
+
+    provisioner "file" {
+      source      = "../../../phippy"
+      destination = "/repo/"
+    }
+
 }
+
+
+resource "aws_spot_instance_request" "node01" {
+    availability_zone           = "${var.region}${var.az}"
+    ami                         = var.instance-ami
+    instance_type               = var.node-instance-type
+    spot_price                  = var.node-spot-price
+    key_name                    = var.k8s-ssh-key-name
+    wait_for_fulfillment        = true
+    subnet_id                   = aws_subnet.main.id
+    associate_public_ip_address = true
+    vpc_security_group_ids      = [aws_security_group.kubernetes.id]
+    depends_on                  = [aws_internet_gateway.gw, aws_key_pair.main, aws_spot_instance_request.control-plane]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file(var.k8s-ssh-key-path)
+      host        = aws_spot_instance_request.node01.public_ip
+    }
+
+    provisioner "remote-exec" {
+      inline = [
+        "sudo mkdir -p /src/output /repo",
+        "sudo chown -R ubuntu /src /repo",
+      ]
+    }
+    
+    provisioner "file" {
+      source      = "../scripts"
+      destination = "/src/"
+    }
+
+    provisioner "remote-exec" {
+      inline = [
+        "sudo echo 'export CONTROL_PLANE_IP=${aws_spot_instance_request.control-plane.private_ip}' >> /src/scripts/vars.sh",
+        "sudo echo 'kubeadm join --token=${local.bootstraptoken} --discovery-token-unsafe-skip-ca-verification ${aws_spot_instance_request.control-plane.private_ip}:6443' >> /src/output/.kubeadmin_init",
+        "sudo /bin/bash /src/scripts/common.sh",
+        "sudo /bin/bash /src/scripts/node.sh",
+      ]
+    }
+}
+
+resource "aws_spot_instance_request" "node02" {
+    availability_zone           = "${var.region}${var.az}"
+    ami                         = var.instance-ami
+    instance_type               = var.node-instance-type
+    spot_price                  = var.node-spot-price
+    key_name                    = var.k8s-ssh-key-name
+    wait_for_fulfillment        = true
+    subnet_id                   = aws_subnet.main.id
+    associate_public_ip_address = true
+    vpc_security_group_ids      = [aws_security_group.kubernetes.id]
+    depends_on                  = [aws_internet_gateway.gw, aws_key_pair.main, aws_spot_instance_request.control-plane]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file(var.k8s-ssh-key-path)
+      host        = aws_spot_instance_request.node01.public_ip
+    }
+
+    provisioner "remote-exec" {
+      inline = [
+        "sudo mkdir -p /src/output /repo",
+        "sudo chown -R ubuntu /src /repo",
+      ]
+    }
+
+    provisioner "file" {
+      source      = "../scripts"
+      destination = "/src/"
+    }
+
+    provisioner "remote-exec" {
+      inline = [
+        "sudo echo 'export CONTROL_PLANE_IP=${aws_spot_instance_request.control-plane.private_ip}' >> /src/scripts/vars.sh",
+        "sudo echo 'kubeadm join --token=${local.bootstraptoken} --discovery-token-unsafe-skip-ca-verification ${aws_spot_instance_request.control-plane.private_ip}:6443' >> /src/output/.kubeadmin_init",
+        "sudo /bin/bash /src/scripts/common.sh",
+        "sudo /bin/bash /src/scripts/node.sh",
+      ]
+    }
+}
+
