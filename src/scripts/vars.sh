@@ -1,3 +1,5 @@
+export K8S_VERSION="1.20.2"
+export ETCD_VERSION=${ETCD_VERSION:-v3.3.10}
 export NETWORK_PLUGIN="cilium"
 export INGRESS_CONTROLLER="nginx"
 export CONTROL_PLANE_IP="192.168.234.100"

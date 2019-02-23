@@ -5,3 +5,4 @@ k8s.gcr.io
 # image templates
 {{
 <FIXME>
+cilium/istio_proxy

@@ -2,8 +2,8 @@
 # vi: set ft=ruby :
 
 VAGRANTFILE_API_VERSION = "2"
-BOX_IMAGE="hlesey/k8s-base"
-BOX_VERSION="1.18.2.2"
+BOX_IMAGE="ubuntu/bionic64"
+BOX_VERSION="20210125.0.0"
 required_plugins = %w(vagrant-vbguest)
 
 cluster = {                                                  
@@ -31,7 +31,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         if hostname.include? "control-plane"
           override.vm.provision "shell", path: "src/scripts/common.sh"
           override.vm.provision "shell", path: "src/scripts/nfs.sh"
-          override.vm.provision "shell", env: {DOCKER_USER:ENV['DOCKER_USER'], DOCKER_PW:ENV['DOCKER_PW']}, path: "src/scripts/control-plane.sh"
+          override.vm.provision "shell", path: "src/scripts/control-plane.sh"
           override.vm.network :forwarded_port, guest: 30080, host: 30080, id: 'ingress-http'
           override.vm.network :forwarded_port, guest: 30443, host: 30443, id: 'ingress-https'
         else

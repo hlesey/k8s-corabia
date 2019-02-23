@@ -46,7 +46,7 @@ curl -L https://github.com/coreos/etcd/releases/download/$ETCD_VERSION/etcd-$ETC
 tar xzvf etcd-$ETCD_VERSION-linux-amd64.tar.gz
 cp etcd-$ETCD_VERSION-linux-amd64/etcdctl /usr/local/bin/
 rm -rf etcd-*
-etcdctl version
+etcdctl --version
 
 # install auger
 git clone https://github.com/jpbetz/auger
