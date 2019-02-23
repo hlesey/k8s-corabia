@@ -1,22 +1,22 @@
-variable "k8stoken" {
+variable "bootstraptoken" {
   default = ""
   description = "Overrides the auto-generated bootstrap token"
 }
 
-resource "random_string" "k8stoken-first-part" {
+resource "random_string" "bootstraptoken-first-part" {
   length = 6
   upper = false
   special = false
 }
 
-resource "random_string" "k8stoken-second-part" {
+resource "random_string" "bootstraptoken-second-part" {
   length = 16
   upper = false
   special = false
 }
 
 locals {
-  k8stoken = var.k8stoken == "" ? "${random_string.k8stoken-first-part.result}.${random_string.k8stoken-second-part.result}" : var.k8stoken
+  bootstraptoken = var.bootstraptoken == "" ? "${random_string.bootstraptoken-first-part.result}.${random_string.bootstraptoken-second-part.result}" : var.bootstraptoken
 }
 
 variable "cluster-name" {
@@ -24,12 +24,8 @@ variable "cluster-name" {
   description = "Controls the naming of the AWS resources"
 }
 
-variable "access_key" {
-  default = ""
-}
-
-variable "secret_key" {
-  default = ""
+variable "k8s-ssh-key-path" {
+  default = "~/.ssh/id_rsa_local"
 }
 
 variable "k8s-ssh-key" {
@@ -41,7 +37,7 @@ variable "k8s-ssh-key-name" {
 }
 
 variable "vpc-cidr" {
-  default = "10.0.0.0/16"
+  default = "192.168.0.0/16"
 }
 
 variable "allowed-cidr-blocks" {
@@ -57,14 +53,19 @@ variable "az" {
   default = "a"
 }
 
+variable "instance-ami" {
+  default = "ami-0e0102e3ff768559b"
+  description = "Which ami is used"
+}
+
 variable "control-plane-instance-type" {
   default = "t3.small"
-  description = "Which EC2 instance type to use for the master nodes"
+  description = "Which EC2 instance type to use for the control-plane node"
 }
 
 variable "control-plane-spot-price" {
   default = "0.01"
-  description = "The maximum spot bid for the master node"
+  description = "The maximum spot bid for the control-plane node"
 }
 
 variable "node-instance-type" {

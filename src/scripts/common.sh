@@ -9,9 +9,8 @@ source /src/scripts/vars.sh
 
 # configure /etc/hosts file
 echo "$CONTROL_PLANE_IP control-plane control-plane.local nfsserver.local" >> /etc/hosts
-echo "$NODE01_IP   node01 node01.local"                 >> /etc/hosts
-echo "$NODE02_IP   node02 node02.local"                 >> /etc/hosts
-echo "$NODE03_IP   node03 node03.local"                 >> /etc/hosts
+echo "$NODE01_IP   node01 node01.local"                                    >> /etc/hosts
+echo "$NODE02_IP   node02 node02.local"                                    >> /etc/hosts
 
 # configure external DNS, instead of using VBox DNS
 echo "DNS=8.8.8.8" >> /etc/systemd/resolved.conf
@@ -23,7 +22,7 @@ export DEBIAN_FRONTEND=noninteractive
 systemctl disable apt-daily.timer
 systemctl disable apt-daily-upgrade.timer
 
-apt-get update && \
+apt-get update
 apt-get install -y iptables arptables ebtables \
                    nfs-kernel-server nfs-common \
                    apt-transport-https curl telnet \
