@@ -6,31 +6,6 @@ variable "az" {
   default = "a"
 }
 
-variable "instance-ami" {
-  default     = "ami-0e0102e3ff768559b"
-  description = "Which ami is used"
-}
-
-variable "control-plane-instance-type" {
-  default     = "t3.small"
-  description = "Which EC2 instance type to use for the control-plane node"
-}
-
-variable "control-plane-spot-price" {
-  default     = "0.01"
-  description = "The maximum spot bid for the control-plane node"
-}
-
-variable "node-instance-type" {
-  default     = "t3.micro"
-  description = "Which EC2 instance type to use for the worker nodes"
-}
-
-variable "node-spot-price" {
-  default     = "0.01"
-  description = "The maximum spot bid for worker nodes"
-}
-
 variable "k8s-ssh-key-path" {
   default = "~/.ssh/id_rsa_local"
 }
@@ -40,5 +15,5 @@ variable "k8s-ssh-key" {
 }
 
 variable "k8s-ssh-key-name" {
-  default = "victor-ssh"
+  default = "test-ssh"
 }

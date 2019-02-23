@@ -1,9 +1,9 @@
 output "cluster_info" {
   value = [
     for name in module.clusters : {
-      Cluster_Name : name.cluster-name
-      Control_Plane_Public_IP : name.control_plane_public_ip
-      Control_Plane_Public_DNS : name.control_plane_public_dns
+      cluster-name : name.cluster-name
+      control-plane-public-ip : name.control_plane_public_ip
+      control-plane-public-dns : name.control_plane_public_dns
     }
   ]
 }
