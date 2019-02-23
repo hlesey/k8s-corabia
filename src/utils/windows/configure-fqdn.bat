@@ -12,5 +12,6 @@ move /Y %hostspath%.bk  %hostspath%
 
 SET NEWLINE=^& echo.
 echo %NEWLINE%^192.168.234.100 phippy.local phippy-api.local phippy-ui.local myapp.local wordpress.local >> %hostspath%
-echo %NEWLINE%^192.168.234.100 control-plane.local k8s.local cluster.local nfsstorage.local prometheus.local >> %hostspath%
+echo %NEWLINE%^192.168.234.100 k8s.local prometheus.local hubble-ui.local >> %hostspath%
+
 echo %NEWLINE%^192.168.234.101 traefik.local >> %hostspath%
