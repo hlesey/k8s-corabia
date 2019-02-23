@@ -5,7 +5,7 @@ set -xe
 # Refs: https://kubernetes.io/docs/setup/independent/install-kubeadm/
 
 # load variables
-source /src/scripts/vars.txt
+source /src/scripts/vars.sh
 
 # configure /etc/hosts file
 echo "$CONTROL_PLANE_IP control-plane control-plane.local nfsserver.local" >> /etc/hosts

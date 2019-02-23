@@ -2,7 +2,7 @@
 # Setup and bootstrap k8s control-plane 
 set -xe
 
-source /src/scripts/vars.txt
+source /src/scripts/vars.sh
 
 # bootstrap k8s control-plane components
 cat /src/manifests/kubeadm/control-plane.yaml | sed -e "s'{{CONTROL_PLANE_IP}}'${CONTROL_PLANE_IP}'g"  > /tmp/control-plane.yaml
@@ -12,10 +12,15 @@ export KUBECONFIG=/etc/kubernetes/admin.conf
 
 # deploy overlay network
 if [[ "$NETWORK_PLUGIN" == "cilium" ]]; then
-    source /src/scripts/cilium.sh
-else
-    kubectl apply -f /src/manifests/network/${NETWORK_PLUGIN}
+    # enable bpf and setup kubelet
+    cat <<EOF >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    ExecStartPre=/bin/bash -c "if [[ $(/bin/mount | /bin/grep /sys/fs/bpf -c) -eq 0 ]]; then /bin/mount bpffs /sys/fs/bpf -t bpf; fi"
+EOF
+    systemctl daemon-reload
+    systemctl restart kubelet
 fi
+
+kubectl apply -f /src/manifests/network/${NETWORK_PLUGIN}
 
 # # workaround for 140615704306112:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/root/.rnd
 # touch /root/.rnd && chmod 600 /root/.rnd
