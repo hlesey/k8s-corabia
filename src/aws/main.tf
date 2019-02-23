@@ -143,17 +143,6 @@ resource "aws_spot_instance_request" "control-plane" {
         "sudo /bin/bash /src/scripts/control-plane.sh",
       ]
     }
-
-    provisioner "file" {
-      source      = "../../../k8s-labs"
-      destination = "/repo/"
-    }
-
-    provisioner "file" {
-      source      = "../../../phippy"
-      destination = "/repo/"
-    }
-
 }
 
 
