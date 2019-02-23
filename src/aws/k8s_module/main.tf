@@ -88,23 +88,22 @@ resource "aws_security_group_rule" "allow_all_out" {
   security_group_id = aws_security_group.kubernetes.id
 }
 
-resource "aws_spot_instance_request" "control-plane" {
+resource "aws_instance" "control-plane" {
   availability_zone           = "${var.region}${var.az}"
   ami                         = var.instance-ami
   instance_type               = var.control-plane-instance-type
-  spot_price                  = var.control-plane-spot-price
   key_name                    = var.k8s-ssh-key-name
-  wait_for_fulfillment        = true
   subnet_id                   = aws_subnet.main.id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]
   depends_on                  = [aws_internet_gateway.gw]
-
+  tags                        = { Name = "${var.cluster-name}-control-plane" }
+  
   connection {
     type        = "ssh"
     user        = "ubuntu"
     private_key = file(var.k8s-ssh-key-path)
-    host        = aws_spot_instance_request.control-plane.public_ip
+    host        = aws_instance.control-plane.public_ip
   }
 
   provisioner "remote-exec" {
@@ -126,9 +125,8 @@ resource "aws_spot_instance_request" "control-plane" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo echo 'export CONTROL_PLANE_IP=${aws_spot_instance_request.control-plane.private_ip}' >> /src/scripts/vars.sh",
-      "sudo echo 'export CONTROL_PLANE_PUBLIC_DNS=${aws_spot_instance_request.control-plane.public_dns}' >> /src/scripts/vars.sh",
-      "sudo echo 'export BOOTSTRAP_TOKEN=${local.bootstraptoken}' >> /src/scripts/vars.sh",
+      "sudo echo 'export CONTROL_PLANE_IP=${aws_instance.control-plane.private_ip}' >> /src/scripts/vars.sh",
+      "sudo echo 'export CONTROL_PLANE_PUBLIC_DNS=${aws_instance.control-plane.public_dns}' >> /src/scripts/vars.sh",
       "sudo /bin/bash /src/scripts/common.sh",
       "sudo /bin/bash /src/scripts/nfs.sh",
       "sudo /bin/bash /src/scripts/control-plane.sh",
@@ -147,7 +145,8 @@ resource "aws_spot_instance_request" "node" {
   subnet_id                   = aws_subnet.main.id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]
-  depends_on                  = [aws_internet_gateway.gw, aws_spot_instance_request.control-plane]
+  depends_on                  = [aws_internet_gateway.gw, aws_instance.control-plane]
+  tags                        = { Name = "${var.cluster-name}-node-${count.index}" }
 
   connection {
     type        = "ssh"
@@ -170,8 +169,8 @@ resource "aws_spot_instance_request" "node" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo echo 'export CONTROL_PLANE_IP=${aws_spot_instance_request.control-plane.private_ip}' >> /src/scripts/vars.sh",
-      "sudo echo 'kubeadm join --token=${local.bootstraptoken} --discovery-token-unsafe-skip-ca-verification ${aws_spot_instance_request.control-plane.private_ip}:6443' >> /src/output/.kubeadmin_init",
+      "sudo echo 'export CONTROL_PLANE_IP=${aws_instance.control-plane.private_ip}' >> /src/scripts/vars.sh",
+      "sudo echo 'kubeadm join --token=${local.bootstraptoken} --discovery-token-unsafe-skip-ca-verification ${aws_instance.control-plane.private_ip}:6443' >> /src/output/.kubeadmin_init",
       "sudo /bin/bash /src/scripts/common.sh",
       "sudo /bin/bash /src/scripts/node.sh",
     ]
