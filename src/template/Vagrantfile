@@ -24,8 +24,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # template image
   config.vm.define "template" do |template|
     template.vm.box = BOX_IMAGE
-    template.vm.network :private_network, ip:"192.168.100.200"
-    template.vm.network :forwarded_port, guest: 22, host: 22200, id: 'ssh'
+    template.vm.network :private_network, ip:"192.168.100.201"
+    template.vm.network :forwarded_port, guest: 22, host: 22201, id: 'ssh'
     template.vm.hostname = 'template.local'
     template.vm.provision "shell", path: "setup.sh"
   end
