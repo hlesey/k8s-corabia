@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# ------------------- Dashboard Secret ------------------- #
+# ------------------- Dashboard Secrets ------------------- #
 
 apiVersion: v1
 kind: Secret
@@ -22,6 +22,19 @@ metadata:
   name: kubernetes-dashboard-certs
   namespace: kube-system
 type: Opaque
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard-csrf
+  namespace: kube-system
+type: Opaque
+data:
+  csrf: ""
 
 ---
 # ------------------- Dashboard Service Account ------------------- #
@@ -54,7 +67,7 @@ rules:
   # Allow Dashboard to get, update and delete Dashboard exclusive secrets.
 - apiGroups: [""]
   resources: ["secrets"]
-  resourceNames: ["kubernetes-dashboard-key-holder", "kubernetes-dashboard-certs"]
+  resourceNames: ["kubernetes-dashboard-key-holder", "kubernetes-dashboard-certs", "kubernetes-dashboard-csrf"]
   verbs: ["get", "update", "delete"]
   # Allow Dashboard to get and update 'kubernetes-dashboard-settings' config map.
 - apiGroups: [""]
@@ -90,7 +103,7 @@ subjects:
 # ------------------- Dashboard Deployment ------------------- #
 
 kind: Deployment
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 metadata:
   labels:
     k8s-app: kubernetes-dashboard
@@ -109,13 +122,12 @@ spec:
     spec:
       containers:
       - name: kubernetes-dashboard
-        image: k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.0
+        image: k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.1
         ports:
         - containerPort: 8443
           protocol: TCP
         args:
           - --auto-generate-certificates
-          - --token-ttl=43200
           # Uncomment the following line to manually specify Kubernetes API server Host
           # If not specified, Dashboard will attempt to auto discover the API server and connect
           # to it. Uncomment only if the default does not work.

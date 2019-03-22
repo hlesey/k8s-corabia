@@ -1,0 +1,2 @@
+export NETWORK_PLUGIN="cilium"
+export INGRESS_CONTROLLER="nginx"
