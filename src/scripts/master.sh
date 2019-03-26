@@ -1,24 +1,18 @@
 #!/usr/bin/env bash
 
-NETWORK_PLUGIN="cilium"
-INGRESS_CONTROLLER="nginx"
-export PATH=$PATH:/root/go/bin/
+source /src/scripts/vars
 
+# init the control plane components
 kubeadm init --apiserver-advertise-address=192.168.100.100 --pod-network-cidr=10.244.0.0/16 > /src/output/.kubeadmin_init
 
 export KUBECONFIG=/etc/kubernetes/admin.conf
 
 # deploy overlay network
-
 if [[ "$NETWORK_PLUGIN" == "cilium" ]]; then
-# setup etcd endpoint
-MASTER_IP=$(ip a | grep 192.168 | cut -d ' ' -f 6 | cut -d '/' -f1)
-sed -i'' -e "s'{{MASTER_IP}}'${MASTER_IP}'g" "/src/manifests/network/${NETWORK_PLUGIN}/cilium.yaml"
-# setup kubelet
+## setup kubelet
 cat <<EOF >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 ExecStartPre=/bin/bash -c "if [[ $(/bin/mount | /bin/grep /sys/fs/bpf -c) -eq 0 ]]; then /bin/mount bpffs /sys/fs/bpf -t bpf; fi"
 EOF
-
 systemctl daemon-reload
 systemctl restart kubelet
 
@@ -27,10 +21,12 @@ kubectl create secret generic -n kube-system cilium-etcd-secrets \
     --from-file=etcd-client-key=/etc/kubernetes/pki/etcd/peer.key \
     --from-file=etcd-client-crt=/etc/kubernetes/pki/etcd/peer.crt
 
-echo "NETWORK_PLUGIN=cilium" >> /src/output/.kubeadmin_init
-fi
+MASTER_IP=$(ip a | grep 192.168 | cut -d ' ' -f 6 | cut -d '/' -f1)
+cat "/src/manifests/network/${NETWORK_PLUGIN}/cilium.yaml" | sed -e "s'{{MASTER_IP}}'${MASTER_IP}'g" | kubectl apply -f -
 
-kubectl apply -f /src/manifests/network/${NETWORK_PLUGIN}
+else
+    kubectl apply -f /src/manifests/network/${NETWORK_PLUGIN}
+fi
 
 # deploy dashboard
 mkdir /home/vagrant/certs
@@ -47,7 +43,7 @@ kubectl apply -f  /src/manifests/ingress/${INGRESS_CONTROLLER}
 kubectl apply -f /src/manifests/metrics-server/
 
 # deploy debug container
-kubectl apply -f /src/manifests/debug-container/deployment.yaml
+kubectl apply -f /src/manifests/debug-container/statefulset.yaml
 
 # fix coredns
 kubectl apply -f /src/manifests/coredns/coredns-cm.yaml
