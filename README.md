@@ -11,15 +11,14 @@ vagrant up node02
 
 ### Manage cluster with kubectl
 ```
-vagrant ssh master
+export KUBECONFIG=$(pwd)/src/output/kubeconfig.yaml
 kubectl cluster-info
-kubectl show nodes
 ```
 
 ### Manage cluster with kube-dashboard
 ```
 Browse to https://192.168.100.100:31001
-Use token generated in scripts/cluster_admin_token.txt
+Use token generated in src/output/cluster_admin_token.txt
 ```
 
 Enjoi;
