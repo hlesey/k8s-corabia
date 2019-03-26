@@ -4,7 +4,7 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 BOX_IMAGE="qedzone/k8s-base"
-# BOX_VERSION="1.12.2"
+BOX_VERSION="1.13.4"
 
 required_plugins = %w(vagrant-vbguest vagrant-share)
 
@@ -23,7 +23,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.define hostname do |cfg|
       cfg.vm.provider :virtualbox do |vb, override|
         config.vm.box = BOX_IMAGE
-         # config.vm.box_version = BOX_VERSION
+        config.vm.box_version = BOX_VERSION
         override.vm.network :private_network, ip: "#{info[:ip]}"
         override.vm.hostname = hostname + ".local"
 
@@ -47,7 +47,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         mount_option: ["dmode=777,fmode=777"]
 
         vb.name = hostname
-        vb.customize ["modifyvm", :id, "--memory", info[:mem], "--cpus", info[:cpus], "--hwvirtex", "on", "--ioapic", "on"]
+        vb.customize ["modifyvm", :id, "--memory", info[:mem], 
+                      "--cpus", info[:cpus], "--hwvirtex", "on", 
+                      "--ioapic", "on", "--uartmode1", "disconnected"]
       end # end provider
     end # end config
 
