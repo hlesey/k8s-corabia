@@ -32,7 +32,7 @@ Use token generated in src/output/cluster_admin_token.txt
 
 If you want to run only the master node and be able to schedule Pods on it, remove the taint from the master:
 ```
-kubectl taint nodes master node-role.kubernetes.io/master-`
+kubectl taint nodes master node-role.kubernetes.io/master-
 ```
 
 
