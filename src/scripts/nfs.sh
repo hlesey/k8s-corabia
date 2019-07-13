@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
-# install and configure NFS server
-
-apt-get update
-apt-get install -y nfs-kernel-server nfs-common
+source /src/scripts/vars
 
 mkdir /nfs
 for i in {0..10}; do
