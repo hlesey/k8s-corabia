@@ -5,8 +5,11 @@ K8S_VERSION="1.14.1"
 
 ############################### INITIAL SETUP ###############################
 # update system 
+export DEBIAN_FRONTEND=noninteractive
+systemctl disable apt-daily.timer and systemctl disable apt-daily-upgrade.timer
 apt-get update && apt-get upgrade -y
-apt-get install -y apt-transport-https curl telnet 
+apt-get install -y apt-transport-https curl telnet
+apt-get install -yq nfs-kernel-server nfs-common
 
 # add kubernetes repos
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
@@ -39,22 +42,6 @@ set number
 set tabstop=2 smarttab expandtab
 set shiftwidth=2
 EOF
-
-
-############################### KERNEL UPGRADE ###############################
-# needed for cilium bpf
-# KERNEL="v4.19.25"
-# KERNEL_LONG="4.19.25-041925"
-# KERNEL_DATE="201902230535"
-
-# wget http://kernel.ubuntu.com/~kernel-ppa/mainline/${KERNEL}/linux-headers-${KERNEL_LONG}_${KERNEL_LONG}.${KERNEL_DATE}_all.deb
-# wget http://kernel.ubuntu.com/~kernel-ppa/mainline/${KERNEL}/linux-headers-${KERNEL_LONG}-generic_${KERNEL_LONG}.${KERNEL_DATE}_amd64.deb
-# wget http://kernel.ubuntu.com/~kernel-ppa/mainline/${KERNEL}/linux-image-unsigned-${KERNEL_LONG}-generic_${KERNEL_LONG}.${KERNEL_DATE}_amd64.deb
-# wget http://kernel.ubuntu.com/~kernel-ppa/mainline/${KERNEL}/linux-modules-${KERNEL_LONG}-generic_${KERNEL_LONG}.${KERNEL_DATE}_amd64.deb
-
-# dpkg -i *.deb
-# rm -rf *.deb
-
 
 ############################### PREPARE KUBEADM ###############################
 kubeadm config images pull
