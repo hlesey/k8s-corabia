@@ -1,2 +1,5 @@
 export NETWORK_PLUGIN="cilium"
 export INGRESS_CONTROLLER="nginx"
+export MASTER_IP="192.168.100.100"
+export NODE01_IP="192.168.100.101"
+export NODE02_IP="192.168.100.102"
