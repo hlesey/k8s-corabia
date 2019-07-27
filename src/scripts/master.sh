@@ -43,11 +43,11 @@ kubectl apply -f  /src/manifests/ingress/${INGRESS_CONTROLLER}
 kubectl apply -f /src/manifests/metrics-server/
 
 # deploy toolbox 
-kubectl apply -f /src/manifests/toolbox
+# kubectl apply -f /src/manifests/toolbox
 
 # fix coredns
 # kubectl apply -f /src/manifests/coredns/coredns-cm.yaml
-kubectl scale deployment coredns --replicas=1
+kubectl -n kube-system scale deployment coredns --replicas=1
 
 # get admin token
 kubectl describe secret $(kubectl get secrets | grep cluster | cut -d ' ' -f1) | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /src/output/cluster_admin_token.txt
