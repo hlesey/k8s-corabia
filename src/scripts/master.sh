@@ -57,17 +57,40 @@ cp /etc/kubernetes/admin.conf /src/output/kubeconfig.yaml
 echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /root/.bashrc
 echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /home/vagrant/.bashrc
 
-# Install kubetail 
+# Install kubetail - FIXME: add them in the image template
 curl -s https://raw.githubusercontent.com/johanhaleby/kubetail/master/kubetail --output /usr/local/bin/kubetail
 chmod +x /usr/local/bin/kubetail
 
-# Enabling shell autocompletion
+# install etcdctl - FIXME: add them in the image template
+ETCD_VERSION=${ETCD_VERSION:-v3.3.10}
+curl -L https://github.com/coreos/etcd/releases/download/$ETCD_VERSION/etcd-$ETCD_VERSION-linux-amd64.tar.gz -o etcd-$ETCD_VERSION-linux-amd64.tar.gz
+tar xzvf etcd-$ETCD_VERSION-linux-amd64.tar.gz
+cp etcd-$ETCD_VERSION-linux-amd64/etcdctl /usr/local/bin/
+rm -rf etcd-*
+etcdctl version
+
+# install  - FIXME: add them in the image template
+git clone https://github.com/jpbetz/auger
+cd auger
+make release
+cp build/auger /usr/local/bin/
+cd ..
+
+# Enabling shell autocompletion -> FIXME: add them in the image template
 echo "source <(kubectl completion bash)" >> /root/.bashrc
-echo "source <(kubectl completion bash)" >> /home/vagrant/.bashrc
 echo '. /usr/share/bash-completion/bash_completion' >> /root/.bashrc
-echo '. /usr/share/bash-completion/bash_completion' >> /home/vagrant/.bashrc
 echo  'alias kns="kubectl config set-context $(kubectl config current-context) --namespace "' >>  /root/.bashrc
-echo  'alias kns="kubectl config set-context $(kubectl config current-context) --namespace "' >> /home/vagrant/.bashrc
+
+# set etcdctl parameters
+echo 'export ETCDCTL_DIAL_TIMEOUT=3s' >> /root/.bashrc
+echo 'export ETCDCTL_CACERT=/etc/kubernetes/pki/etcd/ca.crt' >> /root/.bashrc
+echo 'export ETCDCTL_CERT=/etc/kubernetes/pki/etcd/peer.crt' >> /root/.bashrc
+echo 'export ETCDCTL_KEY=/etc/kubernetes/pki/etcd/peer.key' >> /root/.bashrc
+echo 'export ETCDCTL_ENDPOINTS=https://127.0.0.1:2379' >> /root/.bashrc
+echo 'export ETCDCTL_API=3' >> /root/.bashrc
+
+# copy root aliasses to vagrant
+cat /root/.bashrc >> /home/vagrant/.bashrc
 
 # finish
 ln -s /src/output/cluster_admin_token.txt /root/cluster_admin_token.txt
