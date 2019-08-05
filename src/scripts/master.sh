@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source /src/scripts/vars
+source /src/scripts/vars.txt
 
 # init the control plane components
 kubeadm init --apiserver-advertise-address=$MASTER_IP --pod-network-cidr=10.244.0.0/16 > /src/output/.kubeadmin_init

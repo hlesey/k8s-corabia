@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source /src/scripts/vars
+source /src/scripts/vars.txt
 
 # configure /etc/hosts file
 echo "$MASTER_IP   master master.local nfsserver.local" >> /etc/hosts

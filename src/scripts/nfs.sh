@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source /src/scripts/vars
+source /src/scripts/vars.txt
 
 mkdir /nfs
 for i in {0..10}; do
