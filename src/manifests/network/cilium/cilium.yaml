@@ -591,6 +591,9 @@ spec:
         image: docker.io/cilium/operator:v1.4.2
         imagePullPolicy: IfNotPresent
         name: cilium-operator
+        tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
         volumeMounts:
         - mountPath: /var/lib/etcd-config
           name: etcd-config-path

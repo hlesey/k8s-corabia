@@ -42,11 +42,7 @@ kubectl apply -f  /src/manifests/ingress/${INGRESS_CONTROLLER}
 # deploy metrics-server
 kubectl apply -f /src/manifests/metrics-server/
 
-# deploy toolbox 
-# kubectl apply -f /src/manifests/toolbox
-
 # fix coredns
-# kubectl apply -f /src/manifests/coredns/coredns-cm.yaml
 kubectl -n kube-system scale deployment coredns --replicas=1
 
 # get admin token
@@ -56,25 +52,6 @@ cp /etc/kubernetes/admin.conf /src/output/kubeconfig.yaml
 # configure vagrant and root user with kubeconfig
 echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /root/.bashrc
 echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /home/vagrant/.bashrc
-
-# Install kubetail - FIXME: add them in the image template
-curl -s https://raw.githubusercontent.com/johanhaleby/kubetail/master/kubetail --output /usr/local/bin/kubetail
-chmod +x /usr/local/bin/kubetail
-
-# install etcdctl - FIXME: add them in the image template
-ETCD_VERSION=${ETCD_VERSION:-v3.3.10}
-curl -L https://github.com/coreos/etcd/releases/download/$ETCD_VERSION/etcd-$ETCD_VERSION-linux-amd64.tar.gz -o etcd-$ETCD_VERSION-linux-amd64.tar.gz
-tar xzvf etcd-$ETCD_VERSION-linux-amd64.tar.gz
-cp etcd-$ETCD_VERSION-linux-amd64/etcdctl /usr/local/bin/
-rm -rf etcd-*
-etcdctl version
-
-# install  - FIXME: add them in the image template
-git clone https://github.com/jpbetz/auger
-cd auger
-make release
-cp build/auger /usr/local/bin/
-cd ..
 
 # Enabling shell autocompletion -> FIXME: add them in the image template
 echo "source <(kubectl completion bash)" >> /root/.bashrc
@@ -89,7 +66,7 @@ echo 'export ETCDCTL_KEY=/etc/kubernetes/pki/etcd/peer.key' >> /root/.bashrc
 echo 'export ETCDCTL_ENDPOINTS=https://127.0.0.1:2379' >> /root/.bashrc
 echo 'export ETCDCTL_API=3' >> /root/.bashrc
 
-# copy root aliasses to vagrant
+# copy root user bash config to vagrant user
 cat /root/.bashrc >> /home/vagrant/.bashrc
 
 # finish

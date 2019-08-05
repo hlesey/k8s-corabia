@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # https://kubernetes.io/docs/setup/independent/install-kubeadm/
-K8S_VERSION="1.14.1"
+K8S_VERSION="1.15.1"
+ETCD_VERSION=${ETCD_VERSION:-v3.3.10}
 
 ############################### INITIAL SETUP ###############################
 # update system 
@@ -25,6 +26,24 @@ systemctl enable docker
 # install kubeadm
 apt-get install -y kubeadm=${K8S_VERSION}-00 kubelet=${K8S_VERSION}-00 kubectl=${K8S_VERSION}-00
 
+# Install kubetail 
+curl -s https://raw.githubusercontent.com/johanhaleby/kubetail/master/kubetail --output /usr/local/bin/kubetail
+chmod +x /usr/local/bin/kubetail
+
+# install etcdctl 
+curl -L https://github.com/coreos/etcd/releases/download/$ETCD_VERSION/etcd-$ETCD_VERSION-linux-amd64.tar.gz -o etcd-$ETCD_VERSION-linux-amd64.tar.gz
+tar xzvf etcd-$ETCD_VERSION-linux-amd64.tar.gz
+cp etcd-$ETCD_VERSION-linux-amd64/etcdctl /usr/local/bin/
+rm -rf etcd-*
+etcdctl version
+
+# install auger
+git clone https://github.com/jpbetz/auger
+cd auger
+make release
+cp build/auger /usr/local/bin/
+cd ..
+
 # fixes
 ## configure utf-8
 cat <<EOF > /etc/environment
@@ -43,5 +62,16 @@ set tabstop=2 smarttab expandtab
 set shiftwidth=2
 EOF
 
-############################### PREPARE KUBEADM ###############################
+############################### PRE-PULL DOCKER IMAGES  ###############################
+# kube-system images
 kubeadm config images pull
+docker pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.24.1
+docker pull k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.1
+docker pull k8s.gcr.io/metrics-server-amd64:v0.3.2
+docker pull docker.io/cilium/cilium-init:2018-10-16
+docker pull docker.io/cilium/cilium:v1.4.2
+docker pull docker.io/cilium/operator:v1.4.2
+
+# other usefull images
+docker pull hlesey/toolbox:1.0
+docker pull nginx
