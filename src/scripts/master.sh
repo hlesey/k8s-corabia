@@ -55,16 +55,16 @@ echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /home/vagrant/.bashrc
 
 # Enabling shell autocompletion -> FIXME: add them in the image template
 echo "source <(kubectl completion bash)" >> /root/.bashrc
-echo '. /usr/share/bash-completion/bash_completion' >> /root/.bashrc
-echo  'alias kns="kubectl config set-context $(kubectl config current-context) --namespace "' >>  /root/.bashrc
+echo ". /usr/share/bash-completion/bash_completion" >> /root/.bashrc
+echo  "alias kns='kubectl config set-context \$(kubectl config current-context) --namespace'" >>  /root/.bashrc
 
 # set etcdctl parameters
-echo 'export ETCDCTL_DIAL_TIMEOUT=3s' >> /root/.bashrc
-echo 'export ETCDCTL_CACERT=/etc/kubernetes/pki/etcd/ca.crt' >> /root/.bashrc
-echo 'export ETCDCTL_CERT=/etc/kubernetes/pki/etcd/peer.crt' >> /root/.bashrc
-echo 'export ETCDCTL_KEY=/etc/kubernetes/pki/etcd/peer.key' >> /root/.bashrc
-echo 'export ETCDCTL_ENDPOINTS=https://127.0.0.1:2379' >> /root/.bashrc
-echo 'export ETCDCTL_API=3' >> /root/.bashrc
+echo "export ETCDCTL_DIAL_TIMEOUT=3s" >> /root/.bashrc
+echo "export ETCDCTL_CACERT=/etc/kubernetes/pki/etcd/ca.crt" >> /root/.bashrc
+echo "export ETCDCTL_CERT=/etc/kubernetes/pki/etcd/peer.crt" >> /root/.bashrc
+echo "export ETCDCTL_KEY=/etc/kubernetes/pki/etcd/peer.key" >> /root/.bashrc
+echo "export ETCDCTL_ENDPOINTS=https://127.0.0.1:2379" >> /root/.bashrc
+echo "export ETCDCTL_API=3" >> /root/.bashrc
 
 # copy root user bash config to vagrant user
 cat /root/.bashrc >> /home/vagrant/.bashrc
