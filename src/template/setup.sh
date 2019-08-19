@@ -9,7 +9,7 @@ ETCD_VERSION=${ETCD_VERSION:-v3.3.10}
 export DEBIAN_FRONTEND=noninteractive
 systemctl disable apt-daily.timer and systemctl disable apt-daily-upgrade.timer
 apt-get update && apt-get upgrade -y
-apt-get install -y apt-transport-https curl telnet
+apt-get install -y apt-transport-https curl telnet jq
 apt-get install -yq nfs-kernel-server nfs-common
 
 # add kubernetes repos
