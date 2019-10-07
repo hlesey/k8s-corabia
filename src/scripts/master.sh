@@ -16,6 +16,10 @@ EOF
 systemctl daemon-reload
 systemctl restart kubelet
 
+# workaround for 140615704306112:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/root/.rnd
+touch /root/.rnd
+touch /home/vagrant/.rnd
+
 kubectl create secret generic -n kube-system cilium-etcd-secrets \
     --from-file=etcd-ca=/etc/kubernetes/pki/etcd/ca.crt \
     --from-file=etcd-client-key=/etc/kubernetes/pki/etcd/peer.key \
