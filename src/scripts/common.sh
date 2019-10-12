@@ -29,3 +29,10 @@ mkdir -p /etc/systemd/system/docker.service.d
 systemctl daemon-reload
 systemctl restart docker
 #########################################################
+
+
+#########################################################
+### fix sshd dns lookup --> should be moved in template box
+echo "UseDNS no" >> /etc/ssh/sshd_config
+systemctl restart sshd
+#########################################################
