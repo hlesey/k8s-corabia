@@ -53,7 +53,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           "--cpus", info[:cpus], 
           "--hwvirtex", "on", 
           "--uartmode1", "disconnected",
-          "--nested-hw-virt", "on",
+        # "--nested-hw-virt", "on",
           "--ioapic", "on"
         ]
       end # end provider
