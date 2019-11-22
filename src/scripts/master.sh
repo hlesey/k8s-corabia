@@ -35,7 +35,7 @@ fi
 # deploy dashboard
 mkdir /home/vagrant/certs
 openssl genrsa -out /home/vagrant/certs/dashboard.key 2048
-openssl req -x509 -new -nodes -key /home/vagrant/certs/dashboard.key -subj "/CN=k8s.local" -days 3650 -out /home/vagrant/certs/dashboard.crt
+openssl req -x509 -new -nodes -key /home/vagrant/certs/dashboard.key -subj "/CN=k8s.local" -days 365 -out /home/vagrant/certs/dashboard.crt
 kubectl create secret generic kubernetes-dashboard-certs --from-file=tls.crt=/home/vagrant/certs/dashboard.crt --from-file=tls.key=/home/vagrant/certs/dashboard.key --namespace kube-system
 kubectl apply -f /src/manifests/dashboard/
 kubectl apply -f /src/manifests/rbac/rbac.yaml
