@@ -4,8 +4,8 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 BOX_IMAGE="hlesey/k8s-base"
-BOX_VERSION="1.15.1"
-# BOX_VERSION="0"
+# BOX_VERSION="1.15.1"
+BOX_VERSION="0"
 required_plugins = %w(vagrant-vbguest vagrant-share)
 
 required_plugins.each do |plugin|
