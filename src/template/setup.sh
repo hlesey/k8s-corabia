@@ -72,3 +72,6 @@ set number
 set tabstop=2 smarttab expandtab
 set shiftwidth=2
 EOF
+
+# FIXME: configure sshd to not check dns
+
