@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # https://kubernetes.io/docs/setup/independent/install-kubeadm/
-K8S_VERSION="1.15.1"
+K8S_VERSION="1.17.2"
 ETCD_VERSION=${ETCD_VERSION:-v3.3.10}
 
 ############################### INITIAL SETUP ###############################
@@ -9,14 +9,25 @@ ETCD_VERSION=${ETCD_VERSION:-v3.3.10}
 export DEBIAN_FRONTEND=noninteractive
 systemctl disable apt-daily.timer and systemctl disable apt-daily-upgrade.timer
 apt-get update && apt-get upgrade -y
-apt-get install -y apt-transport-https curl telnet jq
-apt-get install -yq nfs-kernel-server nfs-common
+sudo apt-get install -y iptables arptables ebtables
+apt-get install -y nfs-kernel-server nfs-common
+apt-get install -y ntp 
+apt-get install -y apt-transport-https curl telnet jq dos2unix
+
+# switch to legacy versions
+sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+sudo update-alternatives --set arptables /usr/sbin/arptables-legacy
+sudo update-alternatives --set ebtables /usr/sbin/ebtables-legacy
 
 # add kubernetes repos
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
 deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
+
+# setup ntp
+systemctl enable ntp
 
 # install docker
 apt-get update
@@ -61,17 +72,3 @@ set number
 set tabstop=2 smarttab expandtab
 set shiftwidth=2
 EOF
-
-############################### PRE-PULL DOCKER IMAGES  ###############################
-# kube-system images
-kubeadm config images pull
-docker pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.24.1
-docker pull k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.1
-docker pull k8s.gcr.io/metrics-server-amd64:v0.3.2
-docker pull docker.io/cilium/cilium-init:2018-10-16
-docker pull docker.io/cilium/cilium:v1.4.2
-docker pull docker.io/cilium/operator:v1.4.2
-
-# other usefull images
-docker pull hlesey/toolbox:1.0
-docker pull nginx
