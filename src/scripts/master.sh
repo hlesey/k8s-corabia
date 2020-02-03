@@ -10,24 +10,19 @@ export KUBECONFIG=/etc/kubernetes/admin.conf
 # deploy overlay network
 if [[ "$NETWORK_PLUGIN" == "cilium" ]]; then
 ## setup kubelet
-cat <<EOF >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    cat <<EOF >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 ExecStartPre=/bin/bash -c "if [[ $(/bin/mount | /bin/grep /sys/fs/bpf -c) -eq 0 ]]; then /bin/mount bpffs /sys/fs/bpf -t bpf; fi"
 EOF
-systemctl daemon-reload
-systemctl restart kubelet
+    systemctl daemon-reload
+    systemctl restart kubelet
 
-# workaround for 140615704306112:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/root/.rnd
-touch /root/.rnd
-touch /home/vagrant/.rnd
+    kubectl create secret generic -n kube-system cilium-etcd-secrets \
+        --from-file=etcd-client-ca.crt=/etc/kubernetes/pki/etcd/ca.crt \
+        --from-file=etcd-client.key=/etc/kubernetes/pki/etcd/peer.key \
+        --from-file=etcd-client.crt=/etc/kubernetes/pki/etcd/peer.crt
 
-kubectl create secret generic -n kube-system cilium-etcd-secrets \
-    --from-file=etcd-ca=/etc/kubernetes/pki/etcd/ca.crt \
-    --from-file=etcd-client-key=/etc/kubernetes/pki/etcd/peer.key \
-    --from-file=etcd-client-crt=/etc/kubernetes/pki/etcd/peer.crt
-
-MASTER_IP=$(ip a | grep 192.168 | cut -d ' ' -f 6 | cut -d '/' -f1)
-cat "/src/manifests/network/${NETWORK_PLUGIN}/cilium.yaml" | sed -e "s'{{MASTER_IP}}'${MASTER_IP}'g" | kubectl apply -f -
-
+    MASTER_IP=$(ip a | grep 192.168 | cut -d ' ' -f 6 | cut -d '/' -f1)
+    cat "/src/manifests/network/${NETWORK_PLUGIN}/cilium.yaml" | sed -e "s'{{MASTER_IP}}'${MASTER_IP}'g" | kubectl apply -f -
 else
     kubectl apply -f /src/manifests/network/${NETWORK_PLUGIN}
 fi
@@ -46,8 +41,12 @@ kubectl apply -f  /src/manifests/ingress/${INGRESS_CONTROLLER}
 # deploy metrics-server
 kubectl apply -f /src/manifests/metrics-server/
 
-# fix coredns
+# scale coredns to 1 replica
 kubectl -n kube-system scale deployment coredns --replicas=1
+
+# workaround for 140615704306112:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/root/.rnd
+touch /root/.rnd
+touch /home/vagrant/.rnd
 
 # get admin token
 kubectl describe secret $(kubectl get secrets | grep cluster | cut -d ' ' -f1) | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /src/output/cluster_admin_token.txt
