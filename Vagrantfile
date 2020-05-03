@@ -6,7 +6,7 @@ VAGRANTFILE_API_VERSION = "2"
 BOX_IMAGE="hlesey/k8s-base"
 BOX_VERSION="1.18.2"
 # BOX_VERSION="0"
-required_plugins = %w(vagrant-vbguest vagrant-share)
+required_plugins = %w(vagrant-vbguest)
 
 required_plugins.each do |plugin|
   system "vagrant plugin install #{plugin}" unless Vagrant.has_plugin? plugin
