@@ -24,6 +24,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       cfg.vm.provider :virtualbox do |vb, override|
         config.vm.box = BOX_IMAGE
         config.vm.box_version = BOX_VERSION
+        config.vm.boot_timeout = 900
         override.vm.network :private_network, ip: "#{info[:ip]}"
         override.vm.hostname = hostname + ".local"
 
