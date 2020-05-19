@@ -32,6 +32,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           override.vm.provision "shell", path: "src/scripts/common.sh"
           override.vm.provision "shell", path: "src/scripts/master.sh"
           override.vm.provision "shell", path: "src/scripts/nfs.sh"
+          override.vm.network :forwarded_port, guest: 30080, host: 30080, id: 'ingress-http'
+          override.vm.network :forwarded_port, guest: 30443, host: 30443, id: 'ingress-https'
         else
           override.vm.provision "shell", path: "src/scripts/common.sh"
           override.vm.provision "shell", path: "src/scripts/minion.sh"
