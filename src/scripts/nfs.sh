@@ -3,16 +3,19 @@
 source /src/scripts/vars.txt
 
 mkdir /nfs
-for i in {0..10}; do
+for i in {0..9}; do
     mkdir /nfs/pv0$i
 done
-chmod 777 /nfs
+for i in {10..30}; do
+    mkdir /nfs/pv$i
+done
 
 mkdir /nfs/pv-prom
-chmod 777 /nfs/pv-prom
+chmod -R 777 /nfs
 
 # (rw,sync,no_root_squash,subtree_check)
 cat <<EOF > /etc/exports
 /nfs *(rw,sync,no_root_squash,subtree_check)
 EOF
 exportfs -ra
+
