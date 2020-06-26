@@ -4,7 +4,7 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 BOX_IMAGE="hlesey/k8s-base"
-BOX_VERSION="1.18.2"
+BOX_VERSION="1.18.2.1"
 # BOX_VERSION="0"
 required_plugins = %w(vagrant-vbguest)
 
@@ -53,10 +53,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         vb.customize [
           "modifyvm", :id, 
           "--memory", info[:mem], 
-          "--cpus", info[:cpus], 
-          "--hwvirtex", "on", 
-          "--uartmode1", "disconnected",
-        # "--nested-hw-virt", "on",
+          "--cpus", info[:cpus],
           "--ioapic", "on"
         ]
       end # end provider
