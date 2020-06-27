@@ -6,7 +6,7 @@
 .vscode
 .vagrant/*
 src/template/.vagrant/*
-src/template/output/*.box
+src/template/output
 src/output/.kubeadmin_init
 src/output/*.txt
 src/output/*.yaml
