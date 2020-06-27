@@ -1,13 +1,13 @@
 .PHONY: build add_locally box cleanup
 
-VERSION ?= "1.18.2.1"
+VERSION ?= 1.18.2.1
 
 define metadata
 {
   "name": "hlesey/k8s-base",
   "versions": [
 	{
-	  "version": ${VERSION},
+	  "version": "${VERSION}",
 	  "providers": [
 		{
 		  "name": "virtualbox",
