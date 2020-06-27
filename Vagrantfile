@@ -17,7 +17,7 @@ cluster = {
   "node01" => { :ip => "192.168.100.101", :cpus => 2, :mem => 2048 },
   "node02" => { :ip => "192.168.100.102", :cpus => 2, :mem => 2048 },
 }
- 
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   cluster.each_with_index do |(hostname, info), index|
     config.vm.define hostname do |cfg|
@@ -56,7 +56,31 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           "--cpus", info[:cpus],
           "--ioapic", "on"
         ]
+        if OS.windows?
+          vb.customize [
+           "modifyvm", :id,
+           "--uartmode1", "disconnected"
+          ]
+        end
       end # end provider
     end # end config
   end # end cluster
+end
+
+module OS
+    def OS.windows?
+        (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+    end
+
+    def OS.mac?
+        (/darwin/ =~ RUBY_PLATFORM) != nil
+    end
+
+    def OS.unix?
+        !OS.windows?
+    end
+
+    def OS.linux?
+        OS.unix? and not OS.mac?
+    end
 end
