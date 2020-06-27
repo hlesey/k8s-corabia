@@ -1,0 +1,36 @@
+{
+  "variables": {
+    "cloud_token": "{{ env `VAGRANT_CLOUD_TOKEN` }}",
+    "output_path": "./output"
+  },
+  "builders": [
+    {
+      "type": "vagrant",
+      "source_path": "ubuntu/bionic64",
+      "communicator": "ssh",
+      "add_force": true,
+      "provider": "virtualbox",
+      "output_dir": "{{user `output_path`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "scripts": [
+        "setup.sh"
+      ],
+      "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
+    }
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "vagrant-cloud",
+        "box_tag": "hlesey/k8s-base",
+        "version": "{{user `version`}}",
+        "access_token": "{{user `cloud_token`}}",
+        "version_description":"k8s v{{user `version`}}"
+      }
+    ]
+  ]
+}
