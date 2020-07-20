@@ -56,6 +56,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           "--cpus", info[:cpus],
           "--ioapic", "on"
         ]
+        if OS.linux?
+          # https://github.com/joelhandwell/ubuntu_vagrant_boxes/issues/1
+          # puts "Vagrant launched from linux, disconnecting uartmode1 for #{hostname}..."
+          vb.customize [
+           "modifyvm", :id,
+           "--uartmode1", "disconnected"
+	        ]
+        end
         if OS.windows?
           # https://github.com/joelhandwell/ubuntu_vagrant_boxes/issues/1
           # puts "Vagrant launched from windows, disconnecting uartmode1 for #{hostname}..."
