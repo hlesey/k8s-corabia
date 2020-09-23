@@ -10,13 +10,13 @@ b) Power on the VMs:
 - master node: `vagrant up master`. Afer the VM finish the initialization, the output sould end with the message: `“Enjoi.”`. 
 - worker nodes: `vagrant up node01` and `vagrant up node02`
 
-c) In order to test the cluster, from your local machine open the browser and go to: https://k8s.local:30443. You should see the K8s Dashboard: 
+c) In order to test the cluster, from your local machine open the browser and go to: https://k8s.local:30443. You should see the K8s Dashboard:
 
-![](docs/images/k8s_dashboard_login?raw=true)
+![K8s Dashboard login](./images/k8s_dashboard_login.png)
 
 d) To authenticate to this dashboard, use the token from this file: `kubeadm-vagrant/src/output/cluster_admin_token.txt`.
 
-![](docs/images/k8s_dashboard?raw=true)
+![K8s Dashboard](./images/k8s_dashboard.png)
 
 
 ## Manage cluster with kubectl
