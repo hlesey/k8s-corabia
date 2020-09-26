@@ -9,4 +9,3 @@ VAGRANT_CLOUD_TOKEN=<token> VERSION=<box_version> make box
 Be aware that if the version already exists in vagrant cloud you will get an error.
 This should be solved after https://github.com/hashicorp/packer/issues/9492 will be implemented.
 One way to mitigate it is to manually remove the provider for this version from vagrantcloud UI and retry the above make command.
-        

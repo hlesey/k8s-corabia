@@ -215,6 +215,10 @@ spec:
       serviceAccountName: nginx-ingress-serviceaccount
       nodeSelector:
         kubernetes.io/os: linux
+      # Comment the following tolerations if Dashboard must not be deployed on master
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
       containers:
         - name: nginx-ingress-controller
           image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.32.0
