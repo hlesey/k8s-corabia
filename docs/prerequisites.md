@@ -1,6 +1,6 @@
 # Prerequisites
 
-You need a physical machine (laptop/PC) with a at least i5 CPU and 8GB RAM. Lower resources might work but it is not guaranteed.
+You need a physical machine with a at least i5 CPU and 8GB RAM. Lower resources might work but it is not guaranteed.
 The Operating system could be Windows/MacOS/Linux.
 
 a) Download and install (with default settings) the following software (64bit version):
@@ -38,13 +38,15 @@ c) Deactivate `autocrlf` for git
 d) Clone the following git repos in `labs` folder:
 
 ```
-git clone https://github.com/hlesey/docker-vagrant.git
 git clone https://github.com/hlesey/kubeadm-vagrant.git
+
+# optional:
+git clone https://github.com/hlesey/docker-vagrant.git
 git clone https://github.com/hlesey/k8s-labs.git
 git clone https://github.com/hlesey/phippy.git
 ```
 
-e) On your local machine (laptop/PC) add the following entries in the hosts file:
+e) On your phisical machine add the following entries in the hosts file:
 
 ```
 192.168.100.100 master.local cluster.local nfsstorage.local k8s.local
