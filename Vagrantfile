@@ -53,15 +53,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           "--memory", info[:mem], 
           "--cpus", info[:cpus],
           "--ioapic", "on",
-          # "--uartmode1", "disconnected"
-        ]
-        if OS.windows? || OS.linux?
           # https://github.com/joelhandwell/ubuntu_vagrant_boxes/issues/1
-          vb.customize [
-           "modifyvm", :id,
-           "--uartmode1", "disconnected"
-          ]
-        end
+          "--uartmode1", "disconnected"
+        ]
       end # end provider
     end # end config
   end # end cluster
