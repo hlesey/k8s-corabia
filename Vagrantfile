@@ -54,7 +54,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           "--cpus", info[:cpus],
           "--ioapic", "on",
           # https://github.com/joelhandwell/ubuntu_vagrant_boxes/issues/1
-          "--uartmode1", "disconnected"
+          # "--uartmode1", "disconnected",
+          "--uartmode1", "file", File.join(Dir.pwd, hostname + "-console.log")
         ]
       end # end provider
     end # end config
