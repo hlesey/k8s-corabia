@@ -38,7 +38,7 @@ systemctl enable docker
 apt-get install -y kubeadm=${K8S_VERSION}-00 kubelet=${K8S_VERSION}-00 kubectl=${K8S_VERSION}-00
 
 # Install kubetail 
-curl -s https://raw.githubusercontent.com/johanhaleby/kubetail/master/kubetail --output /usr/local/bin/kubetail
+curl -s https://raw.githubusercontent.com/johanhaleby/kubetail/control-plane/kubetail --output /usr/local/bin/kubetail
 chmod +x /usr/local/bin/kubetail
 
 # install etcdctl 
