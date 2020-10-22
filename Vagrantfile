@@ -7,9 +7,9 @@ BOX_VERSION="1.18.2.2"
 required_plugins = %w(vagrant-vbguest)
 
 cluster = {                                                  
-  "master" => { :ip => "192.168.100.100", :cpus => 2, :mem => 2048 },
-  "node01" => { :ip => "192.168.100.101", :cpus => 2, :mem => 1280 },
-  "node02" => { :ip => "192.168.100.102", :cpus => 2, :mem => 1280 },
+  "control-plane" => { :ip => "192.168.234.100", :cpus => 2, :mem => 2048 },
+  "node01" => { :ip => "192.168.234.101", :cpus => 2, :mem => 1280 },
+  "node02" => { :ip => "192.168.234.102", :cpus => 2, :mem => 1280 },
 }
 
 required_plugins.each do |plugin|
@@ -26,15 +26,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         override.vm.network :private_network, ip: "#{info[:ip]}"
         override.vm.hostname = hostname + ".local"
 
-        if hostname.include? "master"
+        if hostname.include? "control-plane"
           override.vm.provision "shell", path: "src/scripts/common.sh"
-          override.vm.provision "shell", path: "src/scripts/master.sh"
+          override.vm.provision "shell", path: "src/scripts/control-plane.sh"
           override.vm.provision "shell", path: "src/scripts/nfs.sh"
           override.vm.network :forwarded_port, guest: 30080, host: 30080, id: 'ingress-http'
           override.vm.network :forwarded_port, guest: 30443, host: 30443, id: 'ingress-https'
         else
           override.vm.provision "shell", path: "src/scripts/common.sh"
-          override.vm.provision "shell", path: "src/scripts/minion.sh"
+          override.vm.provision "shell", path: "src/scripts/node.sh"
         end
 
         override.vm.synced_folder "../", "/repo", id: "repo",
