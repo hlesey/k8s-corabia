@@ -6,7 +6,7 @@ apiServer:
   - 127.0.0.1
   - cluster-api.example.com # change according to your requirements
   extraArgs:
-    advertise-address: {{MASTER_IP}}
+    advertise-address: {{CONTROL_PLANE_IP}}
     authorization-mode: Node,RBAC
     feature-gates: "TTLAfterFinished=true"
     audit-policy-file: "/etc/kubernetes/audit-policy.yaml"
