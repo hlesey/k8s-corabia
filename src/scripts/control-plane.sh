@@ -3,10 +3,10 @@
 source /src/scripts/vars.txt
 
 # init the control plane components
-kubeadm init --apiserver-advertise-address=$MASTER_IP --pod-network-cidr=10.244.0.0/16 > /src/output/.kubeadmin_init
+kubeadm init --apiserver-advertise-address=$CONTROL_PLANE_IP --pod-network-cidr=10.244.0.0/16 > /src/output/.kubeadmin_init
 
 # tba with kubeadm configfile:
-# cat "/src/manifests/kubeadm/cluster.yaml" | sed -e "s'{{MASTER_IP}}'${MASTER_IP}'g"  | kubeadm init --config -
+# cat "/src/manifests/kubeadm/cluster.yaml" | sed -e "s'{{CONTROL_PLANE_IP}}'${CONTROL_PLANE_IP}'g"  | kubeadm init --config -
 
 export KUBECONFIG=/etc/kubernetes/admin.conf
 
@@ -60,4 +60,4 @@ ln -s /src/output/cluster_admin_token.txt /root/cluster_admin_token.txt
 echo "-------------------------------------------------------------"
 echo "Use this token to login to the kubernetes dashboard:"
 cat /root/cluster_admin_token.txt
-echo "Enjoi."
+echo "Enjoy."
