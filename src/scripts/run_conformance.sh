@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This is a helper script that can be run on the master to run Kubernetes
+# This is a helper script that can be run on the control-plane to run Kubernetes
 # conformance tests.  It is very slow.
 
 set -x
@@ -52,4 +52,4 @@ _output/bin/ginkgo -v -dryRun=$DRY_RUN -focus="$E2E_FOCUS" -skip="$E2E_SKIP" _ou
     --allowed-not-ready-nodes=1 \
     --node-schedulable-timeout=1s \
     --system-pods-startup-timeout=10s \
-    -cluster-ip-range=192.168.100.0/24 > /src/output.txt
+    -cluster-ip-range=192.168.234.0/24 > /src/output.txt
