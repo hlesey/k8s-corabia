@@ -14,8 +14,8 @@ found_images=$(grep -RniI 'image:' "$LOOKUP_MANIFEST_PATH" --exclude-dir='docker
 
 for image in $found_images; do
     new_image="ghcr.io/hlesey/$(echo $image | sed 's/hlesey\///g')"
-#    docker pull $image
-#    docker tag $image $new_image
-    # docker push $new_image
+    docker pull $image
+    docker tag $image $new_image
+    docker push $new_image
     echo $image $new_image >> out.txt
 done
