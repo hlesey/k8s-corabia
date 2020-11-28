@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Deploy cilium on k8s cluster and enable bpf 
 
 ## setup kubelet
 cat <<EOF >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
@@ -11,7 +12,11 @@ systemctl restart kubelet
 kubectl create secret generic -n kube-system cilium-etcd-secrets \
     --from-file=etcd-client-ca.crt=/etc/kubernetes/pki/etcd/ca.crt \
     --from-file=etcd-client.key=/etc/kubernetes/pki/etcd/peer.key \
-    --from-file=etcd-client.crt=/etc/kubernetes/pki/etcd/peer.crt
+    --from-file=etcd-client.crt=/etc/kubernetes/pki/etcd/peer.crt \
+    --dry-run=client -o yaml \
+    | kubectl apply -f -
 
 CONTROL_PLANE_IP=$(ip a | grep 192.168 | cut -d ' ' -f 6 | cut -d '/' -f1)
-cat "/src/manifests/network/${NETWORK_PLUGIN}/cilium.yaml" | sed -e "s'{{CONTROL_PLANE_IP}}'${CONTROL_PLANE_IP}'g" | kubectl apply -f -
+cat "/src/manifests/network/${NETWORK_PLUGIN}/cilium.yaml" \
+    | sed -e "s'{{CONTROL_PLANE_IP}}'${CONTROL_PLANE_IP}'g" \
+    | kubectl apply -f -
