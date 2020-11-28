@@ -68,7 +68,7 @@ sudo vim /etc/hosts
 ```
 
 - For Windows, go to kubeadm-vagrant/src/utils/windows/ and run as Administrator (Run
-  As Administrator) the `configure_fqdn.bat` script.
+  As Administrator) the `configure-fqdn.bat` script.
 
 To verify this, go to command line and do:
 
@@ -94,5 +94,5 @@ git clone https://github.com/hlesey/phippy.git
 ```
 
 f) Download vagrant templates necessary to initialize the K8s cluster. Execute
-the script from `kubeadm-vagrant/src/utils/download_boxes.sh`. This might take a
+the script from `kubeadm-vagrant/src/utils/download-boxes.sh`. This might take a
 while.
