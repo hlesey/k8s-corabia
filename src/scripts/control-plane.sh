@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Setup and bootstrap k8s control-plane 
 
 source /src/scripts/vars.txt
 
@@ -21,14 +22,8 @@ fi
 touch /root/.rnd && chmod 600 /root/.rnd
 touch /home/vagrant/.rnd && chmod 600 /home/vagrant/.rnd && chown vagrant:vagrant /home/vagrant/.rnd
 
-
 # deploy dashboard
-mkdir /home/vagrant/certs
-openssl genrsa -out /home/vagrant/certs/dashboard.key 2048
-openssl req -x509 -new -nodes -key /home/vagrant/certs/dashboard.key -subj "/CN=k8s.local" -days 365 -out /home/vagrant/certs/dashboard.crt
-kubectl create secret generic kubernetes-dashboard-certs --from-file=tls.crt=/home/vagrant/certs/dashboard.crt --from-file=tls.key=/home/vagrant/certs/dashboard.key --namespace kube-system
-kubectl apply -f /src/manifests/dashboard/
-kubectl apply -f /src/manifests/rbac/rbac.yaml
+source /src/scripts/dashboard.sh
 
 # deploy ingress controller
 kubectl apply -f  /src/manifests/ingress/${INGRESS_CONTROLLER}
@@ -40,7 +35,7 @@ kubectl apply -f /src/manifests/metrics-server/
 kubectl -n kube-system scale deployment coredns --replicas=1
 
 # get admin token
-kubectl describe secret $(kubectl get secrets | grep cluster | cut -d ' ' -f1) | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /src/output/cluster_admin_token.txt
+kubectl describe secret $(kubectl get secrets | grep cluster | cut -d ' ' -f1) | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /src/output/cluster-admin-token
 cp /etc/kubernetes/admin.conf /src/output/kubeconfig.yaml
 
 # configure vagrant and root user with kubeconfig
@@ -56,8 +51,8 @@ echo  "alias kns='kubectl config set-context \$(kubectl config current-context) 
 cat /root/.bashrc >> /home/vagrant/.bashrc
 
 # finish
-ln -s /src/output/cluster_admin_token.txt /root/cluster_admin_token.txt
+ln -s /src/output/cluster-admin-token /root/cluster-admin-token
 echo "-------------------------------------------------------------"
 echo "Use this token to login to the kubernetes dashboard:"
-cat /root/cluster_admin_token.txt
+cat /root/cluster-admin-token
 echo "Enjoy."
