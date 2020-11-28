@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Configure nfs server (on control-plane node)
 
 source /src/scripts/vars.txt
 
