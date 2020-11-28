@@ -1,0 +1,4 @@
+language: bash
+
+script:
+    - bash tests/validate_images.sh
