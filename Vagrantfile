@@ -28,8 +28,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
         if hostname.include? "control-plane"
           override.vm.provision "shell", path: "src/scripts/common.sh"
-          override.vm.provision "shell", path: "src/scripts/control-plane.sh"
           override.vm.provision "shell", path: "src/scripts/nfs.sh"
+          override.vm.provision "shell", env: {DOCKER_USER:ENV['DOCKER_USER'], DOCKER_PW:ENV['DOCKER_PW']}, path: "src/scripts/control-plane.sh"
           override.vm.network :forwarded_port, guest: 30080, host: 30080, id: 'ingress-http'
           override.vm.network :forwarded_port, guest: 30443, host: 30443, id: 'ingress-https'
         else
@@ -53,8 +53,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           "--memory", info[:mem], 
           "--cpus", info[:cpus],
           "--ioapic", "on",
-          # https://github.com/joelhandwell/ubuntu_vagrant_boxes/issues/1
-          # "--uartmode1", "disconnected",
           "--uartmode1", "file", File.join(Dir.pwd, hostname + "-console.log")
         ]
       end # end provider

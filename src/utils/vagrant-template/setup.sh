@@ -81,12 +81,11 @@ EOF
 # kube-system images
 kubeadm config images pull
 
-## grep -Rni 'image:' src/manifests/ | cut -d ':' -f4,5 | sort -u  | sed 's/"//g' | sort -u
-docker pull docker.io/cilium/cilium:v1.6.8
-docker pull docker.io/cilium/operator:v1.6.8
-docker pull hlesey/toolbox:1.0
+docker pull ghcr.io/hlesey/cilium/cilium:v1.6.8
+docker pull ghcr.io/hlesey/cilium/operator:v1.6.8
+docker pull ghcr.io/hlesey/toolbox:1.0
 docker pull k8s.gcr.io/metrics-server-amd64:v0.3.6
-docker pull kubernetesui/dashboard:v2.0.0
-docker pull kubernetesui/metrics-scraper:v1.0.4
+docker pull ghcr.io/hlesey/kubernetesui/dashboard:v2.0.0
+docker pull ghcr.io/hlesey/kubernetesui/metrics-scraper:v1.0.4
 docker pull quay.io/coreos/flannel:v0.12.0-amd64
 docker pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.32.0

@@ -84,7 +84,7 @@ data:
 
   # Regular expression matching compatible Istio sidecar istio-proxy
   # container image names
-  sidecar-istio-proxy-image: "cilium/istio_proxy"
+  sidecar-istio-proxy-image: "ghcr.io/hlesey/cilium/istio_proxy:1.1.3"
 
   # Encapsulation mode for communication between nodes
   # Possible values:
@@ -408,7 +408,7 @@ spec:
               key: custom-cni-conf
               name: cilium-config
               optional: true
-        image: "docker.io/cilium/cilium:v1.6.8"
+        image: "ghcr.io/hlesey/cilium/cilium:v1.6.8"
         imagePullPolicy: IfNotPresent
         lifecycle:
           postStart:
@@ -476,7 +476,7 @@ spec:
               key: wait-bpf-mount
               name: cilium-config
               optional: true
-        image: "docker.io/cilium/cilium:v1.6.8"
+        image: "ghcr.io/hlesey/cilium/cilium:v1.6.8"
         imagePullPolicy: IfNotPresent
         name: clean-cilium-state
         securityContext:
@@ -582,6 +582,9 @@ spec:
         io.cilium/app: operator
         name: cilium-operator
     spec:
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
       containers:
       - args:
         - --debug=$(CILIUM_DEBUG)
@@ -665,7 +668,7 @@ spec:
               key: identity-allocation-mode
               name: cilium-config
               optional: true
-        image: "docker.io/cilium/operator:v1.6.8"
+        image: "ghcr.io/hlesey/cilium/operator:v1.6.8"
         imagePullPolicy: IfNotPresent
         name: cilium-operator
         livenessProbe:
