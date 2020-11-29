@@ -8,6 +8,6 @@
 src/template/.vagrant/*
 src/template/output
 src/output/.kubeadmin_init
-src/output/*.txt
+src/output/cluster-admin-token
 src/output/*.yaml
 *.log
