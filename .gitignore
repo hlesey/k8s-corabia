@@ -11,3 +11,8 @@ src/output/.kubeadmin_init
 src/output/cluster-admin-token
 src/output/*.yaml
 *.log
+src/aws/.terraform*
+src/aws/*.log
+src/aws/*.tfstate
+src/aws/*.backup
+
