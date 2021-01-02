@@ -41,7 +41,7 @@ So with an authenticated user you get 100 pulls more. Read also: [Docker Hub rat
 In order to setup a dockerhub account for this cluster, you need to do the following:
 
 - [Create a free dockerhub account](https://hub.docker.com/signup?redirectTo=/subscription%3Fplan%3Dindividual%26paid%3Dfalse)
-- Login to `control-plane` node (`vagrant ssh control-plane`) and execute the following script: `/src/utils/registry-cred.sh`
+- Login to `control-plane` node (`vagrant ssh control-plane`) and execute the following script: `/src/scripts/registry-cred.sh`
 - Type your dockerhub `username` and `password`. A Controller named `registry-cred` will be deployed to the cluster and will replicate your dockerhub credentials in each existing and new namespace.
 
 Enjoy;
