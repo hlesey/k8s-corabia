@@ -213,6 +213,12 @@ spec:
               port: 8443
             initialDelaySeconds: 30
             timeoutSeconds: 30
+          resources:
+            limits:
+              memory: 50Mi
+            requests:
+              cpu: 100m
+              memory: 50Mi
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
