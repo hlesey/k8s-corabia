@@ -237,7 +237,6 @@ spec:
         name: controller
         resources:
           limits:
-            cpu: 100m
             memory: 64Mi
           requests:
             cpu: 100m
