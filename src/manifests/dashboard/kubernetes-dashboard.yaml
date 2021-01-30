@@ -187,7 +187,7 @@ spec:
     spec:
       containers:
         - name: kubernetes-dashboard
-          image: ghcr.io/hlesey/kubernetesui/dashboard:v2.0.0
+          image: ghcr.io/hlesey/dashboard:v2.1.0
           imagePullPolicy: Always
           ports:
             - containerPort: 8443
@@ -213,17 +213,17 @@ spec:
               port: 8443
             initialDelaySeconds: 30
             timeoutSeconds: 30
-          resources:
-            limits:
-              memory: 50Mi
-            requests:
-              cpu: 100m
-              memory: 50Mi
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             runAsUser: 1001
             runAsGroup: 2001
+          resources:
+            limits:
+              memory: 50Mi
+            requests:
+              cpu: 50m
+              memory: 50Mi
       volumes:
         - name: kubernetes-dashboard-certs
           secret:
@@ -232,7 +232,7 @@ spec:
           emptyDir: {}
       serviceAccountName: kubernetes-dashboard
       nodeSelector:
-        "beta.kubernetes.io/os": linux
+        "kubernetes.io/os": linux
       # Comment the following tolerations if Dashboard must not be deployed on master
       tolerations:
         - key: node-role.kubernetes.io/master
@@ -278,7 +278,7 @@ spec:
     spec:
       containers:
         - name: dashboard-metrics-scraper
-          image: ghcr.io/hlesey/kubernetesui/metrics-scraper:v1.0.4
+          image: ghcr.io/hlesey/metrics-scraper:v1.0.6
           ports:
             - containerPort: 8000
               protocol: TCP
@@ -297,9 +297,15 @@ spec:
             readOnlyRootFilesystem: true
             runAsUser: 1001
             runAsGroup: 2001
+          resources:
+            limits:
+              memory: 50Mi
+            requests:
+              cpu: 50m
+              memory: 50Mi
       serviceAccountName: kubernetes-dashboard
       nodeSelector:
-        "beta.kubernetes.io/os": linux
+        "kubernetes.io/os": linux
       # Comment the following tolerations if Dashboard must not be deployed on master
       tolerations:
         - key: node-role.kubernetes.io/master
