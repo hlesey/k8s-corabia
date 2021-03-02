@@ -14,7 +14,6 @@ done
 mkdir /nfs/pv-prom
 chmod -R 777 /nfs
 
-# (rw,sync,no_root_squash,subtree_check)
 cat <<EOF > /etc/exports
 /nfs *(rw,sync,no_root_squash,subtree_check)
 EOF
