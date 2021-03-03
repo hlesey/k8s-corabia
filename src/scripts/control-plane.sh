@@ -3,7 +3,7 @@
 set -xe
 
 source /src/scripts/vars.sh
-[[ -z $BOOTSTRAP_TOKEN ]] && BOOTSTRAP_TOKEN="$(openssl rand -hex 6).$(openssl rand -hex 6)"
+[[ -z $BOOTSTRAP_TOKEN ]] && BOOTSTRAP_TOKEN="$(openssl rand -hex 3).$(openssl rand -hex 8)"
 
 # bootstrap k8s control-plane components
 cat /src/manifests/kubeadm/control-plane.yaml \
