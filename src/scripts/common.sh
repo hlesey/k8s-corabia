@@ -16,6 +16,7 @@ echo "$NODE02_IP   node02 node02.local"                                    >> /e
 echo "DNS=8.8.8.8" >> /etc/systemd/resolved.conf
 echo "DNS=8.8.4.4" >> /etc/systemd/resolved.conf
 systemctl restart systemd-resolved
+sleep 15;
 
 # update system 
 export DEBIAN_FRONTEND=noninteractive
@@ -25,8 +26,8 @@ systemctl disable apt-daily-upgrade.timer
 apt-get update
 apt-get install -y iptables arptables ebtables \
                    nfs-kernel-server nfs-common \
-                   apt-transport-https curl telnet \
-                   jq dos2unix ntp docker.io
+                   apt-transport-https ntp docker.io
+apt-get install -y curl telnet jq dos2unix
 
 # setup ntp
 systemctl enable ntp && \
