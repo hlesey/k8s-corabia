@@ -1,3 +1,17 @@
+variable "cluster-name" {
+  default     = "victor"
+  description = "Controls the naming of the AWS resources"
+}
+
+variable "vpc-cidr" {
+  default = "192.168.0.0/16"
+}
+
+variable "allowed-cidr-blocks" {
+  default     = "193.105.140.131/32,193.105.140.132/32,82.77.192.0/24"
+  description = "A comma separated list of CIDR blocks to allow SSH connections from."
+}
+
 variable "region" {
   default = "eu-central-1"
 }
@@ -29,6 +43,27 @@ variable "node-instance-type" {
 variable "node-spot-price" {
   default     = "0.01"
   description = "The maximum spot bid for worker nodes"
+}
+
+variable "bootstraptoken" {
+  default     = ""
+  description = "Overrides the auto-generated bootstrap token"
+}
+
+resource "random_string" "bootstraptoken-first-part" {
+  length  = 6
+  upper   = false
+  special = false
+}
+
+resource "random_string" "bootstraptoken-second-part" {
+  length  = 16
+  upper   = false
+  special = false
+}
+
+locals {
+  bootstraptoken = var.bootstraptoken == "" ? "${random_string.bootstraptoken-first-part.result}.${random_string.bootstraptoken-second-part.result}" : var.bootstraptoken
 }
 
 variable "k8s-ssh-key-path" {

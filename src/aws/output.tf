@@ -1,7 +1,9 @@
-output "control_plane_public_dns" {
-  value = aws_spot_instance_request.control-plane.public_dns
-}
-
-output "control_plane_public_ip" {
-  value = aws_spot_instance_request.control-plane.public_ip
+output "cluster_info" {
+  value = [
+    for name in module.clusters : {
+      Cluster_Name : name.cluster-name
+      Control_Plane_Public_IP : name.control_plane_public_ip
+      Control_Plane_Public_DNS : name.control_plane_public_dns
+    }
+  ]
 }
