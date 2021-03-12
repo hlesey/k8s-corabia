@@ -10,11 +10,8 @@ resource "aws_key_pair" "main" {
 locals {
   # adjust cluster lists based on your needs
   clusters = {
-    adrian = {
-      allowed_cidr_blocks = "1.2.3.4/32",
-    }
-    victor = {
-      allowed_cidr_blocks = "0.0.0.0/0",
+    test1 = {
+      allowed_cidr_blocks = "186.121.5.0/32",
     }
   }
 }
@@ -28,12 +25,6 @@ module "clusters" {
   region              = var.region
   allowed-cidr-blocks = each.value.allowed_cidr_blocks
 
-  instance-ami                = var.instance-ami
-  control-plane-instance-type = var.control-plane-instance-type
-  node-instance-type          = var.node-instance-type
-  node-spot-price             = var.node-spot-price
-
-  k8s-ssh-key      = var.k8s-ssh-key
   k8s-ssh-key-name = var.k8s-ssh-key-name
   k8s-ssh-key-path = var.k8s-ssh-key-path
 }

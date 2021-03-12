@@ -3,14 +3,11 @@
 set -xe
 
 source /src/scripts/vars.sh
-[[ -z $BOOTSTRAP_TOKEN ]] && BOOTSTRAP_TOKEN="$(openssl rand -hex 3).$(openssl rand -hex 8)"
-[[ -z $CONTROL_PLANE_PUBLIC_DNS ]] && CONTROL_PLANE_PUBLIC_DNS="k8s.local"
 
 # bootstrap k8s control-plane components
 cat /src/manifests/kubeadm/control-plane.yaml \
     | sed -e "s'{{CONTROL_PLANE_IP}}'${CONTROL_PLANE_IP}'g" \
     | sed -e "s'{{CONTROL_PLANE_PUBLIC_DNS}}'${CONTROL_PLANE_PUBLIC_DNS}'g" \
-    | sed -e "s'{{BOOTSTRAP_TOKEN}}'${BOOTSTRAP_TOKEN}'g" \
     > /tmp/control-plane.yaml
 
 kubeadm init --config /tmp/control-plane.yaml > /src/output/.kubeadmin_init
