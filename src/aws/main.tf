@@ -11,7 +11,7 @@ locals {
   # adjust cluster lists based on your needs
   clusters = {
     test1 = {
-      allowed_cidr_blocks = "188.25.59.187/32",
+      allowed_cidr_blocks = "186.121.5.0/32",
     }
   }
 }
