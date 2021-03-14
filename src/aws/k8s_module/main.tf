@@ -176,3 +176,8 @@ resource "aws_spot_instance_request" "node" {
     ]
   }
 }
+
+module "kubeconfig" {
+  source  = "github.com/matti/terraform-shell-resource"
+  command = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.k8s-ssh-key-path} ubuntu@${aws_instance.control-plane.public_ip} sudo cat /src/output/kubeconfig.yaml"
+}

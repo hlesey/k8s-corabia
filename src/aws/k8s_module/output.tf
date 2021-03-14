@@ -9,3 +9,7 @@ output "control_plane_public_ip" {
 output "cluster-name" {
   value = var.cluster-name
 }
+
+output "kubeconfig" {
+  value = module.kubeconfig.stdout
+}

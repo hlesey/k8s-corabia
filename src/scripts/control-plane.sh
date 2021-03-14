@@ -5,10 +5,8 @@ set -xe
 source /src/scripts/vars.sh
 
 # bootstrap k8s control-plane components
-cat /src/manifests/kubeadm/control-plane.yaml \
-    | sed -e "s'{{CONTROL_PLANE_IP}}'${CONTROL_PLANE_IP}'g" \
-    | sed -e "s'{{CONTROL_PLANE_PUBLIC_DNS}}'${CONTROL_PLANE_PUBLIC_DNS}'g" \
-    > /tmp/control-plane.yaml
+sed -e "s'{{CONTROL_PLANE_IP}}'${CONTROL_PLANE_IP}'g" /src/manifests/kubeadm/control-plane.yaml | \
+sed -e "s'{{CONTROL_PLANE_PUBLIC_DNS}}'${CONTROL_PLANE_PUBLIC_DNS}'g" > /tmp/control-plane.yaml
 
 kubeadm init --config /tmp/control-plane.yaml > /src/output/.kubeadmin_init
 
@@ -24,7 +22,7 @@ EOF
     systemctl restart kubelet
 fi
 
-kubectl apply -f /src/manifests/network/${NETWORK_PLUGIN}
+kubectl apply -f /src/manifests/network/"${NETWORK_PLUGIN}"
 
 # deploy dashboard
 kubectl apply -f /src/manifests/dashboard/
@@ -33,7 +31,7 @@ kubectl apply -f /src/manifests/dashboard/
 kubectl apply -f /src/manifests/rbac/rbac.yaml
 
 # deploy ingress controller
-kubectl apply -f  /src/manifests/ingress/${INGRESS_CONTROLLER}
+kubectl apply -f  /src/manifests/ingress/"${INGRESS_CONTROLLER}"
 
 # deploy metrics-server
 kubectl apply -f /src/manifests/metrics-server/
@@ -42,7 +40,7 @@ kubectl apply -f /src/manifests/metrics-server/
 kubectl -n kube-system scale deployment coredns --replicas=1
 
 # get admin token
-kubectl describe secret $(kubectl get secrets | grep cluster | cut -d ' ' -f1) | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /src/output/cluster-admin-token
+kubectl describe secret "$(kubectl get secrets | grep cluster | cut -d ' ' -f1)" | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /src/output/cluster-admin-token
 cp /etc/kubernetes/admin.conf /src/output/kubeconfig.yaml
 
 # configure vagrant and root user with kubeconfig
