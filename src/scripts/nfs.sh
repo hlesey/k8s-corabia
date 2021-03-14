@@ -5,10 +5,10 @@ source /src/scripts/vars.sh
 
 mkdir /nfs
 for i in {0..9}; do
-    mkdir /nfs/pv0$i
+    mkdir /nfs/pv0"${i}"
 done
 for i in {10..30}; do
-    mkdir /nfs/pv$i
+    mkdir /nfs/pv"${i}"
 done
 
 mkdir /nfs/pv-prom

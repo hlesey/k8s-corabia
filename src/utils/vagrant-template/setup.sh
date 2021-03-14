@@ -5,13 +5,13 @@ K8S_VERSION="1.18.2"
 ETCD_VERSION=${ETCD_VERSION:-v3.3.10}
 
 ############################### INITIAL SETUP ###############################
-# update system 
+# update system
 export DEBIAN_FRONTEND=noninteractive
 systemctl disable apt-daily.timer and systemctl disable apt-daily-upgrade.timer
 apt-get update && apt-get upgrade -y
 sudo apt-get install -y iptables arptables ebtables
 apt-get install -y nfs-kernel-server nfs-common
-apt-get install -y ntp 
+apt-get install -y ntp
 apt-get install -y apt-transport-https curl telnet jq dos2unix
 
 # switch to legacy versions
@@ -37,27 +37,28 @@ systemctl enable docker
 # install kubeadm
 apt-get install -y kubeadm=${K8S_VERSION}-00 kubelet=${K8S_VERSION}-00 kubectl=${K8S_VERSION}-00
 
-# Install kubetail 
+# Install kubetail
 curl -s https://raw.githubusercontent.com/johanhaleby/kubetail/control-plane/kubetail --output /usr/local/bin/kubetail
 chmod +x /usr/local/bin/kubetail
 
-# install etcdctl 
-curl -L https://github.com/coreos/etcd/releases/download/$ETCD_VERSION/etcd-$ETCD_VERSION-linux-amd64.tar.gz -o etcd-$ETCD_VERSION-linux-amd64.tar.gz
-tar xzvf etcd-$ETCD_VERSION-linux-amd64.tar.gz
-cp etcd-$ETCD_VERSION-linux-amd64/etcdctl /usr/local/bin/
+# install etcdctl
+curl -L https://github.com/coreos/etcd/releases/download/"$ETCD_VERSION"/etcd-"$ETCD_VERSION"-linux-amd64.tar.gz -o etcd-"$ETCD_VERSION"-linux-amd64.tar.gz
+tar xzvf etcd-"$ETCD_VERSION"-linux-amd64.tar.gz
+cp etcd-"$ETCD_VERSION"-linux-amd64/etcdctl /usr/local/bin/
 rm -rf etcd-*
 etcdctl --version
 
 # install auger
 git clone https://github.com/jpbetz/auger
-cd auger
-make release
-cp build/auger /usr/local/bin/
-cd ..
+(
+  cd auger || exit
+  make release
+  cp build/auger /usr/local/bin/
+)
 
 # fixes
 ## configure utf-8
-cat <<EOF > /etc/environment
+cat <<EOF >/etc/environment
 LANG=en_US.utf-8
 LC_ALL=en_US.utf-8
 EOF
@@ -74,7 +75,6 @@ set shiftwidth=2
 EOF
 
 # FIXME: configure sshd to not check dns
-
 
 ############################### PRE-PULL DOCKER IMAGES  ###############################
 
