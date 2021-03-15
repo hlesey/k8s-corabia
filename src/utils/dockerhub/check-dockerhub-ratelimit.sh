@@ -2,11 +2,11 @@
 # Verify your quota limit in dockerhub for your user
 
 if [ "$DOCKER_USER" == "" ]; then 
-    read -p "Enter your dockerhub username:" DOCKER_USER
+    read -rp "Enter your dockerhub username:" DOCKER_USER
 fi 
 
 if [ "$DOCKER_PW" == "" ]; then 
-    read -p "Enter your dockerhub password:" DOCKER_PW
+    read -rp "Enter your dockerhub password:" DOCKER_PW
 fi 
 
 

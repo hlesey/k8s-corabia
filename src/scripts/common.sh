@@ -8,9 +8,10 @@ set -xe
 source /src/scripts/vars.sh
 
 # configure /etc/hosts file
-echo "$CONTROL_PLANE_IP control-plane control-plane.local nfsserver.local" >> /etc/hosts
-echo "$NODE01_IP   node01 node01.local"                                    >> /etc/hosts
-echo "$NODE02_IP   node02 node02.local"                                    >> /etc/hosts
+
+echo "${CONTROL_PLANE_IP} control-plane control-plane.local nfsserver.local
+${NODE01_IP}   node01 node01.local
+${NODE02_IP}   node02 node02.local" >> /etc/hosts
 
 # configure external DNS, instead of using VBox DNS
 echo "DNS=8.8.8.8" >> /etc/systemd/resolved.conf
@@ -60,7 +61,7 @@ EOF
 
 # install kubeadm
 sudo apt-get update
-apt-get install -y kubeadm=${K8S_VERSION}-00 kubelet=${K8S_VERSION}-00 kubectl=${K8S_VERSION}-00
+apt-get install -y kubeadm="${K8S_VERSION}-00" kubelet="${K8S_VERSION}"-00 kubectl="${K8S_VERSION}-00"
 
 # Install kubetail 
 curl -s https://raw.githubusercontent.com/johanhaleby/kubetail/control-plane/kubetail --output /usr/local/bin/kubetail
@@ -85,6 +86,6 @@ set shiftwidth=2
 EOF
 
 # Enabling shell autocompletion
-echo "source <(kubectl completion bash)" >> /root/.bashrc
-echo ". /usr/share/bash-completion/bash_completion" >> /root/.bashrc
-echo  "alias kns='kubectl config set-context \$(kubectl config current-context) --namespace'" >>  /root/.bashrc
+echo "source <(kubectl completion bash)
+. /usr/share/bash-completion/bash_completion
+alias kns='kubectl config set-context \$(kubectl config current-context) --namespace'" >>  /root/.bashrc
