@@ -13,3 +13,7 @@ output "cluster-name" {
 output "kubeconfig" {
   value = module.kubeconfig.stdout
 }
+
+output "cluster-admin-token" {
+   value = module.cluster-admin-token.stdout
+}
