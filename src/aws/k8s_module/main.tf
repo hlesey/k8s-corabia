@@ -98,7 +98,7 @@ resource "aws_instance" "control-plane" {
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]
   depends_on                  = [aws_internet_gateway.gw]
   tags                        = { Name = "${var.cluster-name}-control-plane" }
-  
+
   connection {
     type        = "ssh"
     user        = "ubuntu"
