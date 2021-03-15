@@ -1,0 +1,59 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# Top-most EditorConfig file
+root = true
+
+# Rules for all filetypes
+#
+# Universal Properties
+#
+# indent_style = space # tab | space
+# indent_size = 4 # int | tab
+# tab_width = 4 # a positive integer (defaults indent_size when indent_size is a number)
+# end_of_line = lf #  lf | cr | lf
+# charset = utf-8 # latin1 | utf-8 | utf-16be | utf-16le
+# trim_trailing_whitespace = true # true | false
+# insert_final_newline = true | false
+# max_line_length = 80 # positive int, only emax or vim
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+tab_width = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.cfg]
+indent_size = 2
+
+[*.{tf,tfvars}]
+indent_size = 4
+
+[*Dockerfile]
+indent_size = 2
+
+# BASH - https://www.gnu.org/software/bash/manual/bash.html
+[*.sh]
+indent_size = 4
+
+shell_variant      = bash
+binary_next_line   = true  # like -bn
+switch_case_indent = true  # like -ci
+space_redirects    = true  # like -sr
+keep_padding       = true  # like -kp
+
+# JSON, YAML - [http://json.org/ | http://yaml.org/]
+[*.{json,yml,yaml}]
+indent_size = 2
+
+# MD files
+[*.{md,markdown}]
+indent_size = 2
+max_line_length = 80
+
+[*.{rst,txt}]
+indent_size = 4
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
