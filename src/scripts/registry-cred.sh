@@ -9,7 +9,7 @@ if [ "$DOCKER_PW" == "" ]; then
     read -rp "Enter your dockerhub password:" DOCKER_PW
 fi
 
-if [[ $(echo "$DOCKER_PW" | docker login -u "$DOCKER_USER" --password-stdin) -ne 0 ]]; then
+if [[ $(echo "$DOCKER_PW" | docker login -u "$DOCKER_USER" --password-stdin > /dev/null) -ne 0 ]]; then
    echo "Invalid docker credentials. Please try again."
    exit 1
 fi
