@@ -5,15 +5,17 @@ resource "aws_vpc" "main" {
 
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
+  tags   = { Name = var.cluster-name}
 }
 
 resource "aws_route_table" "r" {
-  vpc_id = aws_vpc.main.id
+  vpc_id  = aws_vpc.main.id
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
   }
-  depends_on = [aws_internet_gateway.gw]
+  depends_on  = [aws_internet_gateway.gw]
+  tags        = { Name = var.cluster-name }
 }
 
 resource "aws_route_table_association" "main" {
@@ -26,21 +28,23 @@ resource "aws_subnet" "main" {
   cidr_block              = "192.168.234.0/24"
   availability_zone       = "${var.region}${var.az}"
   map_public_ip_on_launch = true
+  tags                    = { Name = var.cluster-name }
 }
 
 resource "aws_security_group" "kubernetes" {
   name        = var.cluster-name
   description = "Allow inbound traffic"
   vpc_id      = aws_vpc.main.id
+  tags        = { Name = var.cluster-name }
 }
 
 resource "aws_security_group_rule" "allow_all_from_self" {
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.kubernetes.id
-  security_group_id        = aws_security_group.kubernetes.id
+  type                      = "ingress"
+  from_port                 = 0
+  to_port                   = 0
+  protocol                  = "-1"
+  source_security_group_id  = aws_security_group.kubernetes.id
+  security_group_id         = aws_security_group.kubernetes.id
 }
 
 resource "aws_security_group_rule" "allow_ssh_from_admin" {
@@ -61,19 +65,10 @@ resource "aws_security_group_rule" "allow_k8sapi_from_admin" {
   security_group_id = aws_security_group.kubernetes.id
 }
 
-resource "aws_security_group_rule" "allow_https_from_web" {
+resource "aws_security_group_rule" "allow_nodeport_from_internet" {
   type              = "ingress"
-  from_port         = 30443
-  to_port           = 30443
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.kubernetes.id
-}
-
-resource "aws_security_group_rule" "allow_http_from_web" {
-  type              = "ingress"
-  from_port         = 30080
-  to_port           = 30080
+  from_port         = 30000
+  to_port           = 32767
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.kubernetes.id
@@ -92,7 +87,7 @@ resource "aws_instance" "control-plane" {
   availability_zone           = "${var.region}${var.az}"
   ami                         = var.instance-ami
   instance_type               = var.control-plane-instance-type
-  key_name                    = var.k8s-ssh-key-name
+  key_name                    = var.ssh-key-name
   subnet_id                   = aws_subnet.main.id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]
@@ -102,7 +97,7 @@ resource "aws_instance" "control-plane" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file(var.k8s-ssh-key-path)
+    private_key = file(var.ssh-key-path)
     host        = aws_instance.control-plane.public_ip
   }
 
@@ -114,12 +109,12 @@ resource "aws_instance" "control-plane" {
   }
 
   provisioner "file" {
-    source      = "../scripts"
+    source      = "../../scripts"
     destination = "/src/"
   }
 
   provisioner "file" {
-    source      = "../manifests"
+    source      = "../../manifests"
     destination = "/src/"
   }
 
@@ -140,7 +135,7 @@ resource "aws_spot_instance_request" "node" {
   ami                         = var.instance-ami
   instance_type               = var.node-instance-type
   spot_price                  = var.node-spot-price
-  key_name                    = var.k8s-ssh-key-name
+  key_name                    = var.ssh-key-name
   wait_for_fulfillment        = true
   subnet_id                   = aws_subnet.main.id
   associate_public_ip_address = true
@@ -151,7 +146,7 @@ resource "aws_spot_instance_request" "node" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file(var.k8s-ssh-key-path)
+    private_key = file(var.ssh-key-path)
     host        = self.public_ip
   }
 
@@ -163,7 +158,7 @@ resource "aws_spot_instance_request" "node" {
   }
 
   provisioner "file" {
-    source      = "../scripts"
+    source      = "../../scripts"
     destination = "/src/"
   }
 
@@ -179,10 +174,10 @@ resource "aws_spot_instance_request" "node" {
 
 module "kubeconfig" {
   source  = "github.com/matti/terraform-shell-resource"
-  command = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.k8s-ssh-key-path} ubuntu@${aws_instance.control-plane.public_ip} sudo sed -e 's#${aws_instance.control-plane.private_ip}#${aws_instance.control-plane.public_dns}#g' /src/output/kubeconfig.yaml"
+  command = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_instance.control-plane.public_ip} sudo sed -e 's#${aws_instance.control-plane.private_ip}#${aws_instance.control-plane.public_dns}#g' /src/output/kubeconfig.yaml"
 }
 
 module "cluster-admin-token" {
   source  = "github.com/matti/terraform-shell-resource"
-  command = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.k8s-ssh-key-path} ubuntu@${aws_instance.control-plane.public_ip} sudo cat /src/output/cluster-admin-token"
+  command = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_instance.control-plane.public_ip} sudo cat /src/output/cluster-admin-token"
 }

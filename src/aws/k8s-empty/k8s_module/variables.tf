@@ -40,8 +40,8 @@ locals {
   bootstraptoken = "abcdef.0123456789abcdef"
 }
 
-variable "k8s-ssh-key-path" {
+variable "ssh-key-path" {
 }
 
-variable "k8s-ssh-key-name" {
+variable "ssh-key-name" {
 }
