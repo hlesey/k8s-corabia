@@ -83,3 +83,6 @@ git clone https://github.com/hlesey/docker-vagrant.git
 git clone https://github.com/hlesey/k8s-labs.git
 git clone https://github.com/hlesey/phippy.git
 ```
+
+f) Configure `kubectl` command line tool. The following script needs to be executed from `labs` folder:
+`./kubeadm-vagrant/src/utils/tools/configure-kubectl.sh`.
