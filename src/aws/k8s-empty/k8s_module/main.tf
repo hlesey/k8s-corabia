@@ -110,7 +110,7 @@ resource "aws_instance" "control-plane" {
   }
 
   provisioner "file" {
-    source      = "../../../../../k8s-labs/src/kubeadm/src/aws/manifests"
+    source      = "../../../../k8s-labs/src/kubeadm/src/aws/manifests"
     destination = "/src/"
   }
 
@@ -127,6 +127,6 @@ resource "aws_spot_instance_request" "node" {
   subnet_id                   = aws_subnet.main.id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]
-  depends_on                  = [aws_internet_gateway.gw, aws_instance.control-plane]
+  depends_on                  = [aws_internet_gateway.gw]
   tags                        = { Name = "${var.cluster-name}-node" }
 }
