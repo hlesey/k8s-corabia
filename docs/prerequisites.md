@@ -50,7 +50,23 @@ Change the current directory to `labs` folder.
 - For Windows run `git-bash` and go to `labs` folder. Ex. `cd /c/Users/<user
   name>/Desktop/labs`
 
-c) On your physical machine add the following entries in the hosts file:
+c) Deactivate `autocrlf` for git.
+
+- `git config --global core.autocrlf false`
+
+d) Clone the following git repositories in `labs` folder:
+
+```bash
+git clone https://github.com/hlesey/kubeadm-vagrant.git
+git clone https://github.com/hlesey/docker-vagrant.git
+git clone https://github.com/hlesey/k8s-labs.git
+git clone https://github.com/hlesey/phippy.git
+```
+
+e) Configure `kubectl` command line tool. The following script needs to be executed from `labs` folder:
+`./kubeadm-vagrant/src/utils/tools/configure-kubectl.sh`.
+
+f) On your physical machine add the following entries in the hosts file:
 
 ```bash
 192.168.234.100 phippy.local phippy-api.local phippy-ui.local wordpress.local
@@ -70,19 +86,3 @@ Request timeout for icmp_seq 0
 ```
 
 If you get response then this setup is OK.
-
-d) Deactivate `autocrlf` for git.
-
-- `git config --global core.autocrlf false`
-
-e) Clone the following git repositories in `labs` folder:
-
-```bash
-git clone https://github.com/hlesey/kubeadm-vagrant.git
-git clone https://github.com/hlesey/docker-vagrant.git
-git clone https://github.com/hlesey/k8s-labs.git
-git clone https://github.com/hlesey/phippy.git
-```
-
-f) Configure `kubectl` command line tool. The following script needs to be executed from `labs` folder:
-`./kubeadm-vagrant/src/utils/tools/configure-kubectl.sh`.

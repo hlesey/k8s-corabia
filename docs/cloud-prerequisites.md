@@ -46,3 +46,24 @@ git clone https://github.com/hlesey/phippy.git
 
 e) Configure `kubectl` command line tool. The following script needs be executed from `labs` folder:
 `./kubeadm-vagrant/src/utils/tools/configure-kubectl.sh`.
+
+f) On your physical machine add the following entries in the hosts file:
+
+```bash
+192.168.234.100 phippy.local phippy-api.local phippy-ui.local wordpress.local
+192.168.234.100 k8s.local prometheus.local hubble-ui.local  myapp.local 
+```
+
+- For Linux/Mac: modify the `/etc/hosts` and append the above lines.
+- For Windows, go to `kubeadm-vagrant/src/utils/windows/` and run as Administrator (Run
+  As Administrator) the `configure-fqdn.bat` script.
+
+To verify this, go to command line and do:
+
+```bash
+ping k8s.local
+PING k8s.local (192.168.234.100): 56 data bytes
+Request timeout for icmp_seq 0
+```
+
+If you get response then this setup is OK.
