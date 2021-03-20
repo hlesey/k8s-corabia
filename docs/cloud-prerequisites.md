@@ -1,50 +1,32 @@
 # Prerequisites
 
-You need a physical machine with a at least i5 CPU and 8GB RAM. Lower resources
-might work but it is not guaranteed. The Operating system could be
-Windows/MacOS/Linux.
+The cluster was provisioned already in the cloud and you need to
+setup your local machine to connect to it.
 
 a) Download and install (with default settings) the following software (64bit
 version):
 
 MacOS:
 
-- [VirtualBox 6.1.6](https://download.virtualbox.org/virtualbox/6.1.6)
-- [Oracle VM VirtualBox Extension Pack
-  6.1.6](https://download.virtualbox.org/virtualbox/6.1.6/Oracle_VM_VirtualBox_Extension_Pack-6.1.6.vbox-extpack)
-- [vagrant v2.2.7](https://releases.hashicorp.com/vagrant/2.2.7/)
 - [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [VSCode](https://code.visualstudio.com/download), vim or any text editor you
   like.
 
 Windows:
 
-- [VirtualBox 6.1.6](https://download.virtualbox.org/virtualbox/6.1.6)
-- [Oracle VM VirtualBox Extension Pack
-  6.1.6](https://download.virtualbox.org/virtualbox/6.1.6/Oracle_VM_VirtualBox_Extension_Pack-6.1.6.vbox-extpack)
-- [vagrant v2.2.7](https://releases.hashicorp.com/vagrant/2.2.7/)
 - [git bash
   v2.23.0](https://github.com/git-for-windows/git/releases/download/v2.23.0.windows.1/Git-2.23.0-64-bit.exe)
 - [VSCode](https://code.visualstudio.com/download),
   [notepad++](https://notepad-plus-plus.org/download) or any text editor you
   like.
 
-Windows only: In case that HyperV is active, you have to deactivate it in order
-to use this setup. More info
-[here](https://support.microsoft.com/en-us/help/3204980/virtualization-applications-do-not-work-together-with-hyper-v-device-g)
-
 Linux:
 
-- [VirtualBox 6.1.6](https://download.virtualbox.org/virtualbox/6.1.6)
-- [Oracle VM VirtualBox Extension Pack
-  6.1.6](https://download.virtualbox.org/virtualbox/6.1.6/Oracle_VM_VirtualBox_Extension_Pack-6.1.6.vbox-extpack)
-- [vagrant v2.2.7](https://releases.hashicorp.com/vagrant/2.2.7/)
 - [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [VSCode](https://code.visualstudio.com/download), vim or any text editor you
   like.
 
-b) Create a folder with the name `labs` where you have ~30GB free space on disk.
-Change the current directory to `labs` folder.
+b) Create a folder with the name `labs` and change the current directory to `labs` folder.
 
 - For Mac/Linux: `cd $HOME/Desktop/labs`
 - For Windows run `git-bash` and go to `labs` folder. Ex. `cd /c/Users/<user
@@ -58,12 +40,11 @@ d) Clone the following git repositories in `labs` folder:
 
 ```bash
 git clone https://github.com/hlesey/kubeadm-vagrant.git
-git clone https://github.com/hlesey/docker-vagrant.git
 git clone https://github.com/hlesey/k8s-labs.git
 git clone https://github.com/hlesey/phippy.git
 ```
 
-e) Configure `kubectl` command line tool. The following script needs to be executed from `labs` folder:
+e) Configure `kubectl` command line tool. The following script needs be executed from `labs` folder:
 `./kubeadm-vagrant/src/utils/tools/configure-kubectl.sh`.
 
 f) On your physical machine add the following entries in the hosts file:

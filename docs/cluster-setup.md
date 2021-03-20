@@ -15,9 +15,6 @@ b) Power on the VMs:
   initialization, the output should end with the message: `“Enjoy”`.
 - worker nodes: `vagrant up node01` and `vagrant up node02`
 
-c) Configure `kubectl` command line tool. Open the terminal (Linux/Mac) or GitBash(Windows) and go to the labs folder.
-Here execute script: `./kubeadm-vagrant/src/utils/tools/configure-kubectl.sh`.
-
 c) In order to test the cluster, from your local machine open the browser and go
 to: [https://k8s.local:30443](https://k8s.local:30443). You should see the K8s
 Dashboard:
@@ -48,5 +45,3 @@ In order to setup a dockerhub account for this cluster, you need to do the follo
 - [Create a free dockerhub account](https://hub.docker.com/signup?redirectTo=/subscription%3Fplan%3Dindividual%26paid%3Dfalse)
 - Login to `control-plane` node (`vagrant ssh control-plane`) and execute the following script: `/src/scripts/registry-cred.sh`
 - Type your dockerhub `username` and `password`. A Controller named `registry-cred` will be deployed to the cluster and will replicate your dockerhub credentials in each existing and new namespace.
-
-Enjoy;
