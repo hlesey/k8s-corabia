@@ -7,7 +7,7 @@ variable "az" {
 }
 
 variable "ssh-key-path" {
-  default = "~/.ssh/id_rsa_local"
+  default = "~/.ssh/id_rsa_lab"
 }
 
 variable "ssh-key" {
