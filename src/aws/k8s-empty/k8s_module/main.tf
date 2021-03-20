@@ -110,7 +110,7 @@ resource "aws_instance" "control-plane" {
   }
 
   provisioner "file" {
-    source      = "../../../../k8s-labs/src/kubeadm/src/aws/manifests"
+    source      = "../../../../../k8s-labs/src/kubeadm/src/aws/manifests"
     destination = "/src/"
   }
 
