@@ -40,7 +40,6 @@ d) Clone the following git repositories in `labs` folder:
 
 ```bash
 git clone https://github.com/hlesey/kubeadm-vagrant.git
-git clone https://github.com/hlesey/docker-vagrant.git
 git clone https://github.com/hlesey/k8s-labs.git
 git clone https://github.com/hlesey/phippy.git
 ```
