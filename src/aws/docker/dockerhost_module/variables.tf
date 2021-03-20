@@ -22,7 +22,7 @@ variable "instance-ami" {
 }
 
 variable "dockerhost-instance-type" {
-  default     = "t3.small"
+  default     = "t3.micro"
   description = "Which EC2 instance type to use for the dockerhost"
 }
 

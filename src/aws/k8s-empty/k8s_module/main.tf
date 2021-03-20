@@ -1,12 +1,12 @@
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc-cidr
   enable_dns_hostnames = true
-  tags                 = { Name = var.cluster-name}
+  tags                 = { Name = var.cluster-name }
 }
 
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
-  tags   = { Name = var.cluster-name}
+  tags   = { Name = var.cluster-name }
 }
 
 resource "aws_route_table" "r" {
@@ -16,7 +16,7 @@ resource "aws_route_table" "r" {
     gateway_id = aws_internet_gateway.gw.id
   }
   depends_on = [aws_internet_gateway.gw]
-  tags       = { Name = var.cluster-name}
+  tags       = { Name = var.cluster-name }
 }
 
 resource "aws_route_table_association" "main" {
@@ -29,14 +29,14 @@ resource "aws_subnet" "main" {
   cidr_block              = "192.168.234.0/24"
   availability_zone       = "${var.region}${var.az}"
   map_public_ip_on_launch = true
-  tags                    = { Name = var.cluster-name}
+  tags                    = { Name = var.cluster-name }
 }
 
 resource "aws_security_group" "kubernetes" {
   name        = var.cluster-name
   description = "Allow inbound traffic"
   vpc_id      = aws_vpc.main.id
-  tags        = { Name = var.cluster-name}
+  tags        = { Name = var.cluster-name }
 }
 
 resource "aws_security_group_rule" "allow_all_from_self" {

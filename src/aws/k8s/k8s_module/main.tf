@@ -5,7 +5,7 @@ resource "aws_vpc" "main" {
 
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
-  tags   = { Name = var.cluster-name}
+  tags   = { Name = var.cluster-name }
 }
 
 resource "aws_route_table" "r" {
