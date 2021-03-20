@@ -3,15 +3,20 @@
 
 ## Bring the cluster up
 
-a) For Mac/Linux - open the terminal and go to `labs/kubeadm-vagrant`. For
-   Windows - open Git-bash and go to the `labs/kubeadm-vagrant` folder (Ex. `cd
-   /c/Users/<user name>/Desktop/labs/kubeadm-vagrant`).
+a) Based on the OS you have:
+
+- for Mac/Linux - open the terminal and go to `labs/kubeadm-vagrant`.
+- for Windows - open Git-bash and go to the `labs/kubeadm-vagrant` folder (Ex. `cd
+   /c/Users/<user-name>/Desktop/labs/kubeadm-vagrant`).
 
 b) Power on the VMs:
 
 - control-plane node: `vagrant up control-plane`. After the VM finish the
   initialization, the output should end with the message: `“Enjoy”`.
 - worker nodes: `vagrant up node01` and `vagrant up node02`
+
+c) Configure `kubectl` command line tool. Open the terminal (Linux/Mac) or GitBash(Windows) and go to the labs folder.
+Here execute script: `./kubeadm-vagrant/src/utils/tools/configure-kubectl.sh`.
 
 c) In order to test the cluster, from your local machine open the browser and go
 to: [https://k8s.local:30443](https://k8s.local:30443). You should see the K8s
