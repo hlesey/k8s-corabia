@@ -5,7 +5,7 @@ provider "aws" {
 locals {
   clusters = {
     test1 = {
-      allowed_cidr_blocks = "188.25.169.63/32",
+      allowed_cidr_blocks = "0.0.0.0/0",
     }
   }
 }
