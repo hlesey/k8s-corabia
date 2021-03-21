@@ -3,8 +3,11 @@
 WINDOWS="MINGW64_NT"
 MAC="Darwin"
 
+extension=""
+
 if [[ $(uname | grep $WINDOWS) != "" ]]; then
 	os="windows"
+    extension=".exe"
 elif [[ $(uname| grep $MAC) != "" ]]; then
 	os="mac"
 else
@@ -14,7 +17,7 @@ fi
 echo "Detected $os operating system."
 
 mkdir -p bin
-curl -o bin/kubectl -LO https://dl.k8s.io/release/"$(curl -sL https://dl.k8s.io/release/stable.txt)"/bin/$os/amd64/kubectl.exe
+curl -o bin/kubectl -LO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/$os/amd64/kubectl${extension}"
 
 cat <<EOF > ~/.bash_profile
 export PATH="$PATH:$(pwd)/bin"
