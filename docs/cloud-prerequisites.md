@@ -46,6 +46,8 @@ git clone https://github.com/hlesey/phippy.git
 
 e) Configure `kubectl` command line tool. The following script needs be executed from `labs` folder:
 `./kubeadm-vagrant/src/utils/tools/configure-kubectl.sh`.
+After that, run the following command to load the new shell configuration: `source ~/.bash_profile`
+
 
 f) On your physical machine add the following entries in the hosts file:
 
