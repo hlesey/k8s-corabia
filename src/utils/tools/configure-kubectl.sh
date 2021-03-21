@@ -26,4 +26,3 @@ alias kns='kubectl config set-context \$(kubectl config current-context) --names
 EOF
 
 . ~/.bash_profile
-kubectl version
