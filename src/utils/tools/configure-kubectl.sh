@@ -6,7 +6,7 @@ MAC="Darwin"
 extension=""
 
 if [[ $(uname | grep $WINDOWS) != "" ]]; then
-	os="windows"
+    os="windows"
     extension=".exe"
 elif [[ $(uname| grep $MAC) != "" ]]; then
 	os="mac"
