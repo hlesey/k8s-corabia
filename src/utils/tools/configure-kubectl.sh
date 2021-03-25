@@ -18,6 +18,7 @@ echo "Detected $os operating system."
 
 mkdir -p bin
 curl -o bin/kubectl -LO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/$os/amd64/kubectl${extension}"
+curl -o bin/kubetail -LO https://raw.githubusercontent.com/johanhaleby/kubetail/master/kubetail
 
 cat <<EOF > ~/.bash_profile
 export PATH="$PATH:$(pwd)/bin"
