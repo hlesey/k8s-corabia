@@ -46,6 +46,11 @@ cp /etc/kubernetes/admin.conf /src/output/kubeconfig.yaml
 # configure vagrant and root user with kubeconfig
 echo "export KUBECONFIG=/src/output/kubeconfig.yaml"  >> /root/.bashrc
 
+# Enabling shell autocompletion
+echo "source <(kubectl completion bash)
+. /usr/share/bash-completion/bash_completion
+alias kns='kubectl config set-context \$(kubectl config current-context) --namespace'" >>  /root/.bashrc
+
 # finish
 ln -s /src/output/cluster-admin-token /root/cluster-admin-token
 echo "-------------------------------------------------------------"
