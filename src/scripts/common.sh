@@ -14,10 +14,11 @@ ${NODE01_IP}   node01 node01.local
 ${NODE02_IP}   node02 node02.local" >> /etc/hosts
 
 # configure external DNS, instead of using VBox DNS
-echo "DNS=8.8.8.8" >> /etc/systemd/resolved.conf
-echo "DNS=8.8.4.4" >> /etc/systemd/resolved.conf
-systemctl restart systemd-resolved
-sleep 15;
+if [[ $(dmidecode -s system-manufacturer) == "innotek GmbH" ]]; then 
+  echo "DNS=8.8.8.8" >> /etc/systemd/resolved.conf
+  echo "DNS=8.8.4.4" >> /etc/systemd/resolved.conf
+  systemctl restart systemd-resolved
+fi
 
 # update system 
 export DEBIAN_FRONTEND=noninteractive
@@ -84,8 +85,3 @@ set number
 set tabstop=2 smarttab expandtab
 set shiftwidth=2
 EOF
-
-# Enabling shell autocompletion
-echo "source <(kubectl completion bash)
-. /usr/share/bash-completion/bash_completion
-alias kns='kubectl config set-context \$(kubectl config current-context) --namespace'" >>  /root/.bashrc

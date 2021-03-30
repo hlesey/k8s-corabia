@@ -31,11 +31,6 @@ variable "node-instance-type" {
   description = "Which EC2 instance type to use for the worker nodes"
 }
 
-variable "node-spot-price" {
-  default     = "0.01"
-  description = "The maximum spot bid for worker nodes"
-}
-
 locals {
   bootstraptoken = "abcdef.0123456789abcdef"
 }
