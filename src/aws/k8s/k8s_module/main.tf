@@ -106,7 +106,7 @@ resource "aws_instance" "control-plane" {
 resource "aws_eip" "control-plane" {
   vpc         = true
   instance    = aws_instance.control-plane.id
-  depends_on  = [aws_internet_gateway.gw, aws_instance.control-plane]
+  depends_on  = [aws_internet_gateway.gw]
 }
 
 resource "null_resource" "control-plane-config" {
