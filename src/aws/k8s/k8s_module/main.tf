@@ -89,16 +89,36 @@ resource "aws_instance" "control-plane" {
   instance_type               = var.control-plane-instance-type
   key_name                    = var.ssh-key-name
   subnet_id                   = aws_subnet.main.id
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]
   depends_on                  = [aws_internet_gateway.gw]
   tags                        = { Name = "${var.cluster-name}-control-plane" }
+
+  lifecycle {
+    ignore_changes = [
+      ami,
+      user_data,
+      associate_public_ip_address,
+    ]
+  }
+}
+
+resource "aws_eip" "control-plane" {
+  vpc         = true
+  instance    = aws_instance.control-plane.id
+  depends_on  = [aws_internet_gateway.gw]
+}
+
+resource "null_resource" "control-plane-config" {
+  triggers = {
+    instance = aws_instance.control-plane.id
+  }
 
   connection {
     type        = "ssh"
     user        = "ubuntu"
     private_key = file(var.ssh-key-path)
-    host        = aws_instance.control-plane.public_ip
+    host        = aws_eip.control-plane.public_ip
   }
 
   provisioner "remote-exec" {
@@ -120,8 +140,8 @@ resource "aws_instance" "control-plane" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo echo 'export CONTROL_PLANE_IP=${aws_instance.control-plane.private_ip}' >> /src/scripts/vars.sh",
-      "sudo echo 'export CONTROL_PLANE_PUBLIC_DNS=${aws_instance.control-plane.public_dns}' >> /src/scripts/vars.sh",
+      "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/scripts/vars.sh",
+      "sudo echo 'export CONTROL_PLANE_PUBLIC_DNS=${aws_eip.control-plane.public_dns}' >> /src/scripts/vars.sh",
       "sudo /bin/bash /src/scripts/common.sh",
       "sudo /bin/bash /src/scripts/nfs.sh",
       "sudo /bin/bash /src/scripts/control-plane.sh",
@@ -129,18 +149,16 @@ resource "aws_instance" "control-plane" {
   }
 }
 
-resource "aws_spot_instance_request" "node" {
+resource "aws_instance" "node" {
   count                       = 2
   availability_zone           = "${var.region}${var.az}"
   ami                         = var.instance-ami
   instance_type               = var.node-instance-type
-  spot_price                  = var.node-spot-price
   key_name                    = var.ssh-key-name
-  wait_for_fulfillment        = true
   subnet_id                   = aws_subnet.main.id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]
-  depends_on                  = [aws_internet_gateway.gw, aws_instance.control-plane]
+  depends_on                  = [null_resource.control-plane-config]
   tags                        = { Name = "${var.cluster-name}-node-${count.index}" }
 
   connection {
@@ -164,20 +182,24 @@ resource "aws_spot_instance_request" "node" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo echo 'export CONTROL_PLANE_IP=${aws_instance.control-plane.private_ip}' >> /src/scripts/vars.sh",
-      "sudo echo 'kubeadm join --token=${local.bootstraptoken} --discovery-token-unsafe-skip-ca-verification ${aws_instance.control-plane.private_ip}:6443' >> /src/output/.kubeadmin_init",
+      "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/scripts/vars.sh",
+      "sudo echo 'kubeadm join --token=${local.bootstraptoken} --discovery-token-unsafe-skip-ca-verification ${aws_eip.control-plane.private_ip}:6443' >> /src/output/.kubeadmin_init",
       "sudo /bin/bash /src/scripts/common.sh",
       "sudo /bin/bash /src/scripts/node.sh",
     ]
   }
 }
 
+# tba: kubectl label node node02 kubernetes.io/role=worker
+
 module "kubeconfig" {
-  source  = "github.com/matti/terraform-shell-resource"
-  command = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_instance.control-plane.public_ip} sudo sed -e 's#${aws_instance.control-plane.private_ip}#${aws_instance.control-plane.public_dns}#g' /src/output/kubeconfig.yaml"
+  depends_on = [null_resource.control-plane-config]
+  source     = "github.com/matti/terraform-shell-resource"
+  command    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo sed -e 's#${aws_eip.control-plane.private_ip}#${aws_eip.control-plane.public_dns}#g' /src/output/kubeconfig.yaml"
 }
 
 module "cluster-admin-token" {
-  source  = "github.com/matti/terraform-shell-resource"
-  command = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_instance.control-plane.public_ip} sudo cat /src/output/cluster-admin-token"
+  depends_on = [null_resource.control-plane-config]
+  source     = "github.com/matti/terraform-shell-resource"
+  command    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo cat /src/output/cluster-admin-token"
 }

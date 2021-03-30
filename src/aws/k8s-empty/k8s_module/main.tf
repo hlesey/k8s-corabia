@@ -113,17 +113,13 @@ resource "aws_instance" "control-plane" {
     source      = "../../../../k8s-labs/src/kubeadm/src/aws/manifests"
     destination = "/src/"
   }
-
-
 }
 
-resource "aws_spot_instance_request" "node" {
+resource "aws_instance" "node" {
   availability_zone           = "${var.region}${var.az}"
   ami                         = var.instance-ami
   instance_type               = var.node-instance-type
-  spot_price                  = var.node-spot-price
   key_name                    = var.ssh-key-name
-  wait_for_fulfillment        = true
   subnet_id                   = aws_subnet.main.id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]

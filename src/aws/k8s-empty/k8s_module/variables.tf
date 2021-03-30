@@ -27,17 +27,8 @@ variable "control-plane-instance-type" {
 }
 
 variable "node-instance-type" {
-  default     = "t3.small"
+  default     = "t3.micro"
   description = "Which EC2 instance type to use for the worker nodes"
-}
-
-variable "node-spot-price" {
-  default     = "0.01"
-  description = "The maximum spot bid for worker nodes"
-}
-
-locals {
-  bootstraptoken = "abcdef.0123456789abcdef"
 }
 
 variable "ssh-key-path" {
