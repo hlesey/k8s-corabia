@@ -159,7 +159,7 @@ resource "aws_instance" "node" {
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]
   depends_on                  = [null_resource.control-plane-config]
-  tags                        = { Name = "${var.cluster-name}-node-${count.index}" }
+  tags                        = { Name = "${var.cluster-name}-node0${count.index + 1}" }
 
   connection {
     type        = "ssh"
@@ -190,7 +190,24 @@ resource "aws_instance" "node" {
   }
 }
 
-# tba: kubectl label node node02 kubernetes.io/role=worker
+resource "null_resource" "node-labels" {
+  count                       = 2
+
+  connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file(var.ssh-key-path)
+      host        = aws_eip.control-plane.public_ip
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf label node $(echo ${aws_instance.node[count.index].private_dns} | cut -d '.' -f1) kubernetes.io/hostname=node0${count.index + 1} --overwrite",
+      "sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf label node $(echo ${aws_instance.node[count.index].private_dns} | cut -d '.' -f1) node-role.kubernetes.io/node0${count.index + 1}= --overwrite",
+      "sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf label node $(echo ${aws_instance.node[count.index].private_dns} | cut -d '.' -f1) node-role.kubernetes.io/worker= --overwrite"
+    ]
+  }
+}
 
 module "kubeconfig" {
   depends_on = [null_resource.control-plane-config]
