@@ -6,25 +6,36 @@ set -xe
 
 # load variables
 source /src/scripts/vars.sh
+DEBIAN_FRONTEND=noninteractive
 
-# configure /etc/hosts file
+# add control-plane IP to hosts file
+echo "${CONTROL_PLANE_IP} control-plane control-plane.local nfsserver.local" >> /etc/hosts
 
-echo "${CONTROL_PLANE_IP} control-plane control-plane.local nfsserver.local
-${NODE01_IP}   node01 node01.local
-${NODE02_IP}   node02 node02.local" >> /etc/hosts
-
-# configure external DNS, instead of using VBox DNS
-if [[ $(dmidecode -s system-manufacturer) == "innotek GmbH" ]]; then 
+# VirtualBox specific
+if [[ "$(dmidecode -s system-manufacturer)" == "innotek GmbH" ]]; then
+  # use external DNS, instead of local VBox
   echo "DNS=8.8.8.8" >> /etc/systemd/resolved.conf
   echo "DNS=8.8.4.4" >> /etc/systemd/resolved.conf
   systemctl restart systemd-resolved
+
+  # disable sshd dns lookup
+  echo "UseDNS no" >> /etc/ssh/sshd_config
+  systemctl restart sshd
+
+  # add nodes IPs to hosts file
+  echo "${NODE01_IP} node01 node01.local" >> /etc/hosts
+  echo "${NODE02_IP} node02 node02.local" >> /etc/hosts
 fi
 
-# update system 
-export DEBIAN_FRONTEND=noninteractive
-systemctl disable apt-daily.timer
-systemctl disable apt-daily-upgrade.timer
+# AWS specific
+if [[ "$(dmidecode -s system-manufacturer)" == "Amazon EC2" ]]; then
+  while [ ! -f /var/lib/cloud/instance/boot-finished ]; do
+    echo 'Waiting for cloud-init...';
+    sleep 1;
+  done
+fi
 
+# install dependencies
 apt-get update
 apt-get install -y iptables arptables ebtables \
                    nfs-kernel-server nfs-common \
@@ -50,10 +61,6 @@ mkdir -p /etc/systemd/system/docker.service.d
 systemctl enable docker && \
 systemctl start docker
 
-### fix sshd dns lookup
-echo "UseDNS no" >> /etc/ssh/sshd_config
-systemctl restart sshd
-
 # add kubernetes repos
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
@@ -68,20 +75,12 @@ apt-get install -y kubeadm="${K8S_VERSION}-00" kubelet="${K8S_VERSION}"-00 kubec
 curl -s https://raw.githubusercontent.com/johanhaleby/kubetail/control-plane/kubetail --output /usr/local/bin/kubetail
 chmod +x /usr/local/bin/kubetail
 
-# fixes
-## configure utf-8
+# update system 
+systemctl disable apt-daily.timer
+systemctl disable apt-daily-upgrade.timer
+
+# configure utf-8
 cat <<EOF > /etc/environment
 LANG=en_US.utf-8
 LC_ALL=en_US.utf-8
-EOF
-
-## config vim
-cat <<EOF >/root/.vimrc
-syntax on
-filetype on
-set incsearch
-set ignorecase
-set number
-set tabstop=2 smarttab expandtab
-set shiftwidth=2
 EOF

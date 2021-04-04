@@ -5,7 +5,7 @@ kind: InitConfiguration
 bootstrapTokens:
 - token: "abcdef.0123456789abcdef"
   description: "kubeadm bootstrap token"
-  ttl: "120h"
+  ttl: "168h" # 7days
 localAPIEndpoint:
   advertiseAddress: {{CONTROL_PLANE_IP}}
   bindPort: 6443
