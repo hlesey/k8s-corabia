@@ -15,4 +15,4 @@ src/aws/**/.terraform*
 src/aws/**/*.log
 *.tfstate
 src/aws/**/*.backup
-
+.localenv
