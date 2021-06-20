@@ -1,21 +1,28 @@
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc-cidr
   enable_dns_hostnames = true
+  tags = {
+    Name = var.cluster-name
+  }
 }
 
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
-  tags   = { Name = var.cluster-name }
+  tags = {
+    Name = var.cluster-name
+  }
 }
 
 resource "aws_route_table" "r" {
-  vpc_id  = aws_vpc.main.id
+  vpc_id = aws_vpc.main.id
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
   }
-  depends_on  = [aws_internet_gateway.gw]
-  tags        = { Name = var.cluster-name }
+  depends_on = [aws_internet_gateway.gw]
+  tags = {
+    Name = var.cluster-name
+  }
 }
 
 resource "aws_route_table_association" "main" {
@@ -28,7 +35,9 @@ resource "aws_subnet" "main" {
   cidr_block              = "192.168.234.0/24"
   availability_zone       = "${var.region}${var.az}"
   map_public_ip_on_launch = true
-  tags                    = { Name = var.cluster-name }
+  tags = {
+    Name = var.cluster-name
+  }
 }
 
 resource "aws_security_group" "kubernetes" {
@@ -39,12 +48,12 @@ resource "aws_security_group" "kubernetes" {
 }
 
 resource "aws_security_group_rule" "allow_all_from_self" {
-  type                      = "ingress"
-  from_port                 = 0
-  to_port                   = 0
-  protocol                  = "-1"
-  source_security_group_id  = aws_security_group.kubernetes.id
-  security_group_id         = aws_security_group.kubernetes.id
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.kubernetes.id
+  security_group_id        = aws_security_group.kubernetes.id
 }
 
 resource "aws_security_group_rule" "allow_ssh_from_admin" {
@@ -92,7 +101,9 @@ resource "aws_instance" "control-plane" {
   associate_public_ip_address = false
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]
   depends_on                  = [aws_internet_gateway.gw]
-  tags                        = { Name = "${var.cluster-name}-control-plane" }
+  tags = {
+    Name = "${var.cluster-name}-control-plane"
+  }
 
   lifecycle {
     ignore_changes = [
@@ -104,9 +115,12 @@ resource "aws_instance" "control-plane" {
 }
 
 resource "aws_eip" "control-plane" {
-  vpc         = true
-  instance    = aws_instance.control-plane.id
-  depends_on  = [aws_internet_gateway.gw]
+  vpc        = true
+  instance   = aws_instance.control-plane.id
+  depends_on = [aws_internet_gateway.gw]
+  tags = {
+    Name = var.cluster-name
+  }
 }
 
 resource "null_resource" "control-plane-config" {
@@ -159,7 +173,9 @@ resource "aws_instance" "node" {
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]
   depends_on                  = [null_resource.control-plane-config]
-  tags                        = { Name = "${var.cluster-name}-node0${count.index + 1}" }
+  tags = {
+    Name = "${var.cluster-name}-node0${count.index + 1}"
+  }
 
   connection {
     type        = "ssh"
@@ -191,13 +207,13 @@ resource "aws_instance" "node" {
 }
 
 resource "null_resource" "node-labels" {
-  count                       = 2
+  count = 2
 
   connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = file(var.ssh-key-path)
-      host        = aws_eip.control-plane.public_ip
+    type        = "ssh"
+    user        = "ubuntu"
+    private_key = file(var.ssh-key-path)
+    host        = aws_eip.control-plane.public_ip
   }
 
   provisioner "remote-exec" {

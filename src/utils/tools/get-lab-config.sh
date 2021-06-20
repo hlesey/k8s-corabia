@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-if [[ "$USER" == "" || "$TOKEN" == "" ]]; then
-    echo "USER and TOKEN environment variables not set."
+if [[ "${USER_LAB}" == "" || "${TOKEN_LAB}" == "" ]]; then
+    echo "USER_LAB and/or TOKEN_LAB environment variables not set."
     exit 1
 fi
 
 # download private key file
-curl -H "Authorization: token $TOKEN" \
+curl -H "Authorization: token ${TOKEN_LAB}" \
   -H "Accept: application/vnd.github.v4.raw" \
   -o id_rsa \
   -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/common/id_rsa_lab
@@ -15,26 +15,26 @@ curl -H "Authorization: token $TOKEN" \
 # Check if the folder exist and create it + check if the key exists and do a backup
 
 # download kubeconfig file
-curl -H "Authorization: token $TOKEN" \
+curl -H "Authorization: token ${TOKEN_LAB}" \
   -H "Accept: application/vnd.github.v4.raw" \
   -O \
-  -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/output/$USER/kubeconfig.yaml
+  -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/output/"${USER_LAB}"/kubeconfig.yaml
 
 
 # download lab-docker info
-curl -H "Authorization: token $TOKEN" \
+curl -H "Authorization: token ${TOKEN_LAB}" \
   -H "Accept: application/vnd.github.v4.raw" \
   -O \
-  -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/output/$USER/lab-docker.yaml
+  -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/output/"${USER_LAB}"/lab-docker.yaml
 
 # download lab-k8s info
-curl -H "Authorization: token $TOKEN" \
+curl -H "Authorization: token ${TOKEN_LAB}" \
   -H "Accept: application/vnd.github.v4.raw" \
   -O \
-  -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/output/$USER/lab-k8s.yaml
+  -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/output/"${USER_LAB}"/lab-k8s.yaml
 
 # download lab-k8s-empty info
-curl -H "Authorization: token $TOKEN" \
+curl -H "Authorization: token ${TOKEN_LAB}" \
   -H "Accept: application/vnd.github.v4.raw" \
   -O \
-  -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/output/$USER/lab-k8s-empty.yaml
+  -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/output/"${USER_LAB}"/lab-k8s-empty.yaml
