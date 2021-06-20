@@ -84,8 +84,9 @@ kubeadm config images pull
 docker pull ghcr.io/hlesey/cilium/cilium:v1.6.8
 docker pull ghcr.io/hlesey/cilium/operator:v1.6.8
 docker pull ghcr.io/hlesey/toolbox:1.0
-docker pull k8s.gcr.io/metrics-server-amd64:v0.3.6
-docker pull ghcr.io/hlesey/kubernetesui/dashboard:v2.0.0
-docker pull ghcr.io/hlesey/kubernetesui/metrics-scraper:v1.0.4
+docker pull k8s.gcr.io/metrics-server/metrics-server:v0.5.0
+docker pull ghcr.io/hlesey/kubernetesui/dashboard:v2.3.1
+docker pull ghcr.io/hlesey/kubernetesui/metrics-scraper:v1.0.7
+docker pull ghcr.io/hlesey/envoy:v1.18.2
 docker pull quay.io/coreos/flannel:v0.12.0-amd64
 docker pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.32.0
