@@ -1,6 +1,6 @@
 resource "local_file" "kubeconfig" {
   for_each = module.clusters
-  content = each.value.kubeconfig
+  content  = each.value.kubeconfig
   filename = "${path.module}/${each.value.cluster-name}"
 }
 
@@ -14,8 +14,8 @@ output "cluster_info" {
       node01-public-dns : name.node01_public_dns
       node02-public-ip : name.node02_public_ip
       node02-public-dns : name.node02_public_dns
-      kubeconfig: name.kubeconfig
-      cluster-admin-token: name.cluster-admin-token
+      kubeconfig : name.kubeconfig
+      cluster-admin-token : name.cluster-admin-token
     }
   ]
 }

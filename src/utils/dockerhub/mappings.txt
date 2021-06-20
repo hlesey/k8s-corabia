@@ -7,6 +7,7 @@ cilium/cilium:v1.6.8 ghcr.io/hlesey/cilium/cilium:v1.6.8
 cilium/istio_proxy:1.1.3 ghcr.io/hlesey/cilium/istio_proxy:1.1.3
 cilium/operator:v1.6.8 ghcr.io/hlesey/cilium/operator:v1.6.8
 debian:latest ghcr.io/hlesey/debian:latest
+envoyproxy/envoy:v1.18.2 ghcr.io/hlesey/envoy:v1.18.2
 hlesey/ctfd:latest ghcr.io/hlesey/ctfd:latest
 hlesey/hash-go:1.0 ghcr.io/hlesey/hash-go:1.0
 hlesey/hash-go:latest ghcr.io/hlesey/hash-go:latest
@@ -21,8 +22,8 @@ hlesey/redis:4 ghcr.io/hlesey/redis:4
 hlesey/redis:latest ghcr.io/hlesey/redis:latest
 hlesey/toolbox:1.0 ghcr.io/hlesey/toolbox:1.0
 hlesey/toolbox:latest ghcr.io/hlesey/toolbox:latest
-kubernetesui/dashboard:v2.0.0 ghcr.io/hlesey/kubernetesui/dashboard:v2.0.0
-kubernetesui/metrics-scraper:v1.0.4 ghcr.io/hlesey/kubernetesui/metrics-scraper:v1.0.4
+kubernetesui/dashboard:v2.3.1 ghcr.io/hlesey/kubernetesui/dashboard:v2.3.1
+kubernetesui/metrics-scraper:v1.0.7 ghcr.io/hlesey/kubernetesui/metrics-scraper:v1.0.7
 mariadb:10.4 ghcr.io/hlesey/mariadb:10.4
 mysql ghcr.io/hlesey/mysql
 nginx:1.17.10 ghcr.io/hlesey/nginx:1.17.10
