@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # https://kubernetes.io/docs/setup/independent/install-kubeadm/
-K8S_VERSION="1.18.2"
-ETCD_VERSION=${ETCD_VERSION:-v3.3.10}
+K8S_VERSION="1.21.2"
+ETCD_VERSION=${ETCD_VERSION:-v3.5.0}
 
 ############################### INITIAL SETUP ###############################
 # update system

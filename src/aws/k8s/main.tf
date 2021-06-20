@@ -6,6 +6,9 @@ locals {
   clusters = {
     test1 = {
       allowed_cidr_blocks = "0.0.0.0/0",
+    },
+    test2 = {
+      allowed_cidr_blocks = "0.0.0.0/0",
     }
   }
 }
