@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 
-USER="$1"
-TOKEN="$2"
-
 if [[ "$USER" == "" || "$TOKEN" == "" ]]; then
-    echo "usage: $0 STUD_X GIT_TOKEN"
+    echo "USER and TOKEN environment variables not set."
     exit 1
 fi
 
@@ -24,8 +21,20 @@ curl -H "Authorization: token $TOKEN" \
   -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/output/$USER/kubeconfig.yaml
 
 
-# download lab info
+# download lab-docker info
 curl -H "Authorization: token $TOKEN" \
   -H "Accept: application/vnd.github.v4.raw" \
   -O \
-  -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/output/$USER/lab.yaml
+  -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/output/$USER/lab-docker.yaml
+
+# download lab-k8s info
+curl -H "Authorization: token $TOKEN" \
+  -H "Accept: application/vnd.github.v4.raw" \
+  -O \
+  -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/output/$USER/lab-k8s.yaml
+
+# download lab-k8s-empty info
+curl -H "Authorization: token $TOKEN" \
+  -H "Accept: application/vnd.github.v4.raw" \
+  -O \
+  -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/output/$USER/lab-k8s-empty.yaml
