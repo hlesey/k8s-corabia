@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 locals {
-  # adjust cluster lists based on your needs
+  # adjust vm lists based on your needs
   dockerhost = {
     test1 = {
       allowed_cidr_blocks = "0.0.0.0/0",
