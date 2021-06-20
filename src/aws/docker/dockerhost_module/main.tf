@@ -13,13 +13,13 @@ resource "aws_route_table" "r" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
   }
-  depends_on  = [aws_internet_gateway.gw]
-  tags        = { Name = var.dockerhost-name }
+  depends_on = [aws_internet_gateway.gw]
+  tags       = { Name = var.dockerhost-name }
 }
 
 resource "aws_route_table_association" "main" {
-  subnet_id       = aws_subnet.main.id
-  route_table_id  = aws_route_table.r.id
+  subnet_id      = aws_subnet.main.id
+  route_table_id = aws_route_table.r.id
 }
 
 resource "aws_subnet" "main" {
@@ -38,12 +38,12 @@ resource "aws_security_group" "dockerhost" {
 }
 
 resource "aws_security_group_rule" "allow_all_from_self" {
-  type                      = "ingress"
-  from_port                 = 0
-  to_port                   = 0
-  protocol                  = "-1"
-  source_security_group_id  = aws_security_group.dockerhost.id
-  security_group_id         = aws_security_group.dockerhost.id
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.dockerhost.id
+  security_group_id        = aws_security_group.dockerhost.id
 }
 
 resource "aws_security_group_rule" "allow_ssh_from_admin" {

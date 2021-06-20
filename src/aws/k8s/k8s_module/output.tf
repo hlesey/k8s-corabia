@@ -31,5 +31,5 @@ output "kubeconfig" {
 }
 
 output "cluster-admin-token" {
-   value = module.cluster-admin-token.stdout
+  value = module.cluster-admin-token.stdout
 }
