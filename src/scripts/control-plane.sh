@@ -29,7 +29,7 @@ fi
 kubectl apply -f /src/manifests/network/"${NETWORK_PLUGIN}"
 
 # deploy dashboard
-sed -i -e "s'clusterx.qedzone.ro'${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/manifests/dashboard/dashboard-ingress.yaml
+sed -i -e "s'clusterx.qedzone.ro'${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/manifests/dashboard/dashboard-ingress.yml
 kubectl apply -f /src/manifests/dashboard/
 
 # setup cluster-admin sa
