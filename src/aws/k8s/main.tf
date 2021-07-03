@@ -4,12 +4,54 @@ provider "aws" {
 
 locals {
   clusters = {
-    test1 = {
-      allowed_cidr_blocks = "0.0.0.0/0",
+    cluster1 = {
+      allowed_cidr_blocks = "188.25.190.205/32,188.26.169.194/32",
     },
-    test2 = {
-      allowed_cidr_blocks = "0.0.0.0/0",
-    }
+    cluster2 = {
+      allowed_cidr_blocks = "188.25.190.205/32,188.26.169.194/32",
+    },
+//    cluster3 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
+//    cluster4 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
+//    cluster5 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
+//    cluster6 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
+//    cluster7 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
+//    cluster8 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
+//    cluster9 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
+//    cluster10 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
+//    cluster11 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
+//    cluster12 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
+//    cluster13 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
+//    cluster14 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
+//    cluster15 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
+//    cluster16 = {
+//      allowed_cidr_blocks = "0.0.0.0/0",
+//    },
   }
 }
 
