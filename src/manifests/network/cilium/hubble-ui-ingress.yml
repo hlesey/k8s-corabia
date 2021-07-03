@@ -6,11 +6,11 @@ metadata:
   namespace: kube-system
 spec:
   rules:
-  - host: hubble-ui.local
+  - host: hubble-ui.clusterx.qedzone.ro
     http:
       paths:
       - path: /
-        pathType: "Prefix" 
+        pathType: "Prefix"
         backend:
           service:
             name: hubble-ui
