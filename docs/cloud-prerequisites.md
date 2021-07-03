@@ -7,9 +7,23 @@ Also you need internet connectivity and *be able to access the internet on the f
 
 - TCP/30080
 - TCP/30443
+- TCP/300XX ( where XX represents your birth day :) )
 - TCP/6443
 - TCP/22
 
+You can use http://portquiz.net:<port number> for testing the egress
+  
+Example: http://portquiz.net:30080 tests if 30080/TCP port is opened for egress.
+To verify, go to command line and execute:
+
+```bash
+❯ curl http://portquiz.net:30080
+Port 30080 test successful!
+Your IP: 188.25.190.205
+```
+Do the same for the remaining ports from the above mentioned port list.
+
+  
 a) Download and install (with default settings) the following software (64bit
 version):
 
@@ -61,24 +75,4 @@ e) Configure `kubectl` command line tool. The following script needs be executed
 
 After that, run the following command to load the new shell configuration: `source ~/.bash_profile`
 
-f) Add the following entries in the hosts file:
-
-```bash
-192.168.234.100 phippy.local phippy-api.local phippy-ui.local wordpress.local
-192.168.234.100 k8s.local prometheus.local hubble-ui.local  myapp.local 
-```
-
-For Linux/Mac: modify the `/etc/hosts` and append the above lines.
-
-For Windows, open Windows explorer, and go to `Desktop/labs/kubeadm-vagrant/src/utils/windows/`, then run as Administrator (Run
-  As Administrator) the `configure-fqdn.bat` script.
-
-To verify, go to command line and execute:
-
-```bash
-ping k8s.local
-PING k8s.local (192.168.234.100): 56 data bytes
-Request timeout for icmp_seq 0
-```
-
-If you get this response then this setup is OK.
+If everything went smooth, you should be ready for the trip :) !
