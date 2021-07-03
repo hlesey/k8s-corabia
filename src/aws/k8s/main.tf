@@ -5,10 +5,10 @@ provider "aws" {
 locals {
   clusters = {
     cluster1 = {
-      allowed_cidr_blocks = "188.25.190.205/32,188.26.169.194/32",
+      allowed_cidr_blocks = "0.0.0.0/0",
     },
     cluster2 = {
-      allowed_cidr_blocks = "188.25.190.205/32,188.26.169.194/32",
+      allowed_cidr_blocks = "0.0.0.0/0",
     },
 //    cluster3 = {
 //      allowed_cidr_blocks = "0.0.0.0/0",
