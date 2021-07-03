@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# Setup and bootstrap k8s control-plane 
+# Setup and bootstrap k8s control-plane
 set -xe
 
 source /src/scripts/vars.sh
 
 # bootstrap k8s control-plane components
 sed -e "s'{{CONTROL_PLANE_IP}}'${CONTROL_PLANE_IP}'g" /src/manifests/kubeadm/control-plane.yaml | \
-sed -e "s'{{CONTROL_PLANE_PUBLIC_DNS}}'${CONTROL_PLANE_PUBLIC_DNS}'g" > /tmp/control-plane.yaml
+sed -e "s'{{CONTROL_PLANE_PUBLIC_DNS}}'${CONTROL_PLANE_PUBLIC_DNS}'g" | \
+sed -e "s'{{CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}}'${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" > /tmp/control-plane.yaml
 
 kubeadm init --config /tmp/control-plane.yaml > /src/output/.kubeadmin_init
 
@@ -20,11 +21,15 @@ if [[ "$NETWORK_PLUGIN" == "cilium" ]]; then
 EOF
     systemctl daemon-reload
     systemctl restart kubelet
+
+    sed -i -e "s'hubble-ui.clusterx.qedzone.ro'hubble-ui.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/manifests/network/cilium/hubble-ui-ingress.yml
 fi
+
 
 kubectl apply -f /src/manifests/network/"${NETWORK_PLUGIN}"
 
 # deploy dashboard
+sed -i -e "s'clusterx.qedzone.ro'${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/manifests/dashboard/dashboard-ingress.yml
 kubectl apply -f /src/manifests/dashboard/
 
 # setup cluster-admin sa

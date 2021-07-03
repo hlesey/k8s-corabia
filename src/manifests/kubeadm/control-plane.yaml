@@ -19,3 +19,4 @@ networking:
 apiServer:
   certSANs:
   - {{CONTROL_PLANE_PUBLIC_DNS}}
+  - {{CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}}

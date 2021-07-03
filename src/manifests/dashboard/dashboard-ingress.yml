@@ -10,14 +10,14 @@ metadata:
 spec:
   tls:
   - hosts:
-    - k8s.local
+    - clusterx.qedzone.ro
     secretName: kubernetes-dashboard-certs
   rules:
-  - host: k8s.local
+  - host: clusterx.qedzone.ro
     http:
       paths:
       - path: /
-        pathType: "Prefix" 
+        pathType: "Prefix"
         backend:
           service:
             name: kubernetes-dashboard
