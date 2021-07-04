@@ -6,8 +6,13 @@ variable "vpc-cidr" {
   default = "192.168.0.0/16"
 }
 
-variable "allowed-cidr-blocks" {
-  description = "A comma separated list of CIDR blocks to allow SSH connections from."
+variable "aws_subnet_id" {
+}
+
+variable "vpc_security_group_ids" {
+}
+
+variable "aws_internet_gateway" {
 }
 
 variable "region" {
