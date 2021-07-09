@@ -1,8 +1,0 @@
-# registries !- dockerhub
-quay.io
-ghcr.io
-k8s.gcr.io
-# image templates
-{{
-<FIXME>
-cilium/istio_proxy
