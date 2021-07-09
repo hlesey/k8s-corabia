@@ -15,11 +15,11 @@ output "control_plane_private_ip" {
 }
 
 output "node_public_dns" {
-  value = aws_spot_instance_request.node.public_dns
+  value = aws_instance.node.public_dns
 }
 
 output "node_public_ip" {
-  value = aws_spot_instance_request.node.public_ip
+  value = aws_instance.node.public_ip
 }
 
 output "cluster-name" {
