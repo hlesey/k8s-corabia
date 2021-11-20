@@ -73,6 +73,6 @@ git clone https://github.com/hlesey/phippy.git
 e) Configure `kubectl` command line tool. The following script needs be executed from `labs` folder:
 `./kubeadm-vagrant/src/utils/tools/configure-kubectl.sh`.
 
-After that, run the following command to load the new shell configuration: `source ~/.bash_profile` (MacOS or Windows) or `source ~/.profile` (Linux)
+After that, run the following command to load the new shell configuration: `source ~/.bash_profile` (MacOS or Windows) or `source ~/.bashrc` (Linux)
 
 If everything went smooth, you should be ready for the trip :) !

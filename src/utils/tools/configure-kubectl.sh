@@ -15,7 +15,7 @@ else
 	os="linux"
 	# If bash is not opened with interactive login, .bash_profile won't be loaded
 	# See https://askubuntu.com/a/121075 for a good explanation
-	env_path="$HOME/.profile"
+	env_path="$HOME/.bashrc"
 fi
 
 echo "Detected $os operating system."
