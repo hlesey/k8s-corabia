@@ -12,7 +12,7 @@ Also you need internet connectivity and *be able to access the internet on the f
 - TCP/22
 
 You can use http://portquiz.net:<port number> for testing the egress
-  
+
 Example: http://portquiz.net:30080 tests if 30080/TCP port is opened for egress.
 To verify, go to command line and execute:
 
@@ -23,7 +23,7 @@ Your IP: 188.25.190.205
 ```
 Do the same for the remaining ports from the above mentioned port list.
 
-  
+
 a) Download and install (with default settings) the following software (64bit
 version):
 
@@ -73,6 +73,6 @@ git clone https://github.com/hlesey/phippy.git
 e) Configure `kubectl` command line tool. The following script needs be executed from `labs` folder:
 `./kubeadm-vagrant/src/utils/tools/configure-kubectl.sh`.
 
-After that, run the following command to load the new shell configuration: `source ~/.bash_profile`
+After that, run the following command to load the new shell configuration: `source ~/.bash_profile` (MacOS or Windows) or `source ~/.profile` (Linux)
 
 If everything went smooth, you should be ready for the trip :) !
