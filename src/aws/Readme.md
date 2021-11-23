@@ -32,3 +32,7 @@ terraform plan -target=module.clusters[\"cluster1\"]
 terraform apply -target=module.clusters[\"cluster1\"]
 terraform destroy -target=module.clusters[\"cluster1\"]
 ```
+
+```terraform
+terraform apply -refresh-only -target=module.dockerhost[11]
+```
