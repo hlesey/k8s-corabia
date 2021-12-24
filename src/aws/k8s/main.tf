@@ -5,6 +5,9 @@ provider "aws" {
 locals {
   # adjust cluster lists based on your needs
   clusters = {
+    cluster0 = {
+      allowed_cidr_blocks = "0.0.0.0/0",
+    },
     cluster1 = {
       allowed_cidr_blocks = "0.0.0.0/0",
     },
@@ -52,7 +55,7 @@ locals {
     # },
     # cluster16 = {
     #   allowed_cidr_blocks = "0.0.0.0/0",
-    # }, 
+    # },
     # cluster17 = {
     #   allowed_cidr_blocks = "0.0.0.0/0",
     # },

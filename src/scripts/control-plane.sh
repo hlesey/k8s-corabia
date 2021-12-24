@@ -25,7 +25,6 @@ EOF
     sed -i -e "s'hubble-ui.clusterx.qedzone.ro'hubble-ui.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/manifests/network/cilium/hubble-ui-ingress.yml
 fi
 
-
 kubectl apply -f /src/manifests/network/"${NETWORK_PLUGIN}"
 
 # deploy dashboard
@@ -45,7 +44,13 @@ kubectl apply -f /src/manifests/metrics-server/
 kubectl -n kube-system scale deployment coredns --replicas=1
 
 # get admin token
-kubectl describe secret "$(kubectl get secrets | grep cluster | cut -d ' ' -f1)" | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /src/output/cluster-admin-token
+until kubectl get secrets -o name | grep cluster
+do
+    echo "Waiting for admin secret to be created"
+    sleep 5;
+done
+
+kubectl describe "$(kubectl get secrets -o name | grep cluster)" | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /src/output/cluster-admin-token
 cp /etc/kubernetes/admin.conf /src/output/kubeconfig.yaml
 
 # configure vagrant and root user with kubeconfig

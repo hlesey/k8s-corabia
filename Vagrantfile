@@ -2,11 +2,13 @@
 # vi: set ft=ruby :
 
 VAGRANTFILE_API_VERSION = "2"
-BOX_IMAGE="ubuntu/bionic64"
-BOX_VERSION="20210125.0.0"
+BOX_IMAGE="ubuntu/focal64"
+BOX_VERSION="20211026.0.0"
 required_plugins = %w(vagrant-vbguest)
 
-cluster = {                                                  
+# On latest versions of VirtualBox you have to manually allow IP addresses range in /etc/vbox/networks.conf
+# See https://www.virtualbox.org/manual/ch06.html#network_hostonly for more details
+cluster = {
   "control-plane" => { :ip => "192.168.234.100", :cpus => 2, :mem => 2048 },
   "node01" => { :ip => "192.168.234.101", :cpus => 2, :mem => 1280 },
   "node02" => { :ip => "192.168.234.102", :cpus => 2, :mem => 1280 },
@@ -51,8 +53,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
         vb.name = hostname
         vb.customize [
-          "modifyvm", :id, 
-          "--memory", info[:mem], 
+          "modifyvm", :id,
+          "--memory", info[:mem],
           "--cpus", info[:cpus],
           "--ioapic", "on",
           "--uartmode1", "file", File.join(Dir.pwd, hostname + "-console.log")

@@ -5,6 +5,7 @@ metadata:
   name: hubble-ui
   namespace: kube-system
 spec:
+  ingressClassName: nginx
   rules:
   - host: hubble-ui.clusterx.qedzone.ro
     http:

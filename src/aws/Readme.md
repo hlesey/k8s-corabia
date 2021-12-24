@@ -16,7 +16,7 @@ terraform init
 - for refresh only:
 
 ```terraform
-terraform apply -refresh-only
+terraform apply -refresh-only -parallelism=30
 ```
 
 - for increasing parallelism (defaults to 10):
