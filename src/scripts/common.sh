@@ -37,10 +37,17 @@ fi
 
 # install dependencies
 apt-get update
-apt-get install -y iptables arptables ebtables \
-                   nfs-kernel-server nfs-common \
-                   apt-transport-https ntp docker.io
-apt-get install -y curl telnet jq dos2unix
+apt-get install -y iptables arptables ebtables nfs-kernel-server nfs-common apt-transport-https ntp \
+                   telnet jq dos2unix ca-certificates curl gnupg lsb-release
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+      https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
+      tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io
 
 # setup ntp
 systemctl enable ntp && \
@@ -53,12 +60,12 @@ cat > /etc/docker/daemon.json <<EOF
   "log-opts": {
     "max-size": "100m"
   },
-  "storage-driver": "overlay2"
+  "exec-opts": ["native.cgroupdriver=systemd"]
 }
 EOF
 mkdir -p /etc/systemd/system/docker.service.d
 systemctl enable docker && \
-systemctl start docker
+systemctl restart docker
 
 # add kubernetes repos
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
@@ -68,13 +75,13 @@ EOF
 
 # install kubeadm
 sudo apt-get update
-apt-get install -y kubeadm="${K8S_VERSION}-00" kubelet="${K8S_VERSION}"-00 kubectl="${K8S_VERSION}-00"
+apt-get install -y kubeadm="${K8S_VERSION}-00" kubelet="${K8S_VERSION}-00" kubectl="${K8S_VERSION}-00"
 
-# Install kubetail 
+# Install kubetail
 curl -s https://raw.githubusercontent.com/johanhaleby/kubetail/control-plane/kubetail --output /usr/local/bin/kubetail
 chmod +x /usr/local/bin/kubetail
 
-# update system 
+# update system
 systemctl disable apt-daily.timer
 systemctl disable apt-daily-upgrade.timer
 
