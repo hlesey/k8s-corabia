@@ -187,7 +187,7 @@ spec:
     spec:
       containers:
         - name: kubernetes-dashboard
-          image: ghcr.io/hlesey/kubernetesui/dashboard:v2.3.1
+          image: ghcr.io/hlesey/kubernetesui/dashboard:v2.4.0
           imagePullPolicy: Always
           ports:
             - containerPort: 8443
@@ -218,12 +218,6 @@ spec:
             readOnlyRootFilesystem: true
             runAsUser: 1001
             runAsGroup: 2001
-          resources:
-            limits:
-              memory: 50Mi
-            requests:
-              cpu: 50m
-              memory: 50Mi
       volumes:
         - name: kubernetes-dashboard-certs
           secret:
@@ -273,9 +267,10 @@ spec:
     metadata:
       labels:
         k8s-app: dashboard-metrics-scraper
-      annotations:
-        seccomp.security.alpha.kubernetes.io/pod: 'runtime/default'
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: dashboard-metrics-scraper
           image: ghcr.io/hlesey/kubernetesui/metrics-scraper:v1.0.7
@@ -290,19 +285,13 @@ spec:
             initialDelaySeconds: 30
             timeoutSeconds: 30
           volumeMounts:
-          - mountPath: /tmp
-            name: tmp-volume
+            - mountPath: /tmp
+              name: tmp-volume
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             runAsUser: 1001
             runAsGroup: 2001
-          resources:
-            limits:
-              memory: 50Mi
-            requests:
-              cpu: 50m
-              memory: 50Mi
       serviceAccountName: kubernetes-dashboard
       nodeSelector:
         "kubernetes.io/os": linux

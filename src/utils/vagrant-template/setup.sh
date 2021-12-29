@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # https://kubernetes.io/docs/setup/independent/install-kubeadm/
-K8S_VERSION="1.21.2"
-ETCD_VERSION=${ETCD_VERSION:-v3.5.0}
+K8S_VERSION="1.23.1"
+ETCD_VERSION=${ETCD_VERSION:-v3.5.1}
 
 ############################### INITIAL SETUP ###############################
 # update system
@@ -81,12 +81,11 @@ EOF
 # kube-system images
 kubeadm config images pull
 
-docker pull ghcr.io/hlesey/cilium/cilium:v1.6.8
-docker pull ghcr.io/hlesey/cilium/operator:v1.6.8
+docker pull ghcr.io/hlesey/cilium/cilium:v1.11.0
+docker pull ghcr.io/hlesey/cilium/operator:v1.11.0
 docker pull ghcr.io/hlesey/toolbox:1.0
-docker pull k8s.gcr.io/metrics-server/metrics-server:v0.5.0
-docker pull ghcr.io/hlesey/kubernetesui/dashboard:v2.3.1
+docker pull k8s.gcr.io/metrics-server/metrics-server:v0.5.2
+docker pull ghcr.io/hlesey/kubernetesui/dashboard:v2.4.0
 docker pull ghcr.io/hlesey/kubernetesui/metrics-scraper:v1.0.7
-docker pull ghcr.io/hlesey/envoy:v1.18.2
 docker pull quay.io/coreos/flannel:v0.12.0-amd64
-docker pull quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.32.0
+docker pull k8s.gcr.io/ingress-nginx/controller:v1.1.0
