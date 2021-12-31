@@ -22,7 +22,7 @@ variable "az" {
 }
 
 variable "instance-ami" {
-  default     = "ami-0c259a97cbf621daf"
+  default     = "ami-08ca3fed11864d6bb" # Ubuntu Focal 20.04 LTS
   description = "Which ami is used"
 }
 
