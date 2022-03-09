@@ -152,12 +152,12 @@ resource "null_resource" "control-plane-config" {
   }
 
   provisioner "file" {
-    source      = "../../scripts"
+    source      = "../../../src/scripts"
     destination = "/src/"
   }
 
   provisioner "file" {
-    source      = "../../manifests"
+    source      = "../../../src/manifests"
     destination = "/src/"
   }
 
@@ -202,7 +202,7 @@ resource "aws_instance" "node" {
   }
 
   provisioner "file" {
-    source      = "../../scripts"
+    source      = "../../../src/scripts"
     destination = "/src/"
   }
 

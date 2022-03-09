@@ -5,9 +5,9 @@
 
 a) Based on the OS you have:
 
-- for Mac/Linux - open the terminal and go to `labs/kubeadm-vagrant`.
-- for Windows - open Git-bash and go to the `labs/kubeadm-vagrant` folder (Ex. `cd
-   /c/Users/<user-name>/Desktop/labs/kubeadm-vagrant`).
+- for Mac/Linux - open the terminal and go to `labs/kubeadm-vagrant/deploy/vagrant`.
+- for Windows - open Git-bash and go to the `labs/kubeadm-vagrant/deploy/vagrant` folder (Ex. `cd
+   /c/Users/<user-name>/Desktop/labs/kubeadm-vagrant/deploy/vagrant`).
 
 b) Power on the VMs:
 
