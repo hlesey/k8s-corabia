@@ -3,7 +3,7 @@
 
 VAGRANTFILE_API_VERSION = "2"
 BOX_IMAGE="ubuntu/focal64"
-BOX_VERSION="20211026.0.0"
+BOX_VERSION="20220308.0.0"
 required_plugins = %w(vagrant-vbguest)
 
 # On latest versions of VirtualBox you have to manually allow IP addresses range in /etc/vbox/networks.conf
@@ -31,14 +31,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         override.vm.hostname = hostname + ".local"
 
         if hostname.include? "control-plane"
-          override.vm.provision "shell", path: "src/scripts/common.sh"
-          override.vm.provision "shell", path: "src/scripts/nfs.sh"
-          override.vm.provision "shell", path: "src/scripts/control-plane.sh"
+          override.vm.provision "shell", path: "../../src/scripts/common.sh"
+          override.vm.provision "shell", path: "../../src/scripts/nfs.sh"
+          override.vm.provision "shell", path: "../../src/scripts/control-plane.sh"
           override.vm.network :forwarded_port, guest: 30080, host: 30080, id: 'ingress-http'
           override.vm.network :forwarded_port, guest: 30443, host: 30443, id: 'ingress-https'
         else
-          override.vm.provision "shell", path: "src/scripts/common.sh"
-          override.vm.provision "shell", path: "src/scripts/node.sh"
+          override.vm.provision "shell", path: "../../src/scripts/common.sh"
+          override.vm.provision "shell", path: "../../src/scripts/node.sh"
         end
 
         override.vm.synced_folder "../", "/repo", id: "repo",
@@ -46,7 +46,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         group: "vagrant",
         mount_option: ["dmode=777,fmode=777"]
 
-        override.vm.synced_folder "src", "/src", id: "scripts",
+        override.vm.synced_folder "../../src", "/src", id: "scripts",
         owner: "vagrant",
         group: "vagrant",
         mount_option: ["dmode=777,fmode=777"]
