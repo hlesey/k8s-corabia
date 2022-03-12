@@ -2,11 +2,11 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  name: dashboard-ingress
+  namespace: kube-system
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     kubernetes.io/ingress.allow-http: "false"
-  name: dashboard-ingress
-  namespace: kube-system
 spec:
   tls:
   - hosts:
