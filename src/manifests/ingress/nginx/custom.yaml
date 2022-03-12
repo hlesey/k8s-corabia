@@ -1,22 +1,16 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: ingress-nginx
   labels:
-    app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+  name: ingress-nginx
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
   labels:
-    helm.sh/chart: ingress-nginx-3.21.0
     app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/instance: ingress-nginx
-    app.kubernetes.io/version: 0.43.0
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/component: controller
   name: ingress-nginx-controller-custom
   namespace: ingress-nginx
 spec:
@@ -33,9 +27,9 @@ spec:
       protocol: TCP
       targetPort: https
   selector:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/instance: ingress-nginx
     app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
@@ -48,5 +42,5 @@ spec:
     kind: Deployment
     name: ingress-nginx-controller
   minReplicas: 1
-  maxReplicas: 3
+  maxReplicas: 2
   targetCPUUtilizationPercentage: 80
