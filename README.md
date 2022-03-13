@@ -1,16 +1,11 @@
-# Kubernetes cluster setup with Kubeadm, Vagrant, VirtualBox
+<p align="center"><img alt="kind" src="./docs/images/k8s-corabia.png" width="300px" /></p>
 
-This repository provides helps you to run a minimum best-practice Kubernetes Cluster for educational and testing purpose that can run on MacOS, Linux or Windows operating systems. This project can be extended for production usage.
+# K8s Corabia
 
-VirtualBox, Vagrant and Kubeadm are used for Virtualization, VMs deployment and K8s Cluster bootstrap:
+This repository provides help to run a minimum best-practice Kubernetes Cluster for educational and testing purposes.
+The cluster can be run on your local machine or in the cloud.
+It can be extended for production usage.
 
-<img alt="Vagrant flow" src="./docs/images/vagrant-flow.png" width="800px" />
+Local machine setup [link](./docs/vagrant/overview.md).
 
-In order to run this cluster on your local machine, please go thought the following docs:
-
-- [prerequisites](./docs/prerequisites.md)
-- [cluster setup](./docs/cluster-setup.md)
-
-The Kubernetes Cluster is described in this diagram:
-
-<img alt="Cluster diagram" src="./docs/images/cluster-diagram.png" width="800px" />
+AWS Cloud setup [link](./docs/aws/overview.md).

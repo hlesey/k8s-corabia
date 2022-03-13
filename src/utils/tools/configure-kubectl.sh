@@ -27,6 +27,6 @@ chmod +x bin/kube*
 
 cat <<EOF >> "${env_path}"
 export PATH="$PATH:$(pwd)/bin"
-export KUBECONFIG="$(pwd)/kubeadm-vagrant/src/output/kubeconfig.yaml:$(pwd)/config/kubeconfig.yaml"
+export KUBECONFIG="$(pwd)/k8s-corabia/src/output/kubeconfig.yaml:$(pwd)/config/kubeconfig.yaml"
 alias kns='kubectl config set-context \$(kubectl config current-context) --namespace'
 EOF

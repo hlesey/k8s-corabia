@@ -57,14 +57,14 @@ c) Deactivate `autocrlf` for git.
 d) Clone the following git repositories in `labs` folder:
 
 ```bash
-git clone https://github.com/hlesey/kubeadm-vagrant.git
+git clone https://github.com/hlesey/k8s-corabia.git
 git clone https://github.com/hlesey/docker-vagrant.git
 git clone https://github.com/hlesey/k8s-labs.git
 git clone https://github.com/hlesey/phippy.git
 ```
 
 e) Configure `kubectl` command line tool. The following script needs to be executed from `labs` folder:
-`./kubeadm-vagrant/src/utils/tools/configure-kubectl.sh`.
+`./k8s-corabia/src/utils/tools/configure-kubectl.sh`.
 After that, run the following command to load the new shell configuration: `source ~/.bash_profile`
 
 f) On your physical machine add the following entries in the hosts file:
@@ -75,7 +75,7 @@ f) On your physical machine add the following entries in the hosts file:
 ```
 
 - For Linux/Mac: modify the `/etc/hosts` and append the above lines.
-- For Windows, go to `kubeadm-vagrant/src/utils/windows/` and run as Administrator (Run
+- For Windows, go to `k8s-corabia/src/utils/windows/` and run as Administrator (Run
   As Administrator) the `configure-fqdn.bat` script.
 
 To verify this, go to command line and do:
