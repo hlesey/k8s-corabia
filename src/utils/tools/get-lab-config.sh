@@ -8,11 +8,9 @@ fi
 # download private key file
 curl -H "Authorization: token ${TOKEN_LAB}" \
   -H "Accept: application/vnd.github.v4.raw" \
-  -o id_rsa \
+  -O \
   -L https://api.github.com/repos/hlesey/k8s-labs-config/contents/data/common/id_rsa_lab
 
-# TODO: copy id_rsa_lab to ~/.ssh/id_rsa
-# Check if the folder exist and create it + check if the key exists and do a backup
 
 # download kubeconfig file
 curl -H "Authorization: token ${TOKEN_LAB}" \
