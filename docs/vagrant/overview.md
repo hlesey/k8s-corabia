@@ -1,6 +1,6 @@
-# Kubernetes cluster setup with Kubeadm, Terraform and AWS
+# Kubernetes cluster setup with Kubeadm, Vagrant and VirtualBox
 
-Terraform, AWS and Kubeadm are used for Virtualization, VMs deployment and K8s Cluster bootstrap:
+VirtualBox, Vagrant and Kubeadm are used for Virtualization, VMs deployment and K8s Cluster bootstrap.
 
 <img alt="Vagrant flow" src="../images/vagrant-flow.png" width="800px" />
 

@@ -2,7 +2,8 @@
 
 # K8s Corabia
 
-This repository provides helps you to run a minimum best-practice Kubernetes Cluster for educational and testing purpose that can run on your local machine or in the cloud.
+This repository provides help to run a minimum best-practice Kubernetes Cluster for educational and testing purposes.
+The cluster can be run on your local machine or in the cloud.
 It can be extended for production usage.
 
 Local machine setup [link](./docs/vagrant/overview.md).
