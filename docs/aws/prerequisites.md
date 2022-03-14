@@ -40,7 +40,7 @@ setup your local machine to connect to it.
 ### 5. Clone the following git repositories in your `labs` folder
 
 ```bash
-git clone https://github.com/hlesey/k8g-corabia.git
+git clone https://github.com/hlesey/k8s-corabia.git
 git clone https://github.com/hlesey/k8s-labs.git
 git clone https://github.com/hlesey/phippy.git
 ```
