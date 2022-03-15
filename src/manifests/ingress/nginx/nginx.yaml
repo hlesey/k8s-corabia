@@ -444,6 +444,7 @@ spec:
         - --validating-webhook=:8443
         - --validating-webhook-certificate=/usr/local/certificates/cert
         - --validating-webhook-key=/usr/local/certificates/key
+        - --watch-ingress-without-class=true
         env:
         - name: POD_NAME
           valueFrom:
@@ -640,8 +641,6 @@ metadata:
     app.kubernetes.io/part-of: ingress-nginx
     app.kubernetes.io/version: 1.1.2
     helm.sh/chart: ingress-nginx-4.0.18
-  annotations:
-    ingressclass.kubernetes.io/is-default-class: "true"
   name: nginx
 spec:
   controller: k8s.io/ingress-nginx
