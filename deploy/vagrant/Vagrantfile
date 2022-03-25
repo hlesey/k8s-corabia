@@ -51,6 +51,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         group: "vagrant",
         mount_option: ["dmode=777,fmode=777"]
 
+        override.vm.synced_folder "../../output", "/output", id: "output",
+        owner: "vagrant",
+        group: "vagrant",
+        mount_option: ["dmode=777,fmode=777"]
+
         vb.name = hostname
         vb.customize [
           "modifyvm", :id,

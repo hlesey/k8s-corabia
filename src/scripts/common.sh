@@ -5,7 +5,7 @@ set -xe
 # Refs: https://kubernetes.io/docs/setup/independent/install-kubeadm/
 
 # load variables
-source /src/scripts/vars.sh
+source /src/scripts/envs
 DEBIAN_FRONTEND=noninteractive
 
 # add control-plane IP to hosts file

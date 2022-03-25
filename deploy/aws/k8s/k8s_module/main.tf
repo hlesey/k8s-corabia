@@ -146,8 +146,8 @@ resource "null_resource" "control-plane-config" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo mkdir -p /src/output /repo",
-      "sudo chown -R ubuntu /src /repo",
+      "sudo mkdir /src /output /repo",
+      "sudo chown ubuntu /src /output /repo",
     ]
   }
 
@@ -163,9 +163,9 @@ resource "null_resource" "control-plane-config" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/scripts/vars.sh",
-      "sudo echo 'export CONTROL_PLANE_PUBLIC_DNS=${aws_eip.control-plane.public_dns}' >> /src/scripts/vars.sh",
-      "sudo echo 'export CONTROL_PLANE_PUBLIC_EXTERNAL_DNS=${var.cluster-name}.qedzone.ro' >> /src/scripts/vars.sh",
+      "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/scripts/envs",
+      "sudo echo 'export CONTROL_PLANE_PUBLIC_DNS=${aws_eip.control-plane.public_dns}' >> /src/scripts/envs",
+      "sudo echo 'export CONTROL_PLANE_PUBLIC_EXTERNAL_DNS=${var.cluster-name}.qedzone.ro' >> /src/scripts/envs",
       "sudo /bin/bash /src/scripts/common.sh",
       "sudo /bin/bash /src/scripts/nfs.sh",
       "sudo /bin/bash /src/scripts/control-plane.sh",
@@ -196,8 +196,8 @@ resource "aws_instance" "node" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo mkdir -p /src/output",
-      "sudo chown -R ubuntu /src",
+      "sudo mkdir /src /output",
+      "sudo chown ubuntu /src /output",
     ]
   }
 
@@ -208,8 +208,8 @@ resource "aws_instance" "node" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/scripts/vars.sh",
-      "sudo echo 'kubeadm join --token=${local.bootstraptoken} --discovery-token-unsafe-skip-ca-verification ${aws_eip.control-plane.private_ip}:6443' >> /src/output/.kubeadmin_init",
+      "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/scripts/envs",
+      "sudo echo 'kubeadm join --token=${local.bootstraptoken} --discovery-token-unsafe-skip-ca-verification ${aws_eip.control-plane.private_ip}:6443' >> /output/.kubeadmin_init",
       "sudo /bin/bash /src/scripts/common.sh",
       "sudo /bin/bash /src/scripts/node.sh",
     ]
@@ -238,11 +238,11 @@ resource "null_resource" "node-labels" {
 module "kubeconfig" {
   depends_on = [null_resource.control-plane-config]
   source     = "github.com/matti/terraform-shell-resource"
-  command    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo sed -e 's#${aws_eip.control-plane.private_ip}#${aws_eip.control-plane.public_dns}#g' /src/output/kubeconfig.yaml"
+  command    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo sed -e 's#${aws_eip.control-plane.private_ip}#${aws_eip.control-plane.public_dns}#g' /output/kubeconfig.yaml"
 }
 
 module "cluster-admin-token" {
   depends_on = [null_resource.control-plane-config]
   source     = "github.com/matti/terraform-shell-resource"
-  command    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo cat /src/output/cluster-admin-token"
+  command    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo cat /output/cluster-admin-token"
 }

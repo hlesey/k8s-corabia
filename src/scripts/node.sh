@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Setup data plane node
 
-source /src/scripts/vars.sh
+source /src/scripts/envs
 cluster_join=""
 
 while [ "$cluster_join" == "" ] ; do
     echo "waiting for the control-plane node";
     sleep 1;
-    cluster_join="$(grep -A2 'kubeadm join' /src/output/.kubeadmin_init | sed 's/\\//g')"
+    cluster_join="$(grep -A2 'kubeadm join' /output/.kubeadmin_init | sed 's/\\//g')"
 done
 
 $cluster_join 

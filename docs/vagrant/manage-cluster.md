@@ -3,7 +3,7 @@
 ## Kubectl
 
 ```bash
-export KUBECONFIG=$(pwd)/src/output/kubeconfig.yaml
+export KUBECONFIG=$(pwd)/output/kubeconfig.yaml
 kubectl cluster-info
 ```
 
@@ -21,5 +21,5 @@ kubectl get <my-fancy-object>
 
 ```bash
 Browse to https://192.168.234.100:30443
-Use token generated in src/output/cluster-admin-token
+Use token generated in output/cluster-admin-token
 ```

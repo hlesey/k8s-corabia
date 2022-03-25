@@ -8,9 +8,9 @@ locals {
     cluster0 = {
       allowed_cidr_blocks = "0.0.0.0/0",
     },
-    # cluster1 = {
-    #   allowed_cidr_blocks = "0.0.0.0/0",
-    # },
+    cluster1 = {
+      allowed_cidr_blocks = "0.0.0.0/0",
+    },
     # cluster2 = {
     #   allowed_cidr_blocks = "0.0.0.0/0",
     # },
@@ -60,6 +60,12 @@ locals {
     #   allowed_cidr_blocks = "0.0.0.0/0",
     # },
     # cluster18 = {
+    #   allowed_cidr_blocks = "0.0.0.0/0",
+    # },
+    # cluster19 = {
+    #   allowed_cidr_blocks = "0.0.0.0/0",
+    # },
+    # cluster20 = {
     #   allowed_cidr_blocks = "0.0.0.0/0",
     # },
   }
