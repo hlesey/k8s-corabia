@@ -26,7 +26,7 @@ Because we know this is our app, we should trust it. To bypass Google Chrome
 error, type `thisisunsafe` and hit enter.
 
 d) To authenticate to this dashboard, use the token from this file:
-`k8s-corabia/src/output/cluster-admin-token`.
+`k8s-corabia/output/cluster-admin-token`.
 
 <img alt="K8s Dashboard" src="../images/k8s-dashboard.png" width="800px" />
 

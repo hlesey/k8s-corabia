@@ -5,9 +5,12 @@ provider "aws" {
 locals {
   # adjust cluster lists based on your needs
   clusters = {
-    cluster-empty1 = {
+    cluster-empty0 = {
       allowed_cidr_blocks = "0.0.0.0/0",
     },
+    # cluster-empty1 = {
+    #   allowed_cidr_blocks = "0.0.0.0/0",
+    # },
     # cluster-empty2 = {
     #   allowed_cidr_blocks = "0.0.0.0/0",
     # },
@@ -57,6 +60,12 @@ locals {
     #   allowed_cidr_blocks = "0.0.0.0/0",
     # },
     # cluster-empty18 = {
+    #   allowed_cidr_blocks = "0.0.0.0/0",
+    # },
+    # cluster-empty19 = {
+    #   allowed_cidr_blocks = "0.0.0.0/0",
+    # },
+    # cluster-empty20 = {
     #   allowed_cidr_blocks = "0.0.0.0/0",
     # },
   }

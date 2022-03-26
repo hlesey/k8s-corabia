@@ -7,9 +7,9 @@
 deploy/vagrant/.vagrant/*
 src/template/.vagrant/*
 src/template/output
-src/output/.kubeadmin_init
-src/output/cluster-admin-token
-src/output/*.yaml
+output/.kubeadmin_init
+output/cluster-admin-token
+output/*.yaml
 *.log
 deploy/aws/**/.terraform*
 deploy/aws/**/*.log
