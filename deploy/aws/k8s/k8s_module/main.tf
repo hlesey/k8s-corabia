@@ -237,12 +237,12 @@ resource "null_resource" "node-labels" {
 
 module "kubeconfig" {
   depends_on = [null_resource.control-plane-config]
-  source     = "github.com/matti/terraform-shell-resource"
-  command    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo sed -e 's#${aws_eip.control-plane.private_ip}#${aws_eip.control-plane.public_dns}#g' /output/kubeconfig.yaml"
+  source     = "Invicton-Labs/shell-resource/external"
+  command_unix    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo sed -e 's#${aws_eip.control-plane.private_ip}#${aws_eip.control-plane.public_dns}#g' /output/kubeconfig.yaml"
 }
 
 module "cluster-admin-token" {
   depends_on = [null_resource.control-plane-config]
-  source     = "github.com/matti/terraform-shell-resource"
-  command    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo cat /output/cluster-admin-token"
+  source     = "Invicton-Labs/shell-resource/external"
+  command_unix    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo cat /output/cluster-admin-token"
 }
