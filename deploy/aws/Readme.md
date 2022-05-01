@@ -24,7 +24,17 @@ terraform apply -refresh-only -parallelism=30
 
 ### Increase parallelism
 
-Default is 10.
+You should also increase the open files limit if increasing the terraform parallelism,
+in order to avoid:
+```bash
+│ Failed to initialize pipe for output: pipe: too many open files
+```
+
+```bash
+ulimit -a
+ulimit -n 10240
+```
+Default terraform parallelism is 10.
 
 ```terraform
 terraform apply -parallelism=30
