@@ -47,7 +47,7 @@ git clone https://github.com/hlesey/phippy.git
 
 ### 6. Configure `kubectl` command line tool
 
-The following script needs be executed from `labs` folder: `./k8s-corabia/src/utils/tools/configure-kubectl.sh`
+The following script needs to be executed from `labs` folder: `./k8s-corabia/src/utils/tools/configure-kubectl.sh`
 
 After that, run the following command to load the new shell configuration:
 
