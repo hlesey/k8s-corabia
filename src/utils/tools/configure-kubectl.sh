@@ -11,7 +11,7 @@ if [[ $(uname | grep $WINDOWS) != "" ]]; then
 	core_os="windows"
     extension=".exe"
 elif [[ $(uname| grep $MAC) != "" ]]; then
-	os="mac"
+	os="darwin"
 	core_os="darwin"
 else
 	os="linux"
