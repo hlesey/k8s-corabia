@@ -1,6 +1,6 @@
 # Update instructions
 
-Refs: https://docs.cilium.io/en/v1.11/gettingstarted/k8s-install-default/
+Refs: https://docs.cilium.io/en/v1.12/gettingstarted/k8s-install-default/
 
 ## Add cilium helm repo
 
@@ -14,7 +14,7 @@ helm repo update
 ```bash
 export CILIUM_NAMESPACE=kube-system
 
-helm template cilium cilium/cilium --version 1.11.2 \
+helm template cilium cilium/cilium --version 1.12.3 \
    --namespace $CILIUM_NAMESPACE \
    --set hubble.relay.enabled=true \
    --set hubble.ui.enabled=true > cilium.yaml

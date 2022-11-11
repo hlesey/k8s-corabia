@@ -183,7 +183,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: kubernetes-dashboard
-          image: ghcr.io/hlesey/kubernetesui/dashboard:v2.5.1
+          image: ghcr.io/hlesey/kubernetesui/dashboard:v2.7.0
           imagePullPolicy: Always
           ports:
             - containerPort: 8443
@@ -268,7 +268,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: dashboard-metrics-scraper
-          image: ghcr.io/hlesey/kubernetesui/metrics-scraper:v1.0.7
+          image: ghcr.io/hlesey/kubernetesui/metrics-scraper:v1.0.8
           ports:
             - containerPort: 8000
               protocol: TCP
@@ -280,8 +280,8 @@ spec:
             initialDelaySeconds: 30
             timeoutSeconds: 30
           volumeMounts:
-          - mountPath: /tmp
-            name: tmp-volume
+            - mountPath: /tmp
+              name: tmp-volume
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

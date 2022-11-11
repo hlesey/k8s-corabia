@@ -40,32 +40,21 @@ apt-get update
 apt-get install -y iptables arptables ebtables nfs-kernel-server nfs-common apt-transport-https ntp \
                    telnet jq dos2unix ca-certificates curl gnupg lsb-release
 
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+echo "deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.list
 
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
-      https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
-      tee /etc/apt/sources.list.d/docker.list > /dev/null
+mkdir -p /usr/share/keyrings
+curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/Release.key | gpg --dearmor -o /usr/share/keyrings/libcontainers-archive-keyring.gpg
+curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/Release.key | gpg --dearmor -o /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
 
 apt-get update
-apt-get install -y docker-ce docker-ce-cli containerd.io
+apt-get install cri-o cri-o-runc
+
+# setup cri-o
+systemctl enable cri-o && systemctl start cri-o
 
 # setup ntp
-systemctl enable ntp && \
-systemctl start ntp
-
-# setup docker
-cat > /etc/docker/daemon.json <<EOF
-{
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "100m"
-  },
-  "exec-opts": ["native.cgroupdriver=systemd"]
-}
-EOF
-mkdir -p /etc/systemd/system/docker.service.d
-systemctl enable docker && \
-systemctl restart docker
+systemctl enable ntp && systemctl start ntp
 
 # add kubernetes repos
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
