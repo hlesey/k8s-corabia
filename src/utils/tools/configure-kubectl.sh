@@ -11,7 +11,7 @@ if [[ $(uname | grep $WINDOWS) != "" ]]; then
     extension=".exe"
 elif [[ $(uname| grep $MAC) != "" ]]; then
 	os="darwin"
-	if [[ "$(echo $0)" == "zsh" ]]; then
+	if [[ "${SHELL}" == */zsh ]]; then
 	    env_path="$HOME/.zshrc"
     fi
 else
