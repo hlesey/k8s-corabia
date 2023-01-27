@@ -14,7 +14,7 @@ helm repo update
 ```bash
 export CILIUM_NAMESPACE=kube-system
 
-helm template cilium cilium/cilium --version 1.12.3 \
+helm template cilium cilium/cilium --version 1.12.6 \
    --namespace $CILIUM_NAMESPACE \
    --set hubble.relay.enabled=true \
    --set hubble.ui.enabled=true > cilium.yaml

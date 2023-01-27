@@ -5,9 +5,7 @@ set -xe
 source /src/scripts/envs
 
 # bootstrap k8s control-plane components
-sed -e "s'{{CONTROL_PLANE_IP}}'${CONTROL_PLANE_IP}'g" /src/manifests/kubeadm/control-plane.yaml | \
-sed -e "s'{{CONTROL_PLANE_PUBLIC_DNS}}'${CONTROL_PLANE_PUBLIC_DNS}'g" | \
-sed -e "s'{{CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}}'${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" > /tmp/control-plane.yaml
+envsubst < /src/manifests/kubeadm/control-plane.yaml > /tmp/control-plane.yaml
 
 kubeadm init --config /tmp/control-plane.yaml > /output/.kubeadmin_init
 
@@ -43,17 +41,12 @@ kubectl apply -f /src/manifests/metrics-server/
 # scale coredns to 1 replica
 kubectl -n kube-system scale deployment coredns --replicas=1
 
-# get admin token
-until kubectl get secrets -o name | grep cluster
-do
-    echo "Waiting for admin secret to be created"
-    sleep 5;
-done
+# generate a lifetime admin token
+kubectl create token --duration=0s cluster-admin > /output/cluster-admin-token
 
-kubectl describe "$(kubectl get secrets -o name | grep cluster)" | grep token:  | tr -s ' ' | cut -d ' ' -f2 > /output/cluster-admin-token
 cp /etc/kubernetes/admin.conf /output/kubeconfig.yaml
 
-# configure vagrant and root user with kubeconfig
+# configure root user with kubeconfig
 echo "export KUBECONFIG=/output/kubeconfig.yaml"  >> /root/.bashrc
 
 # Enabling shell autocompletion

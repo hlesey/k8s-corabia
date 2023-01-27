@@ -1,0 +1,13 @@
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: JoinConfiguration
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: ${CONTROL_PLANE_IP}:6443
+    token: ${BOOTSTRAP_TOKEN}
+    unsafeSkipCAVerification: true
+nodeRegistration:
+  # Needed in order to make cilium manage all pods IPs
+  # see https://docs.cilium.io/en/latest/installation/taints/ for more details
+  taints:
+    - key: node.cilium.io/agent-not-ready
+      effect: NoSchedule
