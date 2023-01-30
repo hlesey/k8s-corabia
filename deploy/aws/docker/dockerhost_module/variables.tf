@@ -22,7 +22,8 @@ variable "az" {
 }
 
 variable "instance-ami" {
-  default     = "ami-08ca3fed11864d6bb" # Ubuntu Focal 20.04 LTS
+  # Get new AMI from https://cloud-images.ubuntu.com/locator/ec2/
+  default     = "ami-0333305f9719618c7" # Ubuntu Jammy 22.04 LTS for eu-west-1 region, amd64 arch and hvm:ebs-ssd instance type
   description = "Which ami is used"
 }
 
