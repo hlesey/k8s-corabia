@@ -3,12 +3,16 @@
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: InitConfiguration
 bootstrapTokens:
-- token: "abcdef.0123456789abcdef"
+- token: ${BOOTSTRAP_TOKEN}
   description: "kubeadm bootstrap token"
   ttl: "168h" # 7days
 localAPIEndpoint:
-  advertiseAddress: {{CONTROL_PLANE_IP}}
+  advertiseAddress: ${CONTROL_PLANE_IP}
   bindPort: 6443
+nodeRegistration:
+  taints:
+    - key: node.cilium.io/agent-not-ready
+      effect: NoSchedule
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
@@ -18,5 +22,5 @@ networking:
   serviceSubnet: 10.96.0.0/12
 apiServer:
   certSANs:
-  - {{CONTROL_PLANE_PUBLIC_DNS}}
-  - {{CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}}
+  - ${CONTROL_PLANE_PUBLIC_DNS}
+  - ${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}

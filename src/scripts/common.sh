@@ -29,43 +29,37 @@ fi
 
 # AWS specific
 if [[ "$(dmidecode -s system-manufacturer)" == "Amazon EC2" ]]; then
-  while [ ! -f /var/lib/cloud/instance/boot-finished ]; do
     echo 'Waiting for cloud-init...';
-    sleep 1;
-  done
+    while [ ! -f /var/lib/cloud/instance/boot-finished ]; do
+        sleep 1;
+    done
 fi
 
 # install dependencies
-apt-get update
+apt-get update > /dev/null
 apt-get install -y iptables arptables ebtables nfs-kernel-server nfs-common apt-transport-https ntp \
-                   telnet jq dos2unix ca-certificates curl gnupg lsb-release
+                   telnet jq dos2unix ca-certificates curl gnupg lsb-release > /dev/null
 
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+# Install CRI-O
+# https://github.com/cri-o/cri-o/blob/main/install.md
+OS="xUbuntu_$(lsb_release -rs)"
+echo "deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/${OS}/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+echo "deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/${CRIO_VERSION}/${OS}/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:"${CRIO_VERSION}".list
 
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
-      https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
-      tee /etc/apt/sources.list.d/docker.list > /dev/null
+mkdir -p /usr/share/keyrings
+curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/"${OS}"/Release.key | gpg --dearmor -o /usr/share/keyrings/libcontainers-archive-keyring.gpg
+curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/"${CRIO_VERSION}"/"${OS}"/Release.key | gpg --dearmor -o /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
 
-apt-get update
-apt-get install -y docker-ce docker-ce-cli containerd.io
+apt-get update > /dev/null
+apt-get install -y cri-o cri-o-runc cri-tools > /dev/null
+
+# setup cri-o
+systemctl daemon-reload
+systemctl enable crio
+systemctl start crio
 
 # setup ntp
-systemctl enable ntp && \
-systemctl start ntp
-
-# setup docker
-cat > /etc/docker/daemon.json <<EOF
-{
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "100m"
-  },
-  "exec-opts": ["native.cgroupdriver=systemd"]
-}
-EOF
-mkdir -p /etc/systemd/system/docker.service.d
-systemctl enable docker && \
-systemctl restart docker
+systemctl enable ntp && systemctl start ntp
 
 # add kubernetes repos
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
@@ -74,8 +68,8 @@ deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 
 # install kubeadm
-sudo apt-get update
-apt-get install -y kubeadm="${K8S_VERSION}-00" kubelet="${K8S_VERSION}-00" kubectl="${K8S_VERSION}-00"
+sudo apt-get update > /dev/null
+apt-get install -y kubeadm="${K8S_VERSION}-00" kubelet="${K8S_VERSION}-00" kubectl="${K8S_VERSION}-00" > /dev/null
 
 # Install kubetail
 curl -s https://raw.githubusercontent.com/johanhaleby/kubetail/control-plane/kubetail --output /usr/local/bin/kubetail
@@ -90,3 +84,23 @@ cat <<EOF > /etc/environment
 LANG=en_US.utf-8
 LC_ALL=en_US.utf-8
 EOF
+
+# Install and configure k8s prerequisites
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/#install-and-configure-prerequisites
+cat <<EOF | tee /etc/modules-load.d/k8s.conf
+overlay
+br_netfilter
+EOF
+
+modprobe overlay
+modprobe br_netfilter
+
+# sysctl params required by setup, params persist across reboots
+cat <<EOF | tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
+EOF
+
+# Apply sysctl params without reboot
+sysctl --system

@@ -17,7 +17,8 @@ variable "az" {
 }
 
 variable "instance-ami" {
-  default     = "ami-08ca3fed11864d6bb" # Ubuntu Focal 20.04 LTS
+  # Get new AMI from https://cloud-images.ubuntu.com/locator/ec2/
+  default     = "ami-0333305f9719618c7" # Ubuntu Jammy 22.04 LTS for eu-west-1 region, amd64 arch and hvm:ebs-ssd instance type
   description = "Which ami is used"
 }
 
@@ -29,10 +30,6 @@ variable "control-plane-instance-type" {
 variable "node-instance-type" {
   default     = "t3.small"
   description = "Which EC2 instance type to use for the worker nodes"
-}
-
-locals {
-  bootstraptoken = "abcdef.0123456789abcdef"
 }
 
 variable "ssh-key-path" {

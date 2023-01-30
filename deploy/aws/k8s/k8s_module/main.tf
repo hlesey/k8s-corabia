@@ -206,10 +206,14 @@ resource "aws_instance" "node" {
     destination = "/src/"
   }
 
+  provisioner "file" {
+    source      = "../../../src/manifests"
+    destination = "/src/"
+  }
+
   provisioner "remote-exec" {
     inline = [
       "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/scripts/envs",
-      "sudo echo 'kubeadm join --token=${local.bootstraptoken} --discovery-token-unsafe-skip-ca-verification ${aws_eip.control-plane.private_ip}:6443' >> /output/.kubeadmin_init",
       "sudo /bin/bash /src/scripts/common.sh",
       "sudo /bin/bash /src/scripts/node.sh",
     ]
@@ -239,6 +243,7 @@ module "kubeconfig" {
   depends_on = [null_resource.control-plane-config]
   source     = "Invicton-Labs/shell-resource/external"
   command_unix    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo sed -e 's#${aws_eip.control-plane.private_ip}#${aws_eip.control-plane.public_dns}#g' /output/kubeconfig.yaml"
+  timeout_create = 120
 }
 
 module "cluster-admin-token" {

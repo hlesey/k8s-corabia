@@ -15,4 +15,5 @@ deploy/aws/**/.terraform*
 deploy/aws/**/*.log
 *.tfstate
 deploy/aws/**/*.backup
+deploy/aws/**/cluster*
 .localenv
