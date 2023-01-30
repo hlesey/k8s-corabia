@@ -11,6 +11,9 @@ if [[ $(uname | grep $WINDOWS) != "" ]]; then
     extension=".exe"
 elif [[ $(uname| grep $MAC) != "" ]]; then
 	os="darwin"
+	if [[ "${SHELL}" == *zsh ]]; then
+	    env_path="$HOME/.zshrc"
+    fi
 else
 	os="linux"
 	# If bash is not opened with interactive login, .bash_profile won't be loaded
@@ -19,6 +22,7 @@ else
 fi
 
 echo "Detected $os operating system."
+echo "Detected $env_path as env path."
 
 mkdir -p bin
 curl -o bin/kubectl -LO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/${os}/amd64/kubectl${extension}"
