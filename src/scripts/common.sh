@@ -6,7 +6,7 @@ set -xe
 
 # load variables
 source /src/scripts/envs
-DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND=noninteractive
 
 # add control-plane IP to hosts file
 echo "${CONTROL_PLANE_IP} control-plane control-plane.local nfsserver.local" >> /etc/hosts
@@ -37,7 +37,7 @@ fi
 
 # install dependencies
 apt-get update > /dev/null
-apt-get install -y iptables arptables ebtables nfs-kernel-server nfs-common apt-transport-https ntp \
+yes | apt-get install -yq iptables arptables ebtables nfs-kernel-server nfs-common apt-transport-https ntp \
                    telnet jq dos2unix ca-certificates curl gnupg lsb-release > /dev/null
 
 # Install CRI-O
@@ -51,7 +51,7 @@ curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/
 curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/"${CRIO_VERSION}"/"${OS}"/Release.key | gpg --dearmor -o /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
 
 apt-get update > /dev/null
-apt-get install -y cri-o cri-o-runc cri-tools > /dev/null
+yes | apt-get install -yq cri-o cri-o-runc cri-tools > /dev/null
 
 # setup cri-o
 systemctl daemon-reload
@@ -69,7 +69,7 @@ EOF
 
 # install kubeadm
 sudo apt-get update > /dev/null
-apt-get install -y kubeadm="${K8S_VERSION}-00" kubelet="${K8S_VERSION}-00" kubectl="${K8S_VERSION}-00" > /dev/null
+yes | apt-get install -yq kubeadm="${K8S_VERSION}-00" kubelet="${K8S_VERSION}-00" kubectl="${K8S_VERSION}-00" > /dev/null
 
 # Install kubetail
 curl -s https://raw.githubusercontent.com/johanhaleby/kubetail/control-plane/kubetail --output /usr/local/bin/kubetail

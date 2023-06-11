@@ -124,7 +124,7 @@ resource "aws_instance" "control-plane" {
 }
 
 resource "aws_eip" "control-plane" {
-  vpc        = true
+  domain     = "vpc"
   instance   = aws_instance.control-plane.id
   depends_on = [aws_internet_gateway.gw]
   tags = {
