@@ -5,7 +5,7 @@ set -xe
 # Refs: https://kubernetes.io/docs/setup/independent/install-kubeadm/
 
 # load variables
-source /src/scripts/envs
+source /src/scripts/envs.sh
 export DEBIAN_FRONTEND=noninteractive
 
 # add control-plane IP to hosts file
@@ -38,9 +38,9 @@ fi
 # install dependencies
 apt-get update > /dev/null
 yes | apt-get install -yq iptables arptables ebtables nfs-kernel-server nfs-common apt-transport-https ntp \
-                   telnet jq dos2unix ca-certificates curl gnupg lsb-release > /dev/null
+                   telnet jq dos2unix ca-certificates curl gnupg lsb-release gpg > /dev/null
 
-# Install CRI-O
+# install cri-o
 # https://github.com/cri-o/cri-o/blob/main/install.md
 OS="xUbuntu_$(lsb_release -rs)"
 echo "deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/${OS}/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
@@ -61,15 +61,18 @@ systemctl start crio
 # setup ntp
 systemctl enable ntp && systemctl start ntp
 
-# add kubernetes repos
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
-deb https://apt.kubernetes.io/ kubernetes-xenial main
-EOF
+# install kubelet, kubeadm, kubectl
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 # install kubeadm
 sudo apt-get update > /dev/null
-yes | apt-get install -yq kubeadm="${K8S_VERSION}-00" kubelet="${K8S_VERSION}-00" kubectl="${K8S_VERSION}-00" > /dev/null
+yes | apt-get install -yq \
+    kubeadm="${K8S_VERSION}.${K8S_PATCH_VERSION}-*" \
+    kubelet="${K8S_VERSION}.${K8S_PATCH_VERSION}-*" \
+    kubectl="${K8S_VERSION}.${K8S_PATCH_VERSION}-*" \
+    > /dev/null
 
 # Install kubetail
 curl -s https://raw.githubusercontent.com/johanhaleby/kubetail/control-plane/kubetail --output /usr/local/bin/kubetail

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Configure nfs server (on control-plane node)
 
-source /src/scripts/envs
+source /src/scripts/envs.sh
 
 mkdir /nfs
 for i in {0..9}; do
@@ -18,4 +18,3 @@ cat <<EOF > /etc/exports
 /nfs *(rw,sync,no_root_squash,subtree_check)
 EOF
 exportfs -ra
-

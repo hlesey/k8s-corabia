@@ -2,27 +2,18 @@
 # Setup and bootstrap k8s control-plane
 set -xe
 
-source /src/scripts/envs
+source /src/scripts/envs.sh
 
 # bootstrap k8s control-plane components
 envsubst < /src/manifests/kubeadm/control-plane.yaml > /tmp/control-plane.yaml
 
 kubeadm init --config /tmp/control-plane.yaml > /output/.kubeadmin_init
-
 export KUBECONFIG=/etc/kubernetes/admin.conf
 
-# deploy overlay network
-if [[ "$NETWORK_PLUGIN" == "cilium" ]]; then
-    # enable bpf and setup kubelet
-    cat <<EOF >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-    ExecStartPre=/bin/bash -c "if [[ $(/bin/mount | /bin/grep /sys/fs/bpf -c) -eq 0 ]]; then /bin/mount bpffs /sys/fs/bpf -t bpf; fi"
-EOF
-    systemctl daemon-reload
-    systemctl restart kubelet
+# modify ingress hubble-ui for cilium
+sed -i -e "s'hubble-ui.clusterx.qedzone.ro'hubble-ui.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/manifests/network/cilium/hubble-ui-ingress.yml
 
-    sed -i -e "s'hubble-ui.clusterx.qedzone.ro'hubble-ui.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/manifests/network/cilium/hubble-ui-ingress.yml
-fi
-
+# deploy network cni plugin
 kubectl apply -f /src/manifests/network/"${NETWORK_PLUGIN}"
 
 # deploy dashboard

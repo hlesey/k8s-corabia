@@ -11,7 +11,7 @@ setup your local machine to connect to it.
   * [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
   * [VSCode](https://code.visualstudio.com/download)
 * Windows:
-  * [git bash v2.23.0](https://github.com/git-for-windows/git/releases/download/v2.23.0.windows.1/Git-2.23.0-64-bit.exe)
+  * [git bash v2.43.0](https://github.com/git-for-windows/git/releases/download/v2.43.0.windows.1/Git-2.43.0-64-bit.exe)
   * [VSCode](https://code.visualstudio.com/download)
 * Linux:
   * [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)

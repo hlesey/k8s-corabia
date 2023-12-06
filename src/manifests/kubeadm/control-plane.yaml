@@ -11,6 +11,8 @@ localAPIEndpoint:
   bindPort: 6443
 nodeRegistration:
   taints:
+    - key: node-role.kubernetes.io/control-plane
+      effect: NoSchedule
     - key: node.cilium.io/agent-not-ready
       effect: NoSchedule
 ---

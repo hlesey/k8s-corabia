@@ -2,8 +2,8 @@
 # vi: set ft=ruby :
 
 VAGRANTFILE_API_VERSION = "2"
-BOX_IMAGE="ubuntu/focal64"
-BOX_VERSION="20220308.0.0"
+BOX_IMAGE="ubuntu/jammy64"
+BOX_VERSION="20231201.0.0"
 required_plugins = %w(vagrant-vbguest)
 
 # On latest versions of VirtualBox you have to manually allow IP addresses range in /etc/vbox/networks.conf
