@@ -163,9 +163,9 @@ resource "null_resource" "control-plane-config" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/scripts/envs",
-      "sudo echo 'export CONTROL_PLANE_PUBLIC_DNS=${aws_eip.control-plane.public_dns}' >> /src/scripts/envs",
-      "sudo echo 'export CONTROL_PLANE_PUBLIC_EXTERNAL_DNS=${var.cluster-name}.qedzone.ro' >> /src/scripts/envs",
+      "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/scripts/envs.sh",
+      "sudo echo 'export CONTROL_PLANE_PUBLIC_DNS=${aws_eip.control-plane.public_dns}' >> /src/scripts/envs.sh",
+      "sudo echo 'export CONTROL_PLANE_PUBLIC_EXTERNAL_DNS=${var.cluster-name}.qedzone.ro' >> /src/scripts/envs.sh",
       "sudo /bin/bash /src/scripts/common.sh",
       "sudo /bin/bash /src/scripts/nfs.sh",
       "sudo /bin/bash /src/scripts/control-plane.sh",
@@ -213,7 +213,7 @@ resource "aws_instance" "node" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/scripts/envs",
+      "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/scripts/envs.sh",
       "sudo /bin/bash /src/scripts/common.sh",
       "sudo /bin/bash /src/scripts/node.sh",
     ]

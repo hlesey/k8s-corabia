@@ -9,22 +9,22 @@ version):
 
 MacOS:
 
-- [VirtualBox 6.1.6](https://download.virtualbox.org/virtualbox/6.1.6)
+- [VirtualBox 7.0.8](https://download.virtualbox.org/virtualbox/7.0.8)
 - [Oracle VM VirtualBox Extension Pack
-  6.1.6](https://download.virtualbox.org/virtualbox/6.1.6/Oracle_VM_VirtualBox_Extension_Pack-6.1.6.vbox-extpack)
-- [vagrant v2.2.7](https://releases.hashicorp.com/vagrant/2.2.7/)
+  7.0.8](https://download.virtualbox.org/virtualbox/7.0.8/Oracle_VM_VirtualBox_Extension_Pack-7.0.8.vbox-extpack)
+- [vagrant v2.4.0](https://releases.hashicorp.com/vagrant/2.4.0/)
 - [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [VSCode](https://code.visualstudio.com/download), vim or any text editor you
   like.
 
 Windows:
 
-- [VirtualBox 6.1.6](https://download.virtualbox.org/virtualbox/6.1.6)
+- [VirtualBox 7.0.8](https://download.virtualbox.org/virtualbox/7.0.8)
 - [Oracle VM VirtualBox Extension Pack
-  6.1.6](https://download.virtualbox.org/virtualbox/6.1.6/Oracle_VM_VirtualBox_Extension_Pack-6.1.6.vbox-extpack)
-- [vagrant v2.2.7](https://releases.hashicorp.com/vagrant/2.2.7/)
+  7.0.8](https://download.virtualbox.org/virtualbox/7.0.8/Oracle_VM_VirtualBox_Extension_Pack-7.0.8.vbox-extpack)
+- [vagrant v2.4.0](https://releases.hashicorp.com/vagrant/2.4.0/)
 - [git bash
-  v2.23.0](https://github.com/git-for-windows/git/releases/download/v2.23.0.windows.1/Git-2.23.0-64-bit.exe)
+  v2.43.0](https://github.com/git-for-windows/git/releases/download/v2.43.0.windows.1/Git-2.43.0-64-bit.exe)
 - [VSCode](https://code.visualstudio.com/download),
   [notepad++](https://notepad-plus-plus.org/download) or any text editor you
   like.
@@ -35,10 +35,10 @@ to use this setup. More info
 
 Linux:
 
-- [VirtualBox 6.1.6](https://download.virtualbox.org/virtualbox/6.1.6)
+- [VirtualBox 7.0.8](https://download.virtualbox.org/virtualbox/7.0.8)
 - [Oracle VM VirtualBox Extension Pack
-  6.1.6](https://download.virtualbox.org/virtualbox/6.1.6/Oracle_VM_VirtualBox_Extension_Pack-6.1.6.vbox-extpack)
-- [vagrant v2.2.7](https://releases.hashicorp.com/vagrant/2.2.7/)
+  7.0.8](https://download.virtualbox.org/virtualbox/7.0.8/Oracle_VM_VirtualBox_Extension_Pack-7.0.8.vbox-extpack)
+- [vagrant v2.4.0](https://releases.hashicorp.com/vagrant/2.4.0/)
 - [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - [VSCode](https://code.visualstudio.com/download), vim or any text editor you
   like.
