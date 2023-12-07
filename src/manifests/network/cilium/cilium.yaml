@@ -154,7 +154,7 @@ data:
 
   # Regular expression matching compatible Istio sidecar istio-proxy
   # container image names
-  sidecar-istio-proxy-image: "cilium/istio_proxy"
+  sidecar-istio-proxy-image: "ghcr.io/hlesey/cilium/istio_proxy:1.10.3"
 
   # Name of the cluster. Only relevant when building a mesh of clusters.
   cluster-name: default
