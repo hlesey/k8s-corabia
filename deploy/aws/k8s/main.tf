@@ -5,8 +5,8 @@ provider "aws" {
 locals {
   # adjust cluster lists based on your needs
   clusters = {
-    playground = {
-      allowed_cidr_blocks = "193.105.140.214/32",
+    cluster0 = {
+      allowed_cidr_blocks = "0.0.0.0/0",
     },
     # cluster1 = {
     #   allowed_cidr_blocks = "0.0.0.0/0",
