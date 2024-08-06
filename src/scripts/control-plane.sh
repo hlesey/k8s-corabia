@@ -8,29 +8,27 @@ source /src/scripts/envs.sh
 envsubst < /src/manifests/kubeadm/control-plane.yaml > /tmp/control-plane.yaml
 
 kubeadm init --config /tmp/control-plane.yaml > /output/.kubeadmin_init
-export KUBECONFIG=/etc/kubernetes/admin.conf
 
-# modify ingress hubble-ui for cilium
-sed -i -e "s'hubble-ui.clusterx.qedzone.ro'hubble-ui.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/manifests/network/cilium/hubble-ui-ingress.yml
+if [[ $NETWORK_PLUGIN == "cilium" ]]
+then
+    # modify ingress hubble-ui for cilium
+    sed -i -e "s'hubble-ui.clusterx.qedzone.ro'hubble-ui.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/manifests/network/cilium/hubble-ui-ingress.yaml
 
-# deploy network cni plugin
-kubectl apply -f /src/manifests/network/"${NETWORK_PLUGIN}"
-
-# deploy dashboard
-sed -i -e "s'clusterx.qedzone.ro'${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/manifests/dashboard/dashboard-ingress.yml
-kubectl apply -f /src/manifests/dashboard/
-
-# setup cluster-admin sa
-kubectl apply -f /src/manifests/cluster-admin/cluster-admin.yaml
-
-# deploy ingress controller
-kubectl apply -f  /src/manifests/ingress/"${INGRESS_CONTROLLER}"
-
-# deploy metrics-server
-kubectl apply -f /src/manifests/metrics-server/
+    # deploy network cni plugin
+    kubectl apply -f /src/manifests/network/cilium/hubble-ui-ingress.yaml
+    helm repo add cilium https://helm.cilium.io/
+    helm repo update
+    helm upgrade --install cilium cilium/cilium --namespace kube-system --version "${CILIUM_VERSION}" -f /src/manifests/network/cilium/helm-values.yaml
+else
+    # deploy network cni plugin
+    kubectl apply -f /src/manifests/network/"${NETWORK_PLUGIN}"
+fi
 
 # scale coredns to 1 replica
 kubectl -n kube-system scale deployment coredns --replicas=1
+
+# setup cluster-admin sa
+kubectl apply -f /src/manifests/cluster-admin/cluster-admin.yaml
 
 # generate a lifetime admin token
 kubectl create token --duration=0s cluster-admin > /output/cluster-admin-token

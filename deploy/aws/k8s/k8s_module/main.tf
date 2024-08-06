@@ -173,6 +173,37 @@ resource "null_resource" "control-plane-config" {
   }
 }
 
+resource "null_resource" "kubernetes-dashboard" {
+
+  depends_on = [aws_instance.node[0]]
+
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    private_key = file(var.ssh-key-path)
+    host        = aws_eip.control-plane.public_ip
+  }
+
+  provisioner "file" {
+    source      = "../../../src/scripts"
+    destination = "/src/"
+  }
+
+  provisioner "file" {
+    source      = "../../../src/manifests"
+    destination = "/src/"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/scripts/envs.sh",
+      "sudo echo 'export CONTROL_PLANE_PUBLIC_DNS=${aws_eip.control-plane.public_dns}' >> /src/scripts/envs.sh",
+      "sudo echo 'export CONTROL_PLANE_PUBLIC_EXTERNAL_DNS=${var.cluster-name}.qedzone.ro' >> /src/scripts/envs.sh",
+      "sudo /bin/bash /src/scripts/dashboard-install.sh",
+    ]
+  }
+}
+
 resource "aws_instance" "node" {
   count                       = 2
   availability_zone           = "${var.region}${var.az}"
@@ -250,4 +281,5 @@ module "cluster-admin-token" {
   depends_on = [null_resource.control-plane-config]
   source     = "Invicton-Labs/shell-resource/external"
   command_unix    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo cat /output/cluster-admin-token"
+  timeout_create = 120
 }

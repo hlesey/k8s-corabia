@@ -109,7 +109,7 @@ module "clusters_eu_west_1" {
   source       = "./k8s_module"
   cluster-name = each.key
 
-  instance-ami = "ami-0c259a97cbf621daf"
+  instance-ami = "ami-02fd062ee104754fc"
 
   az                  = var.az
   region              = "eu-west-1"
@@ -128,7 +128,7 @@ module "clusters_eu_west_2" {
   source       = "./k8s_module"
   cluster-name = each.key
 
-  instance-ami = "ami-013fadefd0ab548ef"
+  instance-ami = "ami-02fd062ee104754fc"
 
   az                  = var.az
   region              = "eu-west-2"

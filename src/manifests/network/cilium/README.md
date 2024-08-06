@@ -1,6 +1,6 @@
 # Update instructions
 
-Refs: https://docs.cilium.io/en/v1.12/gettingstarted/k8s-install-default/
+Refs: https://docs.cilium.io/en/v1.16/gettingstarted/k8s-install-default/
 
 ## Add cilium helm repo
 
@@ -14,10 +14,7 @@ helm repo update
 ```bash
 
 helm template cilium cilium/cilium  \
-   --version 1.14.4 \
+   --version 1.16.0 \
    --namespace kube-system \
-   --set ipam.operator.clusterPoolIPv4PodCIDRList="10.244.0.0/16" \
-   --set proxy.sidecarImageRegex="ghcr.io/hlesey/cilium/istio_proxy:1.10.3" \
-   --set hubble.relay.enabled=true \
-   --set hubble.ui.enabled=true > cilium.yaml
+   -f src/manifests/network/cilium/helm-values.yaml > cilium.yaml
 ```
