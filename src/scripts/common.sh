@@ -38,41 +38,44 @@ fi
 # install dependencies
 apt-get update > /dev/null
 yes | apt-get install -yq iptables arptables ebtables nfs-kernel-server nfs-common apt-transport-https ntp \
-                   telnet jq dos2unix ca-certificates curl gnupg lsb-release gpg > /dev/null
+                   telnet jq dos2unix ca-certificates curl gnupg lsb-release gpg software-properties-common > /dev/null
 
 # install cri-o
-# https://github.com/cri-o/cri-o/blob/main/install.md
-OS="xUbuntu_$(lsb_release -rs)"
-echo "deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/${OS}/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
-echo "deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/${CRIO_VERSION}/${OS}/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:"${CRIO_VERSION}".list
+# https://github.com/cri-o/packaging/blob/main/README.md#distributions-using-deb-packages
 
-mkdir -p /usr/share/keyrings
-curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/"${OS}"/Release.key | gpg --dearmor -o /usr/share/keyrings/libcontainers-archive-keyring.gpg
-curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/"${CRIO_VERSION}"/"${OS}"/Release.key | gpg --dearmor -o /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
+## Add the Kubernetes repository
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v"${K8S_VERSION}"/deb/Release.key | gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/ /" > /etc/apt/sources.list.d/kubernetes.list
+
+
+# Add the CRI-O repository
+curl -fsSL https://pkgs.k8s.io/addons:/cri-o:/stable:/v"${CRIO_VERSION}"/deb/Release.key | gpg --dearmor --yes -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/stable:/v${CRIO_VERSION}/deb/ /" > /etc/apt/sources.list.d/cri-o.list
 
 apt-get update > /dev/null
-yes | apt-get install -yq cri-o cri-o-runc cri-tools > /dev/null
+yes | apt-get install -yq cri-o cri-tools > /dev/null
 
 # setup cri-o
 systemctl daemon-reload
 systemctl enable crio
 systemctl start crio
 
-# setup ntp
-systemctl enable ntp && systemctl start ntp
-
 # install kubelet, kubeadm, kubectl
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
-# install kubeadm
-sudo apt-get update > /dev/null
+apt-get update > /dev/null
 yes | apt-get install -yq \
     kubeadm="${K8S_VERSION}.${K8S_PATCH_VERSION}-*" \
     kubelet="${K8S_VERSION}.${K8S_PATCH_VERSION}-*" \
     kubectl="${K8S_VERSION}.${K8S_PATCH_VERSION}-*" \
     > /dev/null
+
+# Install Helm
+curl https://baltocdn.com/helm/signing.asc | gpg --dearmor --yes -o /usr/share/keyrings/helm.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" > /etc/apt/sources.list.d/helm-stable-debian.list
+apt-get update  > /dev/null
+yes | apt-get install helm  > /dev/null
+
 
 # Install kubetail
 curl -s https://raw.githubusercontent.com/johanhaleby/kubetail/control-plane/kubetail --output /usr/local/bin/kubetail

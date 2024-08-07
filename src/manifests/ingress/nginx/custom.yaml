@@ -7,6 +7,14 @@ metadata:
   name: ingress-nginx
 ---
 apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/instance: cert-manager
+    app.kubernetes.io/name: cert-manager
+  name: cert-manager
+---
+apiVersion: v1
 kind: Service
 metadata:
   labels:
@@ -26,7 +34,6 @@ spec:
       nodePort: 30443
   selector:
     app.kubernetes.io/component: controller
-    app.kubernetes.io/instance: ingress-nginx
     app.kubernetes.io/name: ingress-nginx
 ---
 apiVersion: autoscaling/v1

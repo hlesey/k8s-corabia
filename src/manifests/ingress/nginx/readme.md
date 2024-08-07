@@ -1,5 +1,6 @@
-# Update instructions
+# Nginx ingress controller
 
-Copy the content of following file into `nginx.yaml`:  https://github.com/kubernetes/ingress-nginx/blob/main/deploy/static/provider/baremetal/deploy.yaml.
-
-Add `- --watch-ingress-without-class=true` parameter to `nginx-ingress-controller`.
+The ingress controller is installed via the kubernetes dashboard helm chart.
+We are adding few extra objects like:
+- extra node port service to expose it via the 30443 (https) and 30080 (http) ports.
+- an HPA object to scale it dynamically based on the CPU usage.

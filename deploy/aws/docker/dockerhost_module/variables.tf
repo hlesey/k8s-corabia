@@ -23,12 +23,12 @@ variable "az" {
 
 variable "instance-ami" {
   # Get new AMI from https://cloud-images.ubuntu.com/locator/ec2/
-  default     = "ami-0333305f9719618c7" # Ubuntu Jammy 22.04 LTS for eu-west-1 region, amd64 arch and hvm:ebs-ssd instance type
+  default     = "ami-02fd062ee104754fc" # Ubuntu Noble Numbat	24.04 LTS for eu-west-1 region, arm64 arch and 	hvm:ebs-ssd-gp3 instance type
   description = "Which ami is used"
 }
 
 variable "dockerhost-instance-type" {
-  default     = "t3.micro"
+  default     = "t4g.small"
   description = "Which EC2 instance type to use for the dockerhost"
 }
 

@@ -10,6 +10,7 @@ localAPIEndpoint:
   advertiseAddress: ${CONTROL_PLANE_IP}
   bindPort: 6443
 nodeRegistration:
+  criSocket: "unix:///var/run/crio/crio.sock"
   taints:
     - key: node-role.kubernetes.io/control-plane
       effect: NoSchedule
