@@ -32,8 +32,13 @@ variable "node-instance-type" {
   description = "Which EC2 instance type to use for the worker nodes"
 }
 
+variable "node-disk-size" {
+  default = 20
+  description = "Size of the disk in GB"
+}
+
 variable "ssh-key-path" {
 }
 
 variable "ssh-key-name" {
-}
+} 
