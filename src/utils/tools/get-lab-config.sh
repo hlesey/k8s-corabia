@@ -17,6 +17,12 @@ if [ -z "$CLUSTER_NUMBER" ] || [ -z "$TOKEN" ]; then
     exit 1
 fi
 
+# Validate if the cluster number is a number
+if ! [[ "$CLUSTER_NUMBER" =~ ^[0-9]+$ ]]; then
+    echo "Error: Cluster number must be a number."
+    exit 1
+fi
+
 # Output the values to verify
 echo "Cluster Number: $CLUSTER_NUMBER"
 echo "Token: $TOKEN"
