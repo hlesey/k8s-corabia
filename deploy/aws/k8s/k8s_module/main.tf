@@ -209,10 +209,6 @@ resource "aws_instance" "node" {
   availability_zone           = "${var.region}${var.az}"
   ami                         = var.instance-ami
   instance_type               = var.node-instance-type
-  root_block_device {
-      volume_size = "${var.node-disk-size}"
-      volume_type = "gp3"
-    }
   ebs_optimized = true
   key_name                    = var.ssh-key-name
   subnet_id                   = aws_subnet.main.id

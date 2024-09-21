@@ -48,7 +48,7 @@ Maybe do a backup first.
 ```terraform
 terraform plan -target=module.clusters[\"cluster11\"]
 terraform apply -target=module.clusters[\"cluster11\"]
-terraform destroy -target=module.clusters[\"cluster11\"]
+terraform destroy -target=module.clusters[\"cluster10\"] -target=module.clusters[\"cluster11\"]
 ```
 
 ```terraform

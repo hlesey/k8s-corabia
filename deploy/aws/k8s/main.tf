@@ -3,6 +3,8 @@ provider "aws" {
 }
 
 locals {
+  az_list = ["a", "b", "c"]
+
   # adjust cluster lists based on your needs
   clusters = {
     cluster0 = {
@@ -81,7 +83,7 @@ module "clusters" {
   source       = "./k8s_module"
   cluster-name = each.key
 
-  az                  = var.az
+  az                  = local.az_list[tonumber(substr(each.key, 7, 2)) % 3]
   region              = var.region
   allowed-cidr-blocks = each.value.allowed_cidr_blocks
 
