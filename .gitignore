@@ -4,8 +4,6 @@
 .idea/
 *.DS_Store
 .vscode
-deploy/vagrant/.vagrant/*
-src/template/.vagrant/*
 src/template/output
 output/.kubeadmin_init
 output/cluster-admin-token
