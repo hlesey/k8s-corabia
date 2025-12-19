@@ -49,9 +49,8 @@ echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.
 
 
 # Add the CRI-O repository
-curl -fsSL https://pkgs.k8s.io/addons:/cri-o:/stable:/v"${CRIO_VERSION}"/deb/Release.key | gpg --dearmor --yes -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
-echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/stable:/v${CRIO_VERSION}/deb/ /" > /etc/apt/sources.list.d/cri-o.list
-
+curl -fsSL https://download.opensuse.org/repositories/isv:/cri-o:/stable:/v"${CRIO_VERSION}"/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/v"${CRIO_VERSION}"/deb/ /" | tee /etc/apt/sources.list.d/cri-o.list
 apt-get update > /dev/null
 yes | apt-get install -yq cri-o cri-tools > /dev/null
 

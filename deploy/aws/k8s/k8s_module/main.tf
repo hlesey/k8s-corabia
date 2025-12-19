@@ -209,12 +209,17 @@ resource "aws_instance" "node" {
   availability_zone           = "${var.region}${var.az}"
   ami                         = var.instance-ami
   instance_type               = var.node-instance-type
-  ebs_optimized = true
+  ebs_optimized               = true
   key_name                    = var.ssh-key-name
   subnet_id                   = aws_subnet.main.id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]
   depends_on                  = [null_resource.control-plane-config]
+
+  root_block_device {
+    volume_size = 10  # GB
+  }
+
   tags = {
     Name = "${var.cluster-name}-node0${count.index + 1}"
   }

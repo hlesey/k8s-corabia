@@ -1,6 +1,6 @@
 # https://pkg.go.dev/k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm/v1beta3
 
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: InitConfiguration
 bootstrapTokens:
 - token: ${BOOTSTRAP_TOKEN}
@@ -17,7 +17,7 @@ nodeRegistration:
     - key: node.cilium.io/agent-not-ready
       effect: NoSchedule
 ---
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
 networking:
   dnsDomain: cluster.local
