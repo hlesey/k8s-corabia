@@ -11,22 +11,6 @@ export DEBIAN_FRONTEND=noninteractive
 # add control-plane IP to hosts file
 echo "${CONTROL_PLANE_IP} control-plane control-plane.local nfsserver.local" >> /etc/hosts
 
-# VirtualBox specific
-if [[ "$(dmidecode -s system-manufacturer)" == "innotek GmbH" ]]; then
-  # use external DNS, instead of local VBox
-  echo "DNS=8.8.8.8" >> /etc/systemd/resolved.conf
-  echo "DNS=8.8.4.4" >> /etc/systemd/resolved.conf
-  systemctl restart systemd-resolved
-
-  # disable sshd dns lookup
-  echo "UseDNS no" >> /etc/ssh/sshd_config
-  systemctl restart sshd
-
-  # add nodes IPs to hosts file
-  echo "${NODE01_IP} node01 node01.local" >> /etc/hosts
-  echo "${NODE02_IP} node02 node02.local" >> /etc/hosts
-fi
-
 # AWS specific
 if [[ "$(dmidecode -s system-manufacturer)" == "Amazon EC2" ]]; then
     echo 'Waiting for cloud-init...';
