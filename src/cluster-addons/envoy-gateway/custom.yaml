@@ -1,0 +1,56 @@
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: eg
+  namespace: envoy-gateway-system
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: eg
+  namespace: envoy-gateway-system
+spec:
+  gatewayClassName: eg
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      hostname: "*.clusterx.qedzone.ro"
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https
+      port: 443
+      protocol: HTTPS
+      hostname: "*.clusterx.qedzone.ro"
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+        - kind: Secret
+          name: envoy-gateway
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: envoy-gateway-external-service
+  namespace: envoy-gateway-system
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      targetPort: 10080
+      nodePort: 30080
+    - name: https
+      port: 443
+      targetPort: 10443
+      nodePort: 30443
+  selector:
+    app.kubernetes.io/component: proxy

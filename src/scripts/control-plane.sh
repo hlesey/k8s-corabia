@@ -1,49 +1,60 @@
 #!/usr/bin/env bash
-# Setup and bootstrap k8s control-plane
-set -xe
+ 
+# Setup and bootstrap k8s control-plane components
 
+set -xe
 source /src/scripts/envs.sh
 
-# bootstrap k8s control-plane components
-envsubst < /src/manifests/kubeadm/control-plane.yaml > /tmp/control-plane.yaml
 
+# Bootstrap k8s control-plane components
+envsubst < /src/cluster-addons/kubeadm/control-plane.yaml > /tmp/control-plane.yaml
 kubeadm init --config /tmp/control-plane.yaml > /output/.kubeadmin_init
 
-if [[ $NETWORK_PLUGIN == "cilium" ]]
-then
-    # modify ingress hubble-ui for cilium
-    sed -i -e "s'hubble-ui.clusterx.qedzone.ro'hubble-ui.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/manifests/network/cilium/hubble-ui-ingress.yaml
 
-    # deploy network cni plugin
-    kubectl apply -f /src/manifests/network/cilium/hubble-ui-ingress.yaml
-    helm repo add cilium https://helm.cilium.io/
-    helm repo update
-    helm upgrade --install cilium cilium/cilium --namespace kube-system --version "${CILIUM_VERSION}" -f /src/manifests/network/cilium/helm-values.yaml
-else
-    # deploy network cni plugin
-    kubectl apply -f /src/manifests/network/"${NETWORK_PLUGIN}"
-fi
+# Deploy Cilium CNI
+sed -i -e "s'hubble-ui.clusterx.qedzone.ro'hubble-ui.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/cluster-addons/network/cilium/custom.yaml
+kubectl apply -f /src/cluster-addons/network/cilium/custom.yaml
 
-# scale coredns to 1 replica
+helm repo add cilium https://helm.cilium.io/
+helm repo update
+helm upgrade --install cilium cilium/cilium --namespace kube-system --version "${CILIUM_VERSION}" -f /src/cluster-addons/network/cilium/helm-values.yaml
+
+
+# Deploy Envoy Gateway
+helm install \
+    eg oci://docker.io/envoyproxy/gateway-helm \
+    --version v"${ENVOY_GATEWAY_VERSION}" \
+    -n envoy-gateway-system \
+    --create-namespace
+
+sed -i -e "s'clusterx.qedzone.ro'${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/cluster-addons/envoy-gateway/custom.yaml
+kubectl apply -f /src/cluster-addons/envoy-gateway/custom.yaml
+
+
+# Deploy Kubernetes Dashboard
+sed -i -e "s'dashboard.clusterx.qedzone.ro'dashboard.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/cluster-addons/dashboard/custom.yaml
+kubectl apply -f /src/cluster-addons/dashboard/custom.yaml
+
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+helm repo update
+helm upgrade \
+    --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard \
+    --create-namespace --namespace kubernetes-dashboard \
+    --version "${DASHBOARD_VERSION}" \
+    --set app.ingress.hosts[0]="${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}" \
+    -f /src/cluster-addons/dashboard/helm-values.yaml
+
+
+# Scale coredns to 1 replica
 kubectl -n kube-system scale deployment coredns --replicas=1
 
-# setup cluster-admin sa
-kubectl apply -f /src/manifests/cluster-admin/cluster-admin.yaml
 
-# generate a lifetime admin token
-kubectl create token --duration=0s cluster-admin > /output/cluster-admin-token
+# Setup cluster-admin service account and generate a lifetime admin token
+kubectl apply -f /src/cluster-addons/admin-sa/admin-sa.yaml
+kubectl -n default create token --duration=0s cluster-admin > /output/cluster-admin-token
 
-cp /etc/kubernetes/admin.conf /output/kubeconfig.yaml
 
-# configure root user with kubeconfig
-echo "export KUBECONFIG=/output/kubeconfig.yaml"  >> /root/.bashrc
-
-# Enabling shell autocompletion
-echo "source <(kubectl completion bash)
-. /usr/share/bash-completion/bash_completion
-alias kns='kubectl config set-context \$(kubectl config current-context) --namespace'" >>  /root/.bashrc
-
-# finish
+# Final output
 ln -s /output/cluster-admin-token /root/cluster-admin-token
 echo "-------------------------------------------------------------"
 echo "Use this token to login to the kubernetes dashboard:"
