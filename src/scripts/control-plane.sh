@@ -19,8 +19,8 @@ helm upgrade \
     -f /src/cluster-addons/cilium/helm-values.yaml
 
 # Deploy Envoy Gateway
-helm install \
-    eg oci://docker.io/envoyproxy/gateway-helm \
+helm upgrade \
+    --install eg oci://docker.io/envoyproxy/gateway-helm \
     --version v"${ENVOY_GATEWAY_VERSION}" \
     -n envoy-gateway \
     --create-namespace \
