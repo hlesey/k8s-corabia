@@ -11,22 +11,6 @@ export DEBIAN_FRONTEND=noninteractive
 # add control-plane IP to hosts file
 echo "${CONTROL_PLANE_IP} control-plane control-plane.local nfsserver.local" >> /etc/hosts
 
-# VirtualBox specific
-if [[ "$(dmidecode -s system-manufacturer)" == "innotek GmbH" ]]; then
-  # use external DNS, instead of local VBox
-  echo "DNS=8.8.8.8" >> /etc/systemd/resolved.conf
-  echo "DNS=8.8.4.4" >> /etc/systemd/resolved.conf
-  systemctl restart systemd-resolved
-
-  # disable sshd dns lookup
-  echo "UseDNS no" >> /etc/ssh/sshd_config
-  systemctl restart sshd
-
-  # add nodes IPs to hosts file
-  echo "${NODE01_IP} node01 node01.local" >> /etc/hosts
-  echo "${NODE02_IP} node02 node02.local" >> /etc/hosts
-fi
-
 # AWS specific
 if [[ "$(dmidecode -s system-manufacturer)" == "Amazon EC2" ]]; then
     echo 'Waiting for cloud-init...';
@@ -49,9 +33,8 @@ echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.
 
 
 # Add the CRI-O repository
-curl -fsSL https://pkgs.k8s.io/addons:/cri-o:/stable:/v"${CRIO_VERSION}"/deb/Release.key | gpg --dearmor --yes -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
-echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/stable:/v${CRIO_VERSION}/deb/ /" > /etc/apt/sources.list.d/cri-o.list
-
+curl -fsSL https://download.opensuse.org/repositories/isv:/cri-o:/stable:/v"${CRIO_VERSION}"/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/v"${CRIO_VERSION}"/deb/ /" | tee /etc/apt/sources.list.d/cri-o.list
 apt-get update > /dev/null
 yes | apt-get install -yq cri-o cri-tools > /dev/null
 

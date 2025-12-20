@@ -18,8 +18,8 @@ variable "az" {
 
 variable "instance-ami" {
   # Get new AMI from https://cloud-images.ubuntu.com/locator/ec2/
-  default     = "ami-02fd062ee104754fc" # Ubuntu Noble Numbat	24.04 LTS for eu-west-1 region, arm64 arch and 	hvm:ebs-ssd-gp3 instance type
-              # "ami-0a5fc7f536cbd4467" equivalent for eu-west-2
+  default     = "ami-099ed1bb56a83f2e2" # Ubuntu Noble Numbat	24.04 LTS for eu-west-1 region, arm64 arch and 	hvm:ebs-ssd-gp3 instance type
+              # "ami-0e63f595a004bf5e4" equivalent for eu-west-2
   description = "Which ami is used"
 }
 
