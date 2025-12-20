@@ -52,6 +52,9 @@ kubectl apply -f /src/cluster-addons/dashboard/custom.yaml
 # Scale coredns to 1 replica
 kubectl -n kube-system scale deployment coredns --replicas=1
 
+# Copy kubeconfig to output directory
+cp /etc/kubernetes/admin.conf /output/kubeconfig.yaml
+
 # Setup cluster-admin service account and generate a lifetime admin token
 kubectl apply -f /src/cluster-addons/admin-sa/admin-sa.yaml
 kubectl -n default create token --duration=0s cluster-admin > /output/cluster-admin-token
