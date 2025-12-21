@@ -6,7 +6,7 @@ set -xe
 source /src/bootstrap/envs.sh
 
 # Bootstrap k8s control-plane components
-envsubst < /src/addons/kubeadm/control-plane.yaml > /tmp/control-plane.yaml
+envsubst < /src/bootstrap/kubeadm/control-plane.yaml > /tmp/control-plane.yaml
 kubeadm init --config /tmp/control-plane.yaml > /output/.kubeadmin_init
 
 # Deploy Cilium CNI
