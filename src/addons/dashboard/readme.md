@@ -23,5 +23,5 @@ See https://github.com/google/go-containerregistry/blob/main/cmd/crane/README.md
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
 helm repo update
 # Deploy a Helm Release named "kubernetes-dashboard" using the kubernetes-dashboard chart
-helm template kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --namespace kubernetes-dashboard --version 7.14.0 -f src/cluster-addons/dashboard/helm-values.yaml > src/cluster-addons/dashboard/kubernetes-dashboard.yaml
+helm template kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --namespace kubernetes-dashboard --version 7.14.0 -f src/addons/dashboard/helm-values.yaml > src/addons/dashboard/kubernetes-dashboard.yaml
 ```

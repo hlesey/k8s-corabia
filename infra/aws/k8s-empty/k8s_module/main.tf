@@ -110,7 +110,7 @@ resource "aws_instance" "control-plane" {
   }
 
   provisioner "file" {
-    source      = "../../../src/cluster-addons/network"
+    source      = "../../../src/addons/network"
     destination = "/src/"
   }
 }

@@ -3,10 +3,10 @@
 # Setup and bootstrap k8s control-plane components
 
 set -xe
-source /src/scripts/envs.sh
+source /src/bootstrap/envs.sh
 
 # Bootstrap k8s control-plane components
-envsubst < /src/cluster-addons/kubeadm/control-plane.yaml > /tmp/control-plane.yaml
+envsubst < /src/addons/kubeadm/control-plane.yaml > /tmp/control-plane.yaml
 kubeadm init --config /tmp/control-plane.yaml > /output/.kubeadmin_init
 
 # Deploy Cilium CNI
@@ -16,7 +16,7 @@ helm upgrade \
     --install cilium cilium/cilium \
     --namespace kube-system \
     --version "${CILIUM_VERSION}" \
-    -f /src/cluster-addons/cilium/helm-values.yaml
+    -f /src/addons/cilium/helm-values.yaml
 
 # Deploy Envoy Gateway
 helm upgrade \
@@ -24,15 +24,15 @@ helm upgrade \
     --version v"${ENVOY_GATEWAY_VERSION}" \
     -n envoy-gateway \
     --create-namespace \
-    -f /src/cluster-addons/envoy-gateway/helm-values.yaml
+    -f /src/addons/envoy-gateway/helm-values.yaml
 
 # Deploy Envoy Gateway Gateway Class and Gateway
-sed -i -e "s'clusterx.qedzone.ro'${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/cluster-addons/envoy-gateway/custom.yaml
-kubectl apply -f /src/cluster-addons/envoy-gateway/custom.yaml
+sed -i -e "s'clusterx.qedzone.ro'${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/addons/envoy-gateway/custom.yaml
+kubectl apply -f /src/addons/envoy-gateway/custom.yaml
 
 # Deploy Cilium Hubble UI HTTPRoute
-sed -i -e "s'hubble-ui.clusterx.qedzone.ro'hubble-ui.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/cluster-addons/cilium/custom.yaml
-kubectl apply -f /src/cluster-addons/cilium/custom.yaml
+sed -i -e "s'hubble-ui.clusterx.qedzone.ro'hubble-ui.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/addons/cilium/custom.yaml
+kubectl apply -f /src/addons/cilium/custom.yaml
 
 # Deploy Kubernetes Dashboard
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
@@ -43,11 +43,11 @@ helm upgrade \
     --namespace dashboard \
     --version "${DASHBOARD_VERSION}" \
     --set app.ingress.hosts[0]="${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}" \
-    -f /src/cluster-addons/dashboard/helm-values.yaml
+    -f /src/addons/dashboard/helm-values.yaml
 
 # Deploy Kubernetes Dashboard HTTPRoute
-sed -i -e "s'dashboard.clusterx.qedzone.ro'dashboard.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/cluster-addons/dashboard/custom.yaml
-kubectl apply -f /src/cluster-addons/dashboard/custom.yaml
+sed -i -e "s'dashboard.clusterx.qedzone.ro'dashboard.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/addons/dashboard/custom.yaml
+kubectl apply -f /src/addons/dashboard/custom.yaml
 
 # Scale coredns to 1 replica
 kubectl -n kube-system scale deployment coredns --replicas=1
@@ -56,7 +56,7 @@ kubectl -n kube-system scale deployment coredns --replicas=1
 cp /etc/kubernetes/admin.conf /output/kubeconfig.yaml
 
 # Setup cluster-admin service account and generate a lifetime admin token
-kubectl apply -f /src/cluster-addons/admin-sa/admin-sa.yaml
+kubectl apply -f /src/addons/admin-sa/admin-sa.yaml
 kubectl -n default create token --duration=0s cluster-admin > /output/cluster-admin-token
 
 # Final output
