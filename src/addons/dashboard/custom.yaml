@@ -5,23 +5,20 @@ metadata:
   namespace: dashboard
 spec:
   parentRefs:
-  - name: eg
+  - name: envoy-gateway
     namespace: envoy-gateway
     sectionName: https
   hostnames:
   - dashboard.clusterx.qedzone.ro
   rules:
-  - backendRefs:
-    - name: kubernetes-dashboard-web
-      port: 8000
-    matches:
+  - matches:
     - path:
         type: PathPrefix
         value: /
-  - backendRefs:
-    - name: kubernetes-dashboard-auth
+    backendRefs:
+    - name: kubernetes-dashboard-web
       port: 8000
-    matches:
+  - matches:
     - path:
         type: Exact
         value: /api/v1/login
@@ -34,13 +31,16 @@ spec:
     - path:
         type: Exact
         value: /api/v1/healthz
-  - backendRefs:
-    - name: kubernetes-dashboard-api
+    backendRefs:
+    - name: kubernetes-dashboard-auth
       port: 8000
-    matches:
+  - matches:
     - path:
         type: PathPrefix
         value: /api
     - path:
         type: PathPrefix
         value: /metrics
+    backendRefs:
+    - name: kubernetes-dashboard-api
+      port: 8000

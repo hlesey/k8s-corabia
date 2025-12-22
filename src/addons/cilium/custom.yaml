@@ -5,15 +5,15 @@ metadata:
   namespace: kube-system
 spec:
   parentRefs:
-  - name: eg
+  - name: envoy-gateway
     namespace: envoy-gateway
   hostnames:
   - hubble-ui.clusterx.qedzone.ro
   rules:
-  - backendRefs:
-    - name: hubble-ui
-      port: 80
-    matches:
+  - matches:
     - path:
         type: PathPrefix
         value: /
+    backendRefs:
+    - name: hubble-ui
+      port: 80
