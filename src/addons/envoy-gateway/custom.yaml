@@ -1,9 +1,58 @@
+---
+apiVersion: config.gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: host-port-config
+  namespace: envoy-gateway
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyDeployment:
+        replicas: 1 # Scale based on available control plane nodes
+        container:
+          ports:
+          - name: http
+            containerPort: 8080
+            hostPort: 80 # Binds to Node Public IP port 80
+          - name: https
+            containerPort: 8443
+            hostPort: 443 # Binds to Node Public IP port 443
+          # Needed if using ports < 1024 on some K8s distributions
+          securityContext:
+            capabilities:
+              add: ["NET_BIND_SERVICE"]
+        pod:
+          nodeSelector:
+            node-role.kubernetes.io/control-plane: "true"
+          tolerations:
+          - key: node-role.kubernetes.io/control-plane
+            operator: Exists
+            effect: NoSchedule
+          - key: node-role.kubernetes.io/master
+            operator: Exists
+            effect: NoSchedule
+          # REQUIRED: Prevents 2 pods from landing on 1 node (Port Conflict)
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchLabels:
+                    # Matches the label Envoy Gateway adds to its managed proxy pods
+                    gateway.envoyproxy.io/owning-gateway-name: public-gateway
+                topologyKey: "kubernetes.io/hostname"
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
   name: envoy-gateway
 spec:
   controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  parametersRef:
+    group: config.gateway.envoyproxy.io
+    kind: EnvoyProxy
+    name: host-port-config
+    namespace: envoy-gateway
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -32,22 +81,3 @@ spec:
         certificateRefs:
         - kind: Secret
           name: envoy-gateway
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: envoy-gateway-external-service
-  namespace: envoy-gateway
-spec:
-  type: NodePort
-  ports:
-    - name: http
-      port: 80
-      targetPort: 10080
-      nodePort: 30080
-    - name: https
-      port: 443
-      targetPort: 10443
-      nodePort: 30443
-  selector:
-    app.kubernetes.io/component: proxy

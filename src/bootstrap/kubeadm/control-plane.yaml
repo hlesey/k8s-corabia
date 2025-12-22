@@ -10,6 +10,8 @@ localAPIEndpoint:
   bindPort: 6443
 nodeRegistration:
   criSocket: "unix:///var/run/crio/crio.sock"
+  kubeletExtraArgs:
+    node-labels: "node-role.kubernetes.io/control-plane=true"
   taints:
     - key: node-role.kubernetes.io/control-plane
       effect: NoSchedule
