@@ -1,7 +1,7 @@
 # Kubernetes dashboard instructions
 
-The upstream helm chart is installing the kubernetes dashboard, but is also configured to install the metrics server and the nginx ingress controller.
-We are configuring custom registries for the kubernetes dashboard in `helm-values.yaml` in order to avoid being rate limited by docker.io
+The upstream helm chart is installing the kubernetes dashboard, but is also configured to install the metrics server.
+We are configuring custom registries for the kubernetes dashboard in `helm-values.yaml` in order to avoid being rate limited by docker.io.
 
 
 # Image mirroring
@@ -23,5 +23,5 @@ See https://github.com/google/go-containerregistry/blob/main/cmd/crane/README.md
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
 helm repo update
 # Deploy a Helm Release named "kubernetes-dashboard" using the kubernetes-dashboard chart
-helm template kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --namespace kubernetes-dashboard --version 7.14.0 -f src/manifests/dashboard/helm-values.yaml > src/manifests/dashboard/kubernetes-dashboard.yaml
+helm template kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --namespace kubernetes-dashboard --version 7.14.0 -f src/addons/dashboard/helm-values.yaml > src/addons/dashboard/kubernetes-dashboard.yaml
 ```

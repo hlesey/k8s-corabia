@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Configure nfs server (on control-plane node)
 
-source /src/scripts/envs.sh
+source /src/bootstrap/envs.sh
 
 mkdir /nfs
 for i in {0..9}; do
