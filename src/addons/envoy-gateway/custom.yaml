@@ -65,7 +65,7 @@ metadata:
 spec:
   controllerName: gateway.envoyproxy.io/gatewayclass-controller
   parametersRef:
-    group: config.gateway.envoyproxy.io
+    group: gateway.envoyproxy.io
     kind: EnvoyProxy
     name: host-port-config
     namespace: envoy-gateway
