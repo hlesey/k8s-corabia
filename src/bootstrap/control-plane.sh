@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
- 
+
 # Setup and bootstrap k8s control-plane components
 
 set -xe
