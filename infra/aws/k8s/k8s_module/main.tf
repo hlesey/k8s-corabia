@@ -83,6 +83,24 @@ resource "aws_security_group_rule" "allow_k8sapi_from_admin" {
   security_group_id = aws_security_group.kubernetes.id
 }
 
+resource "aws_security_group_rule" "allow_http_from_internet" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = split(",", var.allowed-cidr-blocks)
+  security_group_id = aws_security_group.kubernetes.id
+}
+
+resource "aws_security_group_rule" "allow_https_from_internet" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = split(",", var.allowed-cidr-blocks)
+  security_group_id = aws_security_group.kubernetes.id
+}
+
 resource "aws_security_group_rule" "allow_nodeport_from_internet" {
   type              = "ingress"
   from_port         = 30000
