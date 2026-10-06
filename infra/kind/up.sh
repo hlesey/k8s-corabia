@@ -128,10 +128,18 @@ if [[ "${NFS}" == "true" ]]; then
             echo '${control_plane_ip} control-plane control-plane.local nfsserver.local' >> /etc/hosts
             apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -yqq nfs-common > /dev/null"
     done
-    docker exec "${control_plane}" bash -c \
-        "DEBIAN_FRONTEND=noninteractive apt-get install -yqq nfs-kernel-server > /dev/null && mkdir -p /src"
-    docker cp "${REPO_ROOT}/src/bootstrap" "${control_plane}:/src/"
-    docker exec "${control_plane}" bash -c "systemctl start nfs-server && bash /src/bootstrap/nfs.sh"
+    # Same layout and export as src/bootstrap/nfs.sh, but the node's root is overlayfs, which nfsd cannot export:
+    # /nfs is a tmpfs instead (in memory, lost when the node restarts), which needs an explicit fsid.
+    docker exec "${control_plane}" bash -c '
+        set -e
+        DEBIAN_FRONTEND=noninteractive apt-get install -yqq nfs-kernel-server > /dev/null
+        mkdir -p /nfs
+        mountpoint -q /nfs || mount -t tmpfs -o size=2g tmpfs /nfs
+        mkdir -p /nfs/pv{00..30} /nfs/pv-prom
+        chmod -R 777 /nfs
+        echo "/nfs *(rw,sync,no_root_squash,subtree_check,fsid=1)" > /etc/exports
+        systemctl start nfs-server
+        exportfs -ra'
 fi
 
 # Deploy Envoy Gateway, Gateway Class and Gateway
