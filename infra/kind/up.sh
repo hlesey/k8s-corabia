@@ -9,7 +9,8 @@
 #   WORKERS          number of worker nodes               (default: 2)
 #   CNI              cilium | kindnet                     (default: cilium; kindnet has no Hubble)
 #   GATEWAY          envoy | none                         (default: envoy; binds 127.0.0.1:80 and :443)
-#   GATEWAY_DOMAIN   wildcard domain for HTTPRoutes       (default: 127.0.0.1.nip.io, resolves to localhost)
+#   GATEWAY_DOMAIN   wildcard domain for HTTPRoutes       (default: clusterx.qedzone.ro, point hostnames to 127.0.0.1 in /etc/hosts)
+#   NFS              true | false                         (default: true; nfsserver.local on the control-plane)
 #   KIND_NODE_IMAGE  kindest/node image                   (default: KIND_DEFAULT_NODE_IMAGE below)
 
 set -euo pipefail
@@ -29,7 +30,8 @@ CLUSTER_NAME="${CLUSTER_NAME:-corabia}"
 WORKERS="${WORKERS:-2}"
 CNI="${CNI:-cilium}"
 GATEWAY="${GATEWAY:-envoy}"
-GATEWAY_DOMAIN="${GATEWAY_DOMAIN:-127.0.0.1.nip.io}"
+GATEWAY_DOMAIN="${GATEWAY_DOMAIN:-clusterx.qedzone.ro}"
+NFS="${NFS:-true}"
 KIND_NODE_IMAGE="${KIND_NODE_IMAGE:-${KIND_DEFAULT_NODE_IMAGE}}"
 CONTEXT="kind-${CLUSTER_NAME}"
 
@@ -42,6 +44,7 @@ fi
 
 [[ "${CNI}" == "cilium" || "${CNI}" == "kindnet" ]] || { echo "unsupported CNI: ${CNI} (use cilium or kindnet)" >&2; exit 1; }
 [[ "${GATEWAY}" == "envoy" || "${GATEWAY}" == "none" ]] || { echo "unsupported GATEWAY: ${GATEWAY} (use envoy or none)" >&2; exit 1; }
+[[ "${NFS}" == "true" || "${NFS}" == "false" ]] || { echo "unsupported NFS: ${NFS} (use true or false)" >&2; exit 1; }
 for tool in docker kind kubectl helm openssl; do
     command -v "${tool}" > /dev/null || { echo "missing: ${tool}" >&2; exit 1; }
 done
@@ -111,6 +114,26 @@ for i in $(seq 1 "${WORKERS}"); do
         node-role.kubernetes.io/"$(printf 'node%02d' "${i}")"= --overwrite
 done
 
+# As on AWS there is no default StorageClass: PVCs without storageClassName bind to static PVs
+# (e.g. k8s-labs/src/storage/pv-nfs.yaml). kind's local-path "standard" class stays available by name.
+k annotate storageclass standard storageclass.kubernetes.io/is-default-class- > /dev/null
+
+# NFS server on the control-plane, exported as nfsserver.local:/nfs/pv*, as on AWS
+# (src/bootstrap/common.sh hosts entry + src/bootstrap/nfs.sh)
+if [[ "${NFS}" == "true" ]]; then
+    control_plane="${CLUSTER_NAME}-control-plane"
+    control_plane_ip="$(docker inspect -f '{{.NetworkSettings.Networks.kind.IPAddress}}' "${control_plane}")"
+    for node in "${control_plane}" $(for i in $(seq 1 "${WORKERS}"); do node_name "${i}"; done); do
+        docker exec "${node}" bash -c "
+            echo '${control_plane_ip} control-plane control-plane.local nfsserver.local' >> /etc/hosts
+            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -yqq nfs-common > /dev/null"
+    done
+    docker exec "${control_plane}" bash -c \
+        "DEBIAN_FRONTEND=noninteractive apt-get install -yqq nfs-kernel-server > /dev/null && mkdir -p /src"
+    docker cp "${REPO_ROOT}/src/bootstrap" "${control_plane}:/src/"
+    docker exec "${control_plane}" bash -c "systemctl start nfs-server && bash /src/bootstrap/nfs.sh"
+fi
+
 # Deploy Envoy Gateway, Gateway Class and Gateway
 if [[ "${GATEWAY}" == "envoy" ]]; then
     h upgrade \
@@ -121,7 +144,9 @@ if [[ "${GATEWAY}" == "envoy" ]]; then
         -f "${ADDONS}/envoy-gateway/helm-values.yaml" \
         --wait
 
-    # Self-signed wildcard certificate for the Gateway https listener (Secret envoy-gateway)
+    # Self-signed wildcard certificate for the Gateway https listener.
+    # custom.yaml references Secret "envoy-gateway", but that is Envoy Gateway's own control-plane (xDS) certificate,
+    # created by its certgen job: overwriting it breaks the proxy, so use a separate Secret.
     tmp="$(mktemp -d)"
     trap 'rm -rf "${tmp}"' EXIT
     cat > "${tmp}/openssl.cnf" <<CNF
@@ -136,10 +161,12 @@ subjectAltName = DNS:*.${GATEWAY_DOMAIN},DNS:${GATEWAY_DOMAIN}
 CNF
     openssl req -x509 -newkey rsa:2048 -nodes -days 365 -config "${tmp}/openssl.cnf" \
         -keyout "${tmp}/tls.key" -out "${tmp}/tls.crt" 2> /dev/null
-    k -n envoy-gateway create secret tls envoy-gateway --cert="${tmp}/tls.crt" --key="${tmp}/tls.key" \
+    k -n envoy-gateway create secret tls envoy-gateway-tls --cert="${tmp}/tls.crt" --key="${tmp}/tls.key" \
         --dry-run=client -o yaml | k apply -f -
 
-    apply_with_domain "${ADDONS}/envoy-gateway/custom.yaml"
+    sed -e "s'clusterx.qedzone.ro'${GATEWAY_DOMAIN}'g" \
+        -e '/certificateRefs:/,/name:/ s/name: envoy-gateway$/name: envoy-gateway-tls/' \
+        "${ADDONS}/envoy-gateway/custom.yaml" | k apply -f -
     k -n envoy-gateway wait gateway/envoy-gateway --for=condition=Programmed --timeout=180s
 
     # Deploy Cilium Hubble UI HTTPRoute
@@ -187,6 +214,9 @@ if [[ "${GATEWAY}" == "envoy" ]]; then
     echo "Headlamp:  https://dashboard.${GATEWAY_DOMAIN} (self-signed certificate)"
     if [[ "${CNI}" == "cilium" ]]; then
         echo "Hubble UI: https://hubble-ui.${GATEWAY_DOMAIN}"
+    fi
+    if [[ "${GATEWAY_DOMAIN}" != *.nip.io ]]; then
+        echo "Add to /etc/hosts: 127.0.0.1 dashboard.${GATEWAY_DOMAIN} hubble-ui.${GATEWAY_DOMAIN} phippy.${GATEWAY_DOMAIN} phippy-api.${GATEWAY_DOMAIN}"
     fi
 else
     echo "Headlamp:  kubectl -n headlamp port-forward svc/headlamp 8080:80, then http://localhost:8080"
