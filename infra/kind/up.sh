@@ -175,7 +175,19 @@ CNF
     sed -e "s'clusterx.qedzone.ro'${GATEWAY_DOMAIN}'g" \
         -e '/certificateRefs:/,/name:/ s/name: envoy-gateway$/name: envoy-gateway-tls/' \
         "${ADDONS}/envoy-gateway/custom.yaml" | k apply -f -
-    k -n envoy-gateway wait gateway/envoy-gateway --for=condition=Programmed --timeout=180s
+    # Wait for the Envoy proxy pod rather than the Gateway's Programmed condition, which the Hostname address in
+    # custom.yaml may keep False although traffic is served (control-plane.sh on AWS does not wait for it either)
+    proxy_selector="gateway.envoyproxy.io/owning-gateway-name=envoy-gateway"
+    for _ in $(seq 1 60); do
+        [[ -n "$(k -n envoy-gateway get pods -l "${proxy_selector}" -o name)" ]] && break
+        sleep 3
+    done
+    if ! k -n envoy-gateway wait pods -l "${proxy_selector}" --for=condition=Ready --timeout=180s; then
+        k -n envoy-gateway get gateway envoy-gateway \
+            -o jsonpath='{range .status.conditions[*]}{.type}={.status} {.reason}: {.message}{"\n"}{end}'
+        k -n envoy-gateway get pods -o wide
+        exit 1
+    fi
 
     # Deploy Cilium Hubble UI HTTPRoute
     if [[ "${CNI}" == "cilium" ]]; then
