@@ -1,0 +1,4 @@
+# Users log in with their own token (e.g. /output/cluster-admin-token), so
+# Headlamp's own ServiceAccount does not need the chart's default cluster-admin binding.
+clusterRoleBinding:
+  create: false
