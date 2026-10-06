@@ -5,8 +5,8 @@
 #
 # Env overrides:
 #   CLUSTER_NAME     kind cluster name                    (default: corabia)
-#   WORKERS          number of worker nodes               (default: 1)
-#   CNI              kindnet | cilium                     (default: kindnet)
+#   WORKERS          number of worker nodes               (default: 2)
+#   CNI              kindnet | cilium                     (default: cilium)
 #   KIND_NODE_IMAGE  kindest/node image                   (default: KIND_DEFAULT_NODE_IMAGE below)
 
 set -euo pipefail
@@ -20,8 +20,8 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 eval "$(grep -E '^export (K8S_VERSION|CILIUM_VERSION)=' "${REPO_ROOT}/src/bootstrap/envs.sh")"
 
 CLUSTER_NAME="${CLUSTER_NAME:-corabia}"
-WORKERS="${WORKERS:-1}"
-CNI="${CNI:-kindnet}"
+WORKERS="${WORKERS:-2}"
+CNI="${CNI:-cilium}"
 KIND_NODE_IMAGE="${KIND_NODE_IMAGE:-${KIND_DEFAULT_NODE_IMAGE}}"
 
 # Keep the same Kubernetes minor version as the AWS cluster
@@ -40,6 +40,9 @@ elif [[ "${CNI}" != "kindnet" ]]; then
     echo "unsupported CNI: ${CNI} (use kindnet or cilium)" >&2; exit 1
 fi
 
+# kind names workers <cluster>-worker, <cluster>-worker2, ...; we use <cluster>-node-01, <cluster>-node-02, ...
+node_name() { printf '%s-node-%02d' "${CLUSTER_NAME}" "$1"; }
+
 # Same pod/service subnets as src/bootstrap/kubeadm/control-plane.yaml
 config="$(cat <<YAML
 kind: Cluster
@@ -50,11 +53,26 @@ networking:
   disableDefaultCNI: $([[ "${CNI}" == "cilium" ]] && echo true || echo false)
 nodes:
 - role: control-plane
-$(for _ in $(seq 1 "${WORKERS}"); do echo "- role: worker"; done)
+$(for i in $(seq 1 "${WORKERS}"); do cat <<NODE
+- role: worker
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      name: $(node_name "${i}")
+NODE
+done)
 YAML
 )"
 
 echo "${config}" | kind create cluster --name "${CLUSTER_NAME}" --image "${KIND_NODE_IMAGE}" --config -
+
+# Rename worker containers to match their Kubernetes node names.
+# kind finds its containers by label, so kind delete/load keep working.
+for i in $(seq 1 "${WORKERS}"); do
+    kind_name="${CLUSTER_NAME}-worker$([[ "${i}" -gt 1 ]] && echo "${i}" || true)"
+    docker rename "${kind_name}" "$(node_name "${i}")"
+done
 
 if [[ "${CNI}" == "cilium" ]]; then
     helm repo add cilium https://helm.cilium.io/ > /dev/null
@@ -75,4 +93,4 @@ kubectl --context "kind-${CLUSTER_NAME}" wait --for=condition=Ready nodes --all 
 kubectl --context "kind-${CLUSTER_NAME}" get nodes -o wide
 echo "-------------------------------------------------------------"
 echo "kubectl context: kind-${CLUSTER_NAME}"
-echo "Node shell (instead of SSH): docker exec -it ${CLUSTER_NAME}-control-plane bash"
+echo "Node shell (instead of SSH): docker exec -it <${CLUSTER_NAME}-control-plane|$(node_name 1)|...> bash"

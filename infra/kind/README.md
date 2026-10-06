@@ -1,7 +1,7 @@
 # Local kind cluster
 
 A light, local version of k8s-corabia for testing labs (e.g. `cks-preparation`) without AWS.
-It runs a kubeadm cluster in Docker containers: 1 control-plane and 1 worker by default.
+It runs a kubeadm cluster in Docker containers: 1 control-plane and 2 workers by default.
 
 The Kubernetes minor and Cilium versions come from [`src/bootstrap/envs.sh`](../../src/bootstrap/envs.sh).
 kind does not publish every patch version, so `up.sh` pins its own node image
@@ -13,17 +13,18 @@ kind does not publish every patch version, so `up.sh` pins its own node image
   - macOS: Docker Desktop with at least 4 GB memory (6 GB with Cilium) in Settings → Resources
   - Linux: your user in the `docker` group (`sudo usermod -aG docker $USER`, then log in again)
 - [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation) and kubectl (macOS: `brew install kind kubectl helm`)
-- helm (only for `CNI=cilium`)
+- helm (not needed with `CNI=kindnet`)
 
 ## Usage
 
 ```bash
-infra/kind/up.sh                 # kindnet CNI (supports NetworkPolicy)
-CNI=cilium infra/kind/up.sh      # Cilium with src/addons/cilium/helm-values.yaml, Hubble disabled
-WORKERS=2 infra/kind/up.sh       # more workers
+infra/kind/up.sh                 # Cilium with src/addons/cilium/helm-values.yaml, Hubble disabled
+CNI=kindnet infra/kind/up.sh     # kind's default CNI (lighter, supports NetworkPolicy)
+WORKERS=1 infra/kind/up.sh       # fewer workers
 infra/kind/down.sh               # delete the cluster
 ```
 
+Nodes (Kubernetes node names and Docker container names): `corabia-control-plane`, `corabia-node-01`, `corabia-node-02`.
 kind adds the `kind-corabia` context to your kubeconfig.
 
 When bumping `K8S_VERSION`, update `KIND_DEFAULT_NODE_IMAGE` with an image (including its digest) listed in the
@@ -37,7 +38,7 @@ KIND_NODE_IMAGE=kindest/node:v1.36.x@sha256:... infra/kind/up.sh
 
 | AWS (kubeadm + CRI-O) | kind |
 |---|---|
-| SSH to a node | `docker exec -it corabia-control-plane bash` / `corabia-worker` (already root, no `sudo`) |
+| SSH to a node | `docker exec -it corabia-control-plane bash` / `corabia-node-01` / `corabia-node-02` (already root, no `sudo`) |
 | CRI-O, container IDs `crio://...` | containerd, container IDs `containerd://...`; `crictl` is available in nodes |
 | Envoy Gateway, Headlamp, metrics-server, Hubble UI | not installed |
 | NFS server and `/nfs/pv*` | `standard` StorageClass (local-path-provisioner) |
