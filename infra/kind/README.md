@@ -1,31 +1,38 @@
 # Local kind cluster
 
-A light, local version of k8s-corabia for testing labs (e.g. `cks-preparation`) without AWS.
-It runs a kubeadm cluster in Docker containers: 1 control-plane and 2 workers by default.
+A local version of k8s-corabia for testing labs (e.g. `cks-preparation`) without AWS.
+It runs a kubeadm cluster in Docker containers (1 control-plane and 2 workers by default) with the same addons as
+[`src/bootstrap/control-plane.sh`](../../src/bootstrap/control-plane.sh):
+Cilium + Hubble, Envoy Gateway, metrics-server, Headlamp and the `cluster-admin` token.
 
-The Kubernetes minor and Cilium versions come from [`src/bootstrap/envs.sh`](../../src/bootstrap/envs.sh).
+The Kubernetes minor and addon versions come from [`src/bootstrap/envs.sh`](../../src/bootstrap/envs.sh).
 kind does not publish every patch version, so `up.sh` pins its own node image
 (`KIND_DEFAULT_NODE_IMAGE`, currently `v1.36.4` from kind v0.33.0); it must use the same minor version as `K8S_VERSION`.
 
 ## Prerequisites
 
 - Docker
-  - macOS: Docker Desktop with at least 4 GB memory (6 GB with Cilium) in Settings → Resources
+  - macOS: Docker Desktop with at least 8 GB memory in Settings → Resources
   - Linux: your user in the `docker` group (`sudo usermod -aG docker $USER`, then log in again)
-- [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation) and kubectl (macOS: `brew install kind kubectl helm`)
-- helm (not needed with `CNI=kindnet`)
+- [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation), kubectl, helm and openssl
+  (macOS: `brew install kind kubectl helm`)
+- Ports 80 and 443 free on `127.0.0.1` (or use `GATEWAY=none`)
 
 ## Usage
 
 ```bash
-infra/kind/up.sh                 # Cilium with src/addons/cilium/helm-values.yaml, Hubble disabled
-CNI=kindnet infra/kind/up.sh     # kind's default CNI (lighter, supports NetworkPolicy)
+infra/kind/up.sh                 # full setup
+CNI=kindnet infra/kind/up.sh     # kind's default CNI instead of Cilium (lighter, no Hubble)
+GATEWAY=none infra/kind/up.sh    # no Envoy Gateway, no host ports 80/443
 WORKERS=1 infra/kind/up.sh       # fewer workers
 infra/kind/down.sh               # delete the cluster
 ```
 
 Nodes (Kubernetes node names and Docker container names): `corabia-control-plane`, `corabia-node-01`, `corabia-node-02`.
-kind adds the `kind-corabia` context to your kubeconfig.
+Workers are also labeled `kubernetes.io/hostname=node0N` and `node-role.kubernetes.io/node0N=`, as on AWS.
+
+kind adds the `kind-corabia` context to your kubeconfig; `up.sh` also writes `output/kubeconfig.yaml` and
+`output/cluster-admin-token` (the Headlamp login token).
 
 When bumping `K8S_VERSION`, update `KIND_DEFAULT_NODE_IMAGE` with an image (including its digest) listed in the
 [kind release notes](https://github.com/kubernetes-sigs/kind/releases), or override it for one run:
@@ -34,14 +41,72 @@ When bumping `K8S_VERSION`, update `KIND_DEFAULT_NODE_IMAGE` with an image (incl
 KIND_NODE_IMAGE=kindest/node:v1.36.x@sha256:... infra/kind/up.sh
 ```
 
+## Ingress (Envoy Gateway)
+
+Envoy runs with hostNetwork on `corabia-control-plane` (same `src/addons/envoy-gateway` manifests as AWS),
+and kind maps that node's ports 80/443 to `127.0.0.1` on your machine.
+The AWS hostnames `*.clusterx.qedzone.ro` become `*.<GATEWAY_DOMAIN>`, and the `https` listener uses a generated
+self-signed wildcard certificate (accept the browser warning).
+
+| AWS | kind |
+|---|---|
+| `https://dashboard.clusterx.qedzone.ro` | `https://dashboard.127.0.0.1.nip.io` |
+| `https://hubble-ui.clusterx.qedzone.ro` | `https://hubble-ui.127.0.0.1.nip.io` |
+
+### Hostnames
+
+By default `GATEWAY_DOMAIN=127.0.0.1.nip.io`: [nip.io](https://nip.io) is public DNS that resolves any
+`*.127.0.0.1.nip.io` name to `127.0.0.1`, so **no hosts file changes are needed**.
+
+If you are offline, or your DNS/router blocks answers pointing to `127.0.0.1` (DNS rebinding protection),
+use your own domain and the hosts file instead. `/etc/hosts` has no wildcards, so add each hostname you use:
+
+```bash
+GATEWAY_DOMAIN=corabia.test infra/kind/up.sh
+```
+
+```text
+# /etc/hosts (macOS: sudo vi /etc/hosts; flush with: sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder)
+127.0.0.1 dashboard.corabia.test hubble-ui.corabia.test web.corabia.test
+```
+
+### Exposing your own app
+
+Attach an HTTPRoute to the `envoy-gateway/envoy-gateway` Gateway:
+
+```bash
+kubectl create deployment web --image=nginx:1.27-alpine
+kubectl expose deployment web --port=80
+cat <<EOF | kubectl apply -f -
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: web
+spec:
+  parentRefs:
+  - name: envoy-gateway
+    namespace: envoy-gateway
+  hostnames:
+  - web.127.0.0.1.nip.io
+  rules:
+  - backendRefs:
+    - name: web
+      port: 80
+EOF
+curl http://web.127.0.0.1.nip.io/
+kubectl -n envoy-gateway get secret envoy-gateway -o jsonpath='{.data.tls\.crt}' | base64 -d > gateway-ca.crt
+curl --cacert gateway-ca.crt https://web.127.0.0.1.nip.io/
+```
+
 ## Differences from the AWS cluster
 
 | AWS (kubeadm + CRI-O) | kind |
 |---|---|
 | SSH to a node | `docker exec -it corabia-control-plane bash` / `corabia-node-01` / `corabia-node-02` (already root, no `sudo`) |
 | CRI-O, container IDs `crio://...` | containerd, container IDs `containerd://...`; `crictl` is available in nodes |
-| Envoy Gateway, Headlamp, metrics-server, Hubble UI | not installed |
+| `*.clusterx.qedzone.ro`, TLS Secret `envoy-gateway` not created by this repo | `*.127.0.0.1.nip.io`, Secret generated by `up.sh` (self-signed) |
 | NFS server and `/nfs/pv*` | `standard` StorageClass (local-path-provisioner) |
+| kubetail installed on the control-plane | install it locally (`brew install kubetail`) |
 | Separate kernel per node | all nodes share one kernel (Linux host, or the Docker Desktop VM on macOS) |
 | AppArmor available on Ubuntu nodes | Linux host with AppArmor: load profiles on the **host** with `sudo apparmor_parser`. Docker Desktop (macOS): no AppArmor, use AWS for AppArmor labs |
 | Sysdig/Falco kernel drivers can be installed on nodes | Linux host only; on Docker Desktop, only in-cluster eBPF (e.g. Falco `modern_ebpf`), if the VM kernel supports it |

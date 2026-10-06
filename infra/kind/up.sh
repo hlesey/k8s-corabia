@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
-# Create a light, local k8s-corabia cluster with kind (1 control-plane + workers).
-# K8s minor and Cilium versions are read from src/bootstrap/envs.sh, so kind follows the same pins as AWS.
+# Create a local k8s-corabia cluster with kind: 1 control-plane + workers and the same addons as
+# src/bootstrap/control-plane.sh (Cilium + Hubble, Envoy Gateway, metrics-server, Headlamp, cluster-admin token).
+# K8s minor and addon versions are read from src/bootstrap/envs.sh, so kind follows the same pins as AWS.
 # kind only publishes some patch versions, so the node image is pinned below per kind release.
 #
 # Env overrides:
 #   CLUSTER_NAME     kind cluster name                    (default: corabia)
 #   WORKERS          number of worker nodes               (default: 2)
-#   CNI              kindnet | cilium                     (default: cilium)
+#   CNI              cilium | kindnet                     (default: cilium; kindnet has no Hubble)
+#   GATEWAY          envoy | none                         (default: envoy; binds 127.0.0.1:80 and :443)
+#   GATEWAY_DOMAIN   wildcard domain for HTTPRoutes       (default: 127.0.0.1.nip.io, resolves to localhost)
 #   KIND_NODE_IMAGE  kindest/node image                   (default: KIND_DEFAULT_NODE_IMAGE below)
 
 set -euo pipefail
@@ -15,14 +18,20 @@ set -euo pipefail
 KIND_DEFAULT_NODE_IMAGE="kindest/node:v1.36.4@sha256:099e049362a1526b2db71494e1947aae99bd16290d7c895f2b7ea312e3cbfaed"  # kind v0.33.0
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+ADDONS="${REPO_ROOT}/src/addons"
+OUTPUT="${REPO_ROOT}/output"
 
 # Read only the version pins; sourcing envs.sh would also override KUBECONFIG.
-eval "$(grep -E '^export (K8S_VERSION|CILIUM_VERSION)=' "${REPO_ROOT}/src/bootstrap/envs.sh")"
+eval "$(grep -E '^export (K8S_VERSION|CILIUM_VERSION|ENVOY_GATEWAY_VERSION|METRICS_SERVER_VERSION|HEADLAMP_VERSION)=' \
+    "${REPO_ROOT}/src/bootstrap/envs.sh")"
 
 CLUSTER_NAME="${CLUSTER_NAME:-corabia}"
 WORKERS="${WORKERS:-2}"
 CNI="${CNI:-cilium}"
+GATEWAY="${GATEWAY:-envoy}"
+GATEWAY_DOMAIN="${GATEWAY_DOMAIN:-127.0.0.1.nip.io}"
 KIND_NODE_IMAGE="${KIND_NODE_IMAGE:-${KIND_DEFAULT_NODE_IMAGE}}"
+CONTEXT="kind-${CLUSTER_NAME}"
 
 # Keep the same Kubernetes minor version as the AWS cluster
 if [[ "${KIND_NODE_IMAGE}" != *":v${K8S_VERSION}."* ]]; then
@@ -31,17 +40,18 @@ if [[ "${KIND_NODE_IMAGE}" != *":v${K8S_VERSION}."* ]]; then
     exit 1
 fi
 
-for tool in docker kind kubectl; do
+[[ "${CNI}" == "cilium" || "${CNI}" == "kindnet" ]] || { echo "unsupported CNI: ${CNI} (use cilium or kindnet)" >&2; exit 1; }
+[[ "${GATEWAY}" == "envoy" || "${GATEWAY}" == "none" ]] || { echo "unsupported GATEWAY: ${GATEWAY} (use envoy or none)" >&2; exit 1; }
+for tool in docker kind kubectl helm openssl; do
     command -v "${tool}" > /dev/null || { echo "missing: ${tool}" >&2; exit 1; }
 done
-if [[ "${CNI}" == "cilium" ]]; then
-    command -v helm > /dev/null || { echo "missing: helm (required for CNI=cilium)" >&2; exit 1; }
-elif [[ "${CNI}" != "kindnet" ]]; then
-    echo "unsupported CNI: ${CNI} (use kindnet or cilium)" >&2; exit 1
-fi
 
 # kind names workers <cluster>-worker, <cluster>-worker2, ...; we use <cluster>-node-01, <cluster>-node-02, ...
 node_name() { printf '%s-node-%02d' "${CLUSTER_NAME}" "$1"; }
+k() { kubectl --context "${CONTEXT}" "$@"; }
+h() { helm --kube-context "${CONTEXT}" "$@"; }
+# Apply an addon manifest with the AWS domain replaced (the repo file is not changed)
+apply_with_domain() { sed -e "s'clusterx.qedzone.ro'${GATEWAY_DOMAIN}'g" "$1" | k apply -f -; }
 
 # Same pod/service subnets as src/bootstrap/kubeadm/control-plane.yaml
 config="$(cat <<YAML
@@ -53,6 +63,13 @@ networking:
   disableDefaultCNI: $([[ "${CNI}" == "cilium" ]] && echo true || echo false)
 nodes:
 - role: control-plane
+$([[ "${GATEWAY}" == "envoy" ]] && cat <<PORTS
+  # Envoy runs with hostNetwork on the control-plane (src/addons/envoy-gateway/custom.yaml)
+  extraPortMappings:
+  - {containerPort: 80, hostPort: 80, listenAddress: 127.0.0.1}
+  - {containerPort: 443, hostPort: 443, listenAddress: 127.0.0.1}
+PORTS
+)
 $(for i in $(seq 1 "${WORKERS}"); do cat <<NODE
 - role: worker
   kubeadmConfigPatches:
@@ -74,23 +91,104 @@ for i in $(seq 1 "${WORKERS}"); do
     docker rename "${kind_name}" "$(node_name "${i}")"
 done
 
+# Deploy Cilium CNI
 if [[ "${CNI}" == "cilium" ]]; then
     helm repo add cilium https://helm.cilium.io/ > /dev/null
     helm repo update cilium > /dev/null
-    # Repo values, minus Hubble to keep the cluster light
-    helm upgrade \
+    h upgrade \
         --install cilium cilium/cilium \
-        --kube-context "kind-${CLUSTER_NAME}" \
         --namespace kube-system \
         --version "${CILIUM_VERSION}" \
-        -f "${REPO_ROOT}/src/addons/cilium/helm-values.yaml" \
-        --set hubble.relay.enabled=false \
-        --set hubble.ui.enabled=false \
+        -f "${ADDONS}/cilium/helm-values.yaml" \
         --wait
 fi
 
-kubectl --context "kind-${CLUSTER_NAME}" wait --for=condition=Ready nodes --all --timeout=180s
-kubectl --context "kind-${CLUSTER_NAME}" get nodes -o wide
+k wait --for=condition=Ready nodes --all --timeout=180s
+
+# Same worker labels as infra/aws/k8s/k8s_module (node-labels)
+for i in $(seq 1 "${WORKERS}"); do
+    k label node "$(node_name "${i}")" kubernetes.io/hostname="$(printf 'node%02d' "${i}")" \
+        node-role.kubernetes.io/"$(printf 'node%02d' "${i}")"= --overwrite
+done
+
+# Deploy Envoy Gateway, Gateway Class and Gateway
+if [[ "${GATEWAY}" == "envoy" ]]; then
+    h upgrade \
+        --install eg oci://docker.io/envoyproxy/gateway-helm \
+        --version v"${ENVOY_GATEWAY_VERSION}" \
+        -n envoy-gateway \
+        --create-namespace \
+        -f "${ADDONS}/envoy-gateway/helm-values.yaml" \
+        --wait
+
+    # Self-signed wildcard certificate for the Gateway https listener (Secret envoy-gateway)
+    tmp="$(mktemp -d)"
+    trap 'rm -rf "${tmp}"' EXIT
+    cat > "${tmp}/openssl.cnf" <<CNF
+[req]
+distinguished_name = dn
+x509_extensions = v3
+prompt = no
+[dn]
+CN = *.${GATEWAY_DOMAIN}
+[v3]
+subjectAltName = DNS:*.${GATEWAY_DOMAIN},DNS:${GATEWAY_DOMAIN}
+CNF
+    openssl req -x509 -newkey rsa:2048 -nodes -days 365 -config "${tmp}/openssl.cnf" \
+        -keyout "${tmp}/tls.key" -out "${tmp}/tls.crt" 2> /dev/null
+    k -n envoy-gateway create secret tls envoy-gateway --cert="${tmp}/tls.crt" --key="${tmp}/tls.key" \
+        --dry-run=client -o yaml | k apply -f -
+
+    apply_with_domain "${ADDONS}/envoy-gateway/custom.yaml"
+    k -n envoy-gateway wait gateway/envoy-gateway --for=condition=Programmed --timeout=180s
+
+    # Deploy Cilium Hubble UI HTTPRoute
+    if [[ "${CNI}" == "cilium" ]]; then
+        apply_with_domain "${ADDONS}/cilium/custom.yaml"
+    fi
+fi
+
+# Deploy Metrics Server
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/ > /dev/null
+helm repo update metrics-server > /dev/null
+h upgrade \
+    --install metrics-server metrics-server/metrics-server \
+    --namespace kube-system \
+    --version "${METRICS_SERVER_VERSION}" \
+    -f "${ADDONS}/metrics-server/helm-values.yaml"
+
+# Deploy Headlamp
+helm repo add headlamp https://kubernetes-sigs.github.io/headlamp/ > /dev/null
+helm repo update headlamp > /dev/null
+h upgrade \
+    --install headlamp headlamp/headlamp \
+    --create-namespace \
+    --namespace headlamp \
+    --version "${HEADLAMP_VERSION}" \
+    -f "${ADDONS}/headlamp/helm-values.yaml"
+if [[ "${GATEWAY}" == "envoy" ]]; then
+    apply_with_domain "${ADDONS}/headlamp/custom.yaml"
+fi
+
+# Scale coredns to 1 replica
+k -n kube-system scale deployment coredns --replicas=1
+
+# Kubeconfig and lifetime cluster-admin token in output/, as on AWS
+mkdir -p "${OUTPUT}"
+kind get kubeconfig --name "${CLUSTER_NAME}" > "${OUTPUT}/kubeconfig.yaml"
+k apply -f "${ADDONS}/admin-sa/admin-sa.yaml"
+k -n default create token --duration=0s cluster-admin > "${OUTPUT}/cluster-admin-token"
+
+k get nodes -o wide
 echo "-------------------------------------------------------------"
-echo "kubectl context: kind-${CLUSTER_NAME}"
+echo "kubectl context: ${CONTEXT} (also ${OUTPUT}/kubeconfig.yaml)"
 echo "Node shell (instead of SSH): docker exec -it <${CLUSTER_NAME}-control-plane|$(node_name 1)|...> bash"
+if [[ "${GATEWAY}" == "envoy" ]]; then
+    echo "Headlamp:  https://dashboard.${GATEWAY_DOMAIN} (self-signed certificate)"
+    if [[ "${CNI}" == "cilium" ]]; then
+        echo "Hubble UI: https://hubble-ui.${GATEWAY_DOMAIN}"
+    fi
+else
+    echo "Headlamp:  kubectl -n headlamp port-forward svc/headlamp 8080:80, then http://localhost:8080"
+fi
+echo "Login token: ${OUTPUT}/cluster-admin-token"
