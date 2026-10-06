@@ -50,7 +50,7 @@ for tool in docker kind kubectl helm openssl; do
 done
 
 # kind names workers <cluster>-worker, <cluster>-worker2, ...; we use <cluster>-node-01, <cluster>-node-02, ...
-node_name() { printf '%s-node-%02d' "${CLUSTER_NAME}" "$1"; }
+node_name() { printf '%s-node-%02d\n' "${CLUSTER_NAME}" "$1"; }
 k() { kubectl --context "${CONTEXT}" "$@"; }
 h() { helm --kube-context "${CONTEXT}" "$@"; }
 # Apply an addon manifest with the AWS domain replaced (the repo file is not changed)
