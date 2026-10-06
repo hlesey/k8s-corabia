@@ -3,7 +3,9 @@
 A light, local version of k8s-corabia for testing labs (e.g. `cks-preparation`) without AWS.
 It runs a kubeadm cluster in Docker containers: 1 control-plane and 1 worker by default.
 
-Versions come from [`src/bootstrap/envs.sh`](../../src/bootstrap/envs.sh).
+The Kubernetes minor and Cilium versions come from [`src/bootstrap/envs.sh`](../../src/bootstrap/envs.sh).
+kind does not publish every patch version, so `up.sh` pins its own node image
+(`KIND_DEFAULT_NODE_IMAGE`, currently `v1.36.4` from kind v0.33.0); it must use the same minor version as `K8S_VERSION`.
 
 ## Prerequisites
 
@@ -24,11 +26,11 @@ infra/kind/down.sh               # delete the cluster
 
 kind adds the `kind-corabia` context to your kubeconfig.
 
-If there is no `kindest/node` image for the pinned version, pick one listed in the
-[kind release notes](https://github.com/kubernetes-sigs/kind/releases):
+When bumping `K8S_VERSION`, update `KIND_DEFAULT_NODE_IMAGE` with an image (including its digest) listed in the
+[kind release notes](https://github.com/kubernetes-sigs/kind/releases), or override it for one run:
 
 ```bash
-KIND_NODE_IMAGE=kindest/node:v1.36.x infra/kind/up.sh
+KIND_NODE_IMAGE=kindest/node:v1.36.x@sha256:... infra/kind/up.sh
 ```
 
 ## Differences from the AWS cluster

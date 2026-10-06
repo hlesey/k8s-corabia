@@ -1,24 +1,35 @@
 #!/usr/bin/env bash
 # Create a light, local k8s-corabia cluster with kind (1 control-plane + workers).
-# Versions are read from src/bootstrap/envs.sh, so kind follows the same pins as AWS.
+# K8s minor and Cilium versions are read from src/bootstrap/envs.sh, so kind follows the same pins as AWS.
+# kind only publishes some patch versions, so the node image is pinned below per kind release.
 #
 # Env overrides:
 #   CLUSTER_NAME     kind cluster name                    (default: corabia)
 #   WORKERS          number of worker nodes               (default: 1)
 #   CNI              kindnet | cilium                     (default: kindnet)
-#   KIND_NODE_IMAGE  kindest/node image                   (default: kindest/node:v<K8S_VERSION>.<K8S_PATCH_VERSION>)
+#   KIND_NODE_IMAGE  kindest/node image                   (default: KIND_DEFAULT_NODE_IMAGE below)
 
 set -euo pipefail
+
+# Node images for each kind release: https://github.com/kubernetes-sigs/kind/releases
+KIND_DEFAULT_NODE_IMAGE="kindest/node:v1.36.4@sha256:099e049362a1526b2db71494e1947aae99bd16290d7c895f2b7ea312e3cbfaed"  # kind v0.33.0
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 # Read only the version pins; sourcing envs.sh would also override KUBECONFIG.
-eval "$(grep -E '^export (K8S_VERSION|K8S_PATCH_VERSION|CILIUM_VERSION)=' "${REPO_ROOT}/src/bootstrap/envs.sh")"
+eval "$(grep -E '^export (K8S_VERSION|CILIUM_VERSION)=' "${REPO_ROOT}/src/bootstrap/envs.sh")"
 
 CLUSTER_NAME="${CLUSTER_NAME:-corabia}"
 WORKERS="${WORKERS:-1}"
 CNI="${CNI:-kindnet}"
-KIND_NODE_IMAGE="${KIND_NODE_IMAGE:-kindest/node:v${K8S_VERSION}.${K8S_PATCH_VERSION}}"
+KIND_NODE_IMAGE="${KIND_NODE_IMAGE:-${KIND_DEFAULT_NODE_IMAGE}}"
+
+# Keep the same Kubernetes minor version as the AWS cluster
+if [[ "${KIND_NODE_IMAGE}" != *":v${K8S_VERSION}."* ]]; then
+    echo "${KIND_NODE_IMAGE} does not match K8S_VERSION=${K8S_VERSION} from envs.sh;" \
+         "update KIND_DEFAULT_NODE_IMAGE in $0 or set KIND_NODE_IMAGE" >&2
+    exit 1
+fi
 
 for tool in docker kind kubectl; do
     command -v "${tool}" > /dev/null || { echo "missing: ${tool}" >&2; exit 1; }
