@@ -6,3 +6,5 @@ This repository provides help to run a minimum best-practice Kubernetes Cluster 
 It can be extended for production usage.
 
 AWS Cloud setup [link](./docs/aws/overview.md).
+
+Local kind setup [link](./infra/kind/README.md).
