@@ -128,6 +128,12 @@ resource "aws_instance" "control-plane" {
   associate_public_ip_address = false
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]
   depends_on                  = [aws_internet_gateway.gw]
+
+  root_block_device {
+    volume_size = 15  # GB
+    volume_type = "gp3"
+  }
+
   tags = {
     Name = "${var.cluster-name}-control-plane"
   }
@@ -204,7 +210,8 @@ resource "aws_instance" "node" {
   depends_on                  = [null_resource.control-plane-config]
 
   root_block_device {
-    volume_size = 10  # GB
+    volume_size = 15  # GB
+    volume_type = "gp3"
   }
 
   tags = {
