@@ -4,7 +4,7 @@
 # trivy, kube-bench, syft, cosign, kube-linter and sysdig.
 
 set -u
-source "${ENVS_FILE:-/src/bootstrap/envs.sh}"
+source /src/bootstrap/envs.sh
 
 : "${TRIVY_VERSION:?missing in envs.sh}"
 : "${KUBE_BENCH_VERSION:?missing in envs.sh}"

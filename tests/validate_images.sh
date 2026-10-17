@@ -8,7 +8,8 @@ set -o pipefail
 allowed_registries="ghcr.io\|k8s.gcr.io\|registry.k8s.io\|quay.io"
 
 # no dockerhub images
-images=$(grep -RniI 'image:' . --exclude-dir='dockerhub' --exclude-dir='tests' | cut -d ':' -f4,5 | sort -u  | sed 's/"//g' | sort -u | grep -v $allowed_registries)
+# match the YAML image: key only, not shell expansions like ${KIND_NODE_IMAGE:-...}
+images=$(grep -RnIE '(^|[[:space:]"-])image:' . --exclude-dir='dockerhub' --exclude-dir='tests' | cut -d ':' -f4,5 | sort -u  | sed 's/"//g' | sort -u | grep -v $allowed_registries)
 
 if [ "$images" != "" ]; then
     echo "The following dockerhub images found in docker hub and they might need to by synced to ghcr.io:"
