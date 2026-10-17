@@ -1,0 +1,4 @@
+# Previously installed as a subchart of the Kubernetes Dashboard.
+args:
+- --kubelet-preferred-address-types=InternalIP
+- --kubelet-insecure-tls

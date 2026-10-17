@@ -128,6 +128,12 @@ resource "aws_instance" "control-plane" {
   associate_public_ip_address = false
   vpc_security_group_ids      = [aws_security_group.kubernetes.id]
   depends_on                  = [aws_internet_gateway.gw]
+
+  root_block_device {
+    volume_size = 15  # GB
+    volume_type = "gp3"
+  }
+
   tags = {
     Name = "${var.cluster-name}-control-plane"
   }
@@ -187,6 +193,7 @@ resource "null_resource" "control-plane-config" {
       "sudo /bin/bash /src/bootstrap/common.sh",
       "sudo /bin/bash /src/bootstrap/nfs.sh",
       "sudo /bin/bash /src/bootstrap/control-plane.sh",
+      "sudo /bin/bash /src/bootstrap/security-tools.sh || echo 'WARNING: some security tools failed to install'",
     ]
   }
 }
@@ -204,7 +211,8 @@ resource "aws_instance" "node" {
   depends_on                  = [null_resource.control-plane-config]
 
   root_block_device {
-    volume_size = 10  # GB
+    volume_size = 15  # GB
+    volume_type = "gp3"
   }
 
   tags = {
@@ -240,6 +248,7 @@ resource "aws_instance" "node" {
       "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/bootstrap/envs.sh",
       "sudo /bin/bash /src/bootstrap/common.sh",
       "sudo /bin/bash /src/bootstrap/node.sh",
+      "sudo /bin/bash /src/bootstrap/security-tools.sh || echo 'WARNING: some security tools failed to install'",
     ]
   }
 }

@@ -34,20 +34,28 @@ kubectl apply -f /src/addons/envoy-gateway/custom.yaml
 sed -i -e "s'hubble-ui.clusterx.qedzone.ro'hubble-ui.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/addons/cilium/custom.yaml
 kubectl apply -f /src/addons/cilium/custom.yaml
 
-# Deploy Kubernetes Dashboard
-helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+# Deploy Metrics Server
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 helm repo update
 helm upgrade \
-    --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard \
-    --create-namespace \
-    --namespace dashboard \
-    --version "${DASHBOARD_VERSION}" \
-    --set app.ingress.hosts[0]="${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}" \
-    -f /src/addons/dashboard/helm-values.yaml
+    --install metrics-server metrics-server/metrics-server \
+    --namespace kube-system \
+    --version "${METRICS_SERVER_VERSION}" \
+    -f /src/addons/metrics-server/helm-values.yaml
 
-# Deploy Kubernetes Dashboard HTTPRoute
-sed -i -e "s'dashboard.clusterx.qedzone.ro'dashboard.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/addons/dashboard/custom.yaml
-kubectl apply -f /src/addons/dashboard/custom.yaml
+# Deploy Headlamp (replaces the archived Kubernetes Dashboard)
+helm repo add headlamp https://kubernetes-sigs.github.io/headlamp/
+helm repo update
+helm upgrade \
+    --install headlamp headlamp/headlamp \
+    --create-namespace \
+    --namespace headlamp \
+    --version "${HEADLAMP_VERSION}" \
+    -f /src/addons/headlamp/helm-values.yaml
+
+# Deploy Headlamp HTTPRoute
+sed -i -e "s'dashboard.clusterx.qedzone.ro'dashboard.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/addons/headlamp/custom.yaml
+kubectl apply -f /src/addons/headlamp/custom.yaml
 
 # Scale coredns to 1 replica
 kubectl -n kube-system scale deployment coredns --replicas=1
@@ -62,6 +70,6 @@ kubectl -n default create token --duration=0s cluster-admin > /output/cluster-ad
 # Final output
 ln -s /output/cluster-admin-token /root/cluster-admin-token
 echo "-------------------------------------------------------------"
-echo "Use this token to login to the kubernetes dashboard:"
+echo "Use this token to login to Headlamp (https://dashboard.${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}):"
 cat /root/cluster-admin-token
 echo "Enjoy."
