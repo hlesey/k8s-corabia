@@ -193,6 +193,7 @@ resource "null_resource" "control-plane-config" {
       "sudo /bin/bash /src/bootstrap/common.sh",
       "sudo /bin/bash /src/bootstrap/nfs.sh",
       "sudo /bin/bash /src/bootstrap/control-plane.sh",
+      "sudo /bin/bash /src/bootstrap/security-tools.sh || echo 'WARNING: some security tools failed to install'",
     ]
   }
 }
@@ -247,6 +248,7 @@ resource "aws_instance" "node" {
       "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/bootstrap/envs.sh",
       "sudo /bin/bash /src/bootstrap/common.sh",
       "sudo /bin/bash /src/bootstrap/node.sh",
+      "sudo /bin/bash /src/bootstrap/security-tools.sh || echo 'WARNING: some security tools failed to install'",
     ]
   }
 }
