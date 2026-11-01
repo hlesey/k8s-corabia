@@ -19,6 +19,7 @@ export SYFT_VERSION="1.33.0"  # https://github.com/anchore/syft/releases
 export COSIGN_VERSION="3.1.3"  # https://github.com/sigstore/cosign/releases
 export KUBE_LINTER_VERSION="0.8.3"  # https://github.com/stackrox/kube-linter/releases
 export SYSDIG_VERSION="0.41.4"  # https://github.com/draios/sysdig/releases
+export KUBESEC_VERSION="2.15.0"  # https://github.com/controlplaneio/kubesec/releases
 # end of security tools
 
 # cluster config
