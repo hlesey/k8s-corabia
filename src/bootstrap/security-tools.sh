@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Install the security tools used for CKS
-# trivy, kube-bench, syft, cosign, kube-linter and sysdig.
+# trivy, kube-bench, syft, cosign, kube-linter, sysdig and kubesec.
 
 set -u
 source /src/bootstrap/envs.sh
@@ -12,6 +12,7 @@ source /src/bootstrap/envs.sh
 : "${COSIGN_VERSION:?missing in envs.sh}"
 : "${KUBE_LINTER_VERSION:?missing in envs.sh}"
 : "${SYSDIG_VERSION:?missing in envs.sh}"
+: "${KUBESEC_VERSION:?missing in envs.sh}"
 
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=l  # never let needrestart restart kubelet or crio
@@ -77,9 +78,17 @@ install_sysdig() {
         apt-get install -y -qq "${WORK}/${a}" > /dev/null
 }
 
+install_kubesec() {
+    local a="kubesec_linux_${ARCH}.tar.gz"
+    fetch controlplaneio/kubesec "v${KUBESEC_VERSION}" "${a}" &&
+        tar -xzf "${WORK}/${a}" -C "${WORK}" kubesec &&
+        install -m 0755 "${WORK}/kubesec" /usr/local/bin/kubesec
+}
+
 failed=()
 for tool in trivy:TRIVY_VERSION kube-bench:KUBE_BENCH_VERSION syft:SYFT_VERSION \
-            cosign:COSIGN_VERSION kube-linter:KUBE_LINTER_VERSION sysdig:SYSDIG_VERSION; do
+            cosign:COSIGN_VERSION kube-linter:KUBE_LINTER_VERSION sysdig:SYSDIG_VERSION \
+            kubesec:KUBESEC_VERSION; do
     name=${tool%%:*}
     var=${tool#*:}
     version=${!var}
