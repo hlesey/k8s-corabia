@@ -11,7 +11,7 @@ setup your local machine to connect to it.
   * [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
   * [VSCode](https://code.visualstudio.com/download)
 * Windows:
-  * [git bash v2.52.0](https://github.com/git-for-windows/git/releases/download/v2.52.0.windows.1/Git-2.52.0-64-bit.exe)
+  * [git bash v2.56.0](https://github.com/git-for-windows/git/releases/download/v2.56.0.windows.4/Git-2.56.0.4-64-bit.exe)
   * [VSCode](https://code.visualstudio.com/download)
 * Linux:
   * [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
@@ -60,22 +60,21 @@ After that, run the following command to load the new shell configuration:
 
 ### 7. You need internet connectivity and *be able to access the internet on the following ports*
 
-* TCP/30080
-* TCP/30443
+* TCP/80 and TCP/443 (applications exposed through the Gateway)
 * TCP/300XX ( where XX represents your birth day :) )
 * TCP/6443
 * TCP/22
 
 You can use `http://portquiz.net:<port number>` for testing the connectivity.
 
-Example: <http://portquiz.net:30080> tests if 30080/TCP port is opened for egress.
+Example: <http://portquiz.net:30001> tests if 30001/TCP port is opened for egress.
 To verify, open the link in your browser and check if the page is displayed.
 
 Another way to verify via the command line by executing:
 
 ```bash
-❯ curl http://portquiz.net:30080
-Port 30080 test successful!
+❯ curl http://portquiz.net:30001
+Port 30001 test successful!
 Your IP: 188.25.190.205
 ```
 
