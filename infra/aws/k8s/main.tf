@@ -8,7 +8,7 @@ locals {
   # adjust cluster lists based on your needs
   clusters = {
     cluster0 = {
-      allowed_cidr_blocks = "0.0.0.0/0",
+      allowed_cidr_blocks = "130.248.80.10/32,5.12.84.42/32",
     },
     # cluster1 = {
     #   allowed_cidr_blocks = "0.0.0.0/0",

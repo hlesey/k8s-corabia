@@ -5,6 +5,7 @@ resource "local_file" "kubeconfig" {
 }
 
 output "cluster_info" {
+  sensitive = true
   value = [
     for name in module.clusters : {
       cluster-name : name.cluster-name
