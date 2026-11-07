@@ -65,18 +65,24 @@ After that, run the following command to load the new shell configuration:
 * TCP/6443
 * TCP/22
 
-You can use `http://portquiz.net:<port number>` for testing the connectivity.
+You can use `http://open.zorinaq.com:<port number>` for testing the connectivity.
+The server listens on all TCP ports and answers with the port number.
 
-Example: <http://portquiz.net:30001> tests if 30001/TCP port is opened for egress.
-To verify, open the link in your browser and check if the page is displayed.
+Example: <http://open.zorinaq.com:30001> tests if 30001/TCP port is opened for egress.
+To verify, open the link in your browser and check if the page says `Yep, port 30001 is open.`
 
 Another way to verify via the command line by executing:
 
 ```bash
-❯ curl http://portquiz.net:30001
-Port 30001 test successful!
-Your IP: 188.25.190.205
+❯ curl -m 10 http://open.zorinaq.com:30001
+Yep, port 30001 is open. <a href="http://blog.zorinaq.com/65k-open-tcp-ports-on-openzorinaqcom/">About...</a>
 ```
+
+If the command hangs until the timeout or fails with `Connection refused`, the port is blocked by your network (firewall, proxy or VPN).
+
+> **Note:** browsers refuse to open some ports, such as TCP/22 (`ERR_UNSAFE_PORT` in Chrome,
+> "This address is restricted" in Firefox), even if your network allows them.
+> Test TCP/22 with `curl` from the terminal (git bash on Windows), not from the browser.
 
 Do the same for the remaining ports from the above mentioned ports list.
 
