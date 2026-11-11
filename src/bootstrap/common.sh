@@ -22,7 +22,8 @@ fi
 # install dependencies
 apt-get update > /dev/null
 yes | apt-get install -yq iptables arptables ebtables nfs-kernel-server nfs-common apt-transport-https ntp \
-                   telnet jq dos2unix ca-certificates curl gnupg lsb-release gpg software-properties-common > /dev/null
+                   telnet jq dos2unix ca-certificates curl gnupg lsb-release gpg software-properties-common \
+                   apparmor-utils > /dev/null
 
 # install cri-o
 # https://github.com/cri-o/packaging/blob/main/README.md#distributions-using-deb-packages
