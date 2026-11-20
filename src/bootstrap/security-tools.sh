@@ -6,6 +6,11 @@
 set -u
 source /src/bootstrap/envs.sh
 
+if [[ "${ENABLE_SECURITY_TOOL:-false}" != "true" ]]; then
+    echo "security-tools: not enabled (ENABLE_SECURITY_TOOL=true in envs.sh); skipping"
+    exit 0
+fi
+
 : "${TRIVY_VERSION:?missing in envs.sh}"
 : "${KUBE_BENCH_VERSION:?missing in envs.sh}"
 : "${SYFT_VERSION:?missing in envs.sh}"

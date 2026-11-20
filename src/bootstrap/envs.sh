@@ -12,7 +12,8 @@ export METRICS_SERVER_VERSION="3.14.0" # https://github.com/kubernetes-sigs/metr
 export HEADLAMP_VERSION="0.45.0" # https://github.com/kubernetes-sigs/headlamp/releases
 # end of addons
 
-# security tools (installed by secucirty-tools.sh))
+# security tools (installed by security-tools.sh, if ENABLE_SECURITY_TOOL=true)
+export ENABLE_SECURITY_TOOL=false
 export TRIVY_VERSION="0.74.0"  # https://github.com/aquasecurity/trivy/releases
 export KUBE_BENCH_VERSION="0.16.0"  # https://github.com/aquasecurity/kube-bench/releases
 export SYFT_VERSION="1.33.0"  # https://github.com/anchore/syft/releases
