@@ -80,21 +80,17 @@ metadata:
   namespace: envoy-gateway
 spec:
   gatewayClassName: envoy-gateway
-  addresses:
-  - type: Hostname
-    value: clusterx.qedzone.ro
   listeners:
+    # port 80 only admits the redirect route below; app routes attach to https
     - name: http
       port: 80
       protocol: HTTP
-      hostname: "*.clusterx.qedzone.ro"
       allowedRoutes:
         namespaces:
-          from: All
+          from: Same
     - name: https
       port: 443
       protocol: HTTPS
-      hostname: "*.clusterx.qedzone.ro"
       allowedRoutes:
         namespaces:
           from: All
@@ -103,3 +99,36 @@ spec:
         certificateRefs:
         - kind: Secret
           name: envoy-gateway
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-to-https
+  namespace: envoy-gateway
+spec:
+  parentRefs:
+  - name: envoy-gateway
+    sectionName: http
+  rules:
+  - filters:
+    - type: RequestRedirect
+      requestRedirect:
+        scheme: https
+        statusCode: 301
+---
+# Listeners share one certificate, so Envoy Gateway drops h2 from ALPN by default;
+# HTTP/1.1 caps the browser at 6 connections so switch to h2.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: ClientTrafficPolicy
+metadata:
+  name: enable-h2
+  namespace: envoy-gateway
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: envoy-gateway
+  tls:
+    alpnProtocols:
+    - h2
+    - http/1.1
