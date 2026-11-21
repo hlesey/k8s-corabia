@@ -1,5 +1,28 @@
+terraform {
+  required_providers {
+    acme = {
+      source  = "vancluever/acme"
+      version = "~> 3.0"
+    }
+  }
+}
+
 provider "aws" {
   region = var.region
+}
+
+provider "acme" {
+  server_url = var.acme-server-url
+}
+
+# One Let's Encrypt account for all clusters: new accounts are limited to 10 per IP per 3 hours.
+resource "tls_private_key" "acme" {
+  algorithm   = "ECDSA"
+  ecdsa_curve = "P256"
+}
+
+resource "acme_registration" "main" {
+  account_key_pem = tls_private_key.acme.private_key_pem
 }
 
 locals {
@@ -9,6 +32,7 @@ locals {
   clusters = {
     cluster0 = {
       allowed_cidr_blocks = "0.0.0.0/0",
+      extra_sans          = ["ctf.qedzone.ro"],
     },
     # cluster1 = {
     #   allowed_cidr_blocks = "0.0.0.0/0",
@@ -83,9 +107,11 @@ module "clusters" {
   source       = "./k8s_module"
   cluster-name = each.key
 
-  az                  = local.az_list[tonumber(substr(each.key, 7, 2)) % 3]
-  region              = var.region
-  allowed-cidr-blocks = each.value.allowed_cidr_blocks
+  az                   = local.az_list[tonumber(substr(each.key, 7, 2)) % 3]
+  region               = var.region
+  allowed-cidr-blocks  = each.value.allowed_cidr_blocks
+  extra-sans           = lookup(each.value, "extra_sans", [])
+  acme-account-key-pem = acme_registration.main.account_key_pem
 
   ssh-key-name = var.ssh-key-name
   ssh-key-path = var.ssh-key-path

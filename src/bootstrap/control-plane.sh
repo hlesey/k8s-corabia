@@ -26,6 +26,9 @@ helm upgrade \
     --create-namespace \
     -f /src/addons/envoy-gateway/helm-values.yaml
 
+# Let's Encrypt certificate for the Gateway https listener, issued by Terraform (infra/aws/k8s/k8s_module/main.tf)
+kubectl create secret tls envoy-gateway-tls -n envoy-gateway --cert=/src/tls.crt --key=/src/tls.key
+
 # Deploy Envoy Gateway Gateway Class and Gateway
 sed -i -e "s'clusterx.qedzone.ro'${CONTROL_PLANE_PUBLIC_EXTERNAL_DNS}'g" /src/addons/envoy-gateway/custom.yaml
 kubectl apply -f /src/addons/envoy-gateway/custom.yaml

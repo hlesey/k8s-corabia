@@ -152,9 +152,7 @@ if [[ "${GATEWAY}" == "envoy" ]]; then
         -f "${ADDONS}/envoy-gateway/helm-values.yaml" \
         --wait
 
-    # Self-signed wildcard certificate for the Gateway https listener.
-    # custom.yaml references Secret "envoy-gateway", but that is Envoy Gateway's own control-plane (xDS) certificate,
-    # created by its certgen job: overwriting it breaks the proxy, so use a separate Secret.
+    # Self-signed wildcard certificate for the Gateway https listener (AWS gets a Let's Encrypt one from Terraform).
     tmp="$(mktemp -d)"
     trap 'rm -rf "${tmp}"' EXIT
     cat > "${tmp}/openssl.cnf" <<CNF
@@ -172,9 +170,7 @@ CNF
     k -n envoy-gateway create secret tls envoy-gateway-tls --cert="${tmp}/tls.crt" --key="${tmp}/tls.key" \
         --dry-run=client -o yaml | k apply -f -
 
-    sed -e "s'clusterx.qedzone.ro'${GATEWAY_DOMAIN}'g" \
-        -e '/certificateRefs:/,/name:/ s/name: envoy-gateway$/name: envoy-gateway-tls/' \
-        "${ADDONS}/envoy-gateway/custom.yaml" | k apply -f -
+    sed -e "s'clusterx.qedzone.ro'${GATEWAY_DOMAIN}'g" "${ADDONS}/envoy-gateway/custom.yaml" | k apply -f -
     # Wait for the Envoy proxy pod rather than the Gateway's Programmed condition, which the Hostname address in
     # custom.yaml may keep False although traffic is served (control-plane.sh on AWS does not wait for it either)
     proxy_selector="gateway.envoyproxy.io/owning-gateway-name=envoy-gateway"

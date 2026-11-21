@@ -18,8 +18,8 @@ variable "az" {
 
 variable "instance-ami" {
   # Get new AMI from https://cloud-images.ubuntu.com/locator/ec2/
-  default     = "ami-099ed1bb56a83f2e2" # Ubuntu Noble Numbat	24.04 LTS for eu-west-1 region, arm64 arch and 	hvm:ebs-ssd-gp3 instance type
-              # "ami-0e63f595a004bf5e4" equivalent for eu-west-2
+  default = "ami-099ed1bb56a83f2e2" # Ubuntu Noble Numbat	24.04 LTS for eu-west-1 region, arm64 arch and 	hvm:ebs-ssd-gp3 instance type
+  # "ami-0e63f595a004bf5e4" equivalent for eu-west-2
   description = "Which ami is used"
 }
 
@@ -37,4 +37,15 @@ variable "ssh-key-path" {
 }
 
 variable "ssh-key-name" {
-} 
+}
+
+variable "extra-sans" {
+  description = "Extra DNS names added to the gateway certificate."
+  type        = list(string)
+  default     = []
+}
+
+variable "acme-account-key-pem" {
+  description = "Let's Encrypt account key shared by all clusters (see root main.tf)."
+  sensitive   = true
+}
