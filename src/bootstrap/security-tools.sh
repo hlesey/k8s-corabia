@@ -77,10 +77,14 @@ install_kube_linter() {
         install -m 0755 "${WORK}/${a}" /usr/local/bin/kube-linter
 }
 
+# Install without compiling the kernel module
 install_sysdig() {
-    local a="sysdig-${SYSDIG_VERSION}-${UNAME_M}.deb"
+    local a="sysdig-${SYSDIG_VERSION}-${UNAME_M}.deb" root="${WORK}/sysdig"
     fetch draios/sysdig "${SYSDIG_VERSION}" "${a}" &&
-        apt-get install -y -qq "${WORK}/${a}" > /dev/null
+        dpkg-deb -x "${WORK}/${a}" "${root}" &&
+        install -m 0755 "${root}/usr/bin/sysdig" "${root}/usr/bin/csysdig" /usr/local/bin/ &&
+        install -d /usr/share/sysdig &&
+        cp -r "${root}/usr/share/sysdig/." /usr/share/sysdig/
 }
 
 install_kubesec() {
