@@ -17,3 +17,8 @@ variable "ssh-key" {
 variable "ssh-key-name" {
   default = "test-ssh"
 }
+
+variable "acme-server-url" {
+  # Use https://acme-staging-v02.api.letsencrypt.org/directory while iterating on the bootstrap.
+  default = "https://acme-v02.api.letsencrypt.org/directory"
+}

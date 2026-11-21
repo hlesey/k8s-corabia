@@ -4,6 +4,28 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 2.7.0"
     }
+    acme = {
+      source  = "vancluever/acme"
+      version = "~> 3.0"
+    }
+  }
+}
+
+# Gateway TLS certificate, issued here so the Cloudflare token never reaches the cluster.
+# DNS-01 reads CLOUDFLARE_DNS_API_TOKEN from the environment running terraform.
+resource "acme_certificate" "gateway" {
+  account_key_pem           = var.acme-account-key-pem
+  common_name               = "${var.cluster-name}.qedzone.ro"
+  subject_alternative_names = concat(["*.${var.cluster-name}.qedzone.ro"], var.extra-sans)
+  # Propagation pre-check via IPv4 public resolvers only. The default also queries Cloudflare's authoritative
+  # servers over IPv6, which times out on networks with a broken IPv6 path and burns the 2 min timeout per name.
+  # The delay lets Cloudflare propagate first, so the resolvers never cache a negative answer.
+  recursive_nameservers             = ["1.1.1.1:53", "8.8.8.8:53"]
+  disable_authoritative_propagation = true
+  pre_check_delay                   = 5
+
+  dns_challenge {
+    provider = "cloudflare"
   }
 }
 
@@ -130,7 +152,7 @@ resource "aws_instance" "control-plane" {
   depends_on                  = [aws_internet_gateway.gw]
 
   root_block_device {
-    volume_size = 15  # GB
+    volume_size = 15 # GB
     volume_type = "gp3"
   }
 
@@ -185,6 +207,16 @@ resource "null_resource" "control-plane-config" {
     destination = "/src/"
   }
 
+  provisioner "file" {
+    content     = "${acme_certificate.gateway.certificate_pem}${acme_certificate.gateway.issuer_pem}"
+    destination = "/src/tls.crt"
+  }
+
+  provisioner "file" {
+    content     = acme_certificate.gateway.private_key_pem
+    destination = "/src/tls.key"
+  }
+
   provisioner "remote-exec" {
     inline = [
       "sudo echo 'export CONTROL_PLANE_IP=${aws_eip.control-plane.private_ip}' >> /src/bootstrap/envs.sh",
@@ -211,7 +243,7 @@ resource "aws_instance" "node" {
   depends_on                  = [null_resource.control-plane-config]
 
   root_block_device {
-    volume_size = 15  # GB
+    volume_size = 15 # GB
     volume_type = "gp3"
   }
 
@@ -273,15 +305,15 @@ resource "null_resource" "node-labels" {
 }
 
 module "kubeconfig" {
-  depends_on = [null_resource.control-plane-config]
-  source     = "Invicton-Labs/shell-resource/external"
-  command_unix    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo sed -e 's#${aws_eip.control-plane.private_ip}#${aws_eip.control-plane.public_dns}#g' /output/kubeconfig.yaml"
+  depends_on     = [null_resource.control-plane-config]
+  source         = "Invicton-Labs/shell-resource/external"
+  command_unix   = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo sed -e 's#${aws_eip.control-plane.private_ip}#${aws_eip.control-plane.public_dns}#g' /output/kubeconfig.yaml"
   timeout_create = 120
 }
 
 module "cluster-admin-token" {
-  depends_on = [null_resource.control-plane-config]
-  source     = "Invicton-Labs/shell-resource/external"
-  command_unix    = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo cat /output/cluster-admin-token"
+  depends_on     = [null_resource.control-plane-config]
+  source         = "Invicton-Labs/shell-resource/external"
+  command_unix   = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.ssh-key-path} ubuntu@${aws_eip.control-plane.public_ip} sudo cat /output/cluster-admin-token"
   timeout_create = 120
 }
