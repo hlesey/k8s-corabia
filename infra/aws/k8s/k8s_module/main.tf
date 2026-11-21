@@ -17,9 +17,6 @@ resource "acme_certificate" "gateway" {
   account_key_pem           = var.acme-account-key-pem
   common_name               = "${var.cluster-name}.qedzone.ro"
   subject_alternative_names = concat(["*.${var.cluster-name}.qedzone.ro"], var.extra-sans)
-  # Propagation pre-check via IPv4 public resolvers only. The default also queries Cloudflare's authoritative
-  # servers over IPv6, which times out on networks with a broken IPv6 path and burns the 2 min timeout per name.
-  # The delay lets Cloudflare propagate first, so the resolvers never cache a negative answer.
   recursive_nameservers             = ["1.1.1.1:53", "8.8.8.8:53"]
   disable_authoritative_propagation = true
   pre_check_delay                   = 5
