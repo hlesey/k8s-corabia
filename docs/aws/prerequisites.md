@@ -58,6 +58,9 @@ After that, run the following command to load the new shell configuration:
 * Linux:
   * `source ~/.bashrc`
 
+**Only for the Kubernetes Security course:** also install the security tools; 
+executed from `labs` folder: `./k8s-corabia/src/tools/configure-sec-tools.sh`.
+
 ### 7. You need internet connectivity and *be able to access the internet on the following ports*
 
 * TCP/80 and TCP/443 (applications exposed through the Gateway)
